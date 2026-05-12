@@ -1,0 +1,817 @@
+import { useState } from "react";
+
+const FONT_URL = "https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap";
+
+const EM = {
+  happy:   { e:"😊", c:"#FFD166", l:"Happy",    bg:"#FFF9E6" },
+  excited: { e:"🤩", c:"#FF6B9D", l:"Excited",  bg:"#FFF0F8" },
+  calm:    { e:"😌", c:"#6BCB77", l:"Calm",      bg:"#F0FAF2" },
+  anxious: { e:"😰", c:"#FFB347", l:"Anxious",   bg:"#FFF8EC" },
+  sad:     { e:"😢", c:"#74B9FF", l:"Sad",       bg:"#EEF6FF" },
+  tired:   { e:"😴", c:"#B8A9E0", l:"Tired",     bg:"#F5F2FF" },
+  angry:   { e:"😤", c:"#FF6B6B", l:"Angry",     bg:"#FFF0F0" },
+  content: { e:"🙂", c:"#55EFC4", l:"Content",   bg:"#EDFAF5" },
+  grateful:{ e:"🥰", c:"#FD79A8", l:"Grateful",  bg:"#FFF0F8" },
+  neutral: { e:"😐", c:"#B2BEC3", l:"Neutral",   bg:"#F5F5F5" },
+};
+
+const QS = [
+  { id:"mood",   q:"How's your mood right now?",   icon:"💭", opts:["😞 Very Low","😔 Low","😐 Neutral","🙂 Good","😄 Great"] },
+  { id:"sleep",  q:"How did you sleep?",            icon:"🌙", opts:["😫 Terrible","😕 Poor","😶 OK","🙂 Good","🤩 Amazing"] },
+  { id:"energy", q:"Energy level today?",           icon:"⚡", opts:["💀 Drained","😩 Low","😐 Moderate","😊 Energised","🚀 Pumped!"] },
+  { id:"social", q:"Ready to socialise?",           icon:"👥", opts:["🔇 Need space","😶 Prefer solo","🤷 Open","😊 Social","🎉 Very social"] },
+];
+
+const FRIENDS = [
+  { name:"Alex",  av:"🧑",     em:"happy",   land:"Sunset Valley",  online:true  },
+  { name:"Mia",   av:"👩",     em:"calm",    land:"Crystal Cove",   online:true  },
+  { name:"Kai",   av:"🧑‍🦱",  em:"tired",   land:"Misty Hills",    online:false },
+  { name:"Zoe",   av:"👩‍🦰",  em:"excited", land:"Starlight Isle", online:true  },
+];
+
+const ACTS = [
+  { id:1, t:"Morning Dog Walk",    host:"wanderer_99",  date:"Sun 11 May • 7:00 AM",   loc:"East Coast Park",  joined:4,  max:8,  icon:"🐕" },
+  { id:2, t:"Mental Health Circle",host:"mindful_jo",   date:"Sat 10 May • 6:00 PM",   loc:"Online Meeting",   joined:12, max:20, icon:"🧠" },
+  { id:3, t:"Sunset Yoga",          host:"yogini_sun",  date:"Sun 11 May • 6:30 PM",   loc:"Marina Barrage",   joined:6,  max:10, icon:"🧘" },
+  { id:4, t:"Board Game Café",      host:"gamemaster_k",date:"Sat 17 May • 2:00 PM",   loc:"Meeples Café",     joined:3,  max:6,  icon:"🎲" },
+];
+
+function AvatarFace({ emotion="neutral", size=80 }) {
+  const sc = size / 90;
+  const m = {
+    happy:"M 30 54 Q 40 64 50 54", excited:"M 28 53 Q 40 65 52 53",
+    calm:"M 32 54 Q 40 59 48 54",  anxious:"M 32 57 Q 40 51 48 57",
+    sad:"M 30 59 Q 40 51 50 59",   tired:"M 32 55 L 48 55",
+    angry:"M 30 57 Q 40 49 50 57", content:"M 32 53 Q 40 59 48 53",
+    grateful:"M 28 53 Q 40 65 52 53", neutral:"M 32 55 L 48 55",
+  };
+  const ec = (EM[emotion]||EM.neutral).c;
+  return (
+    <svg width={size} height={size} viewBox="0 0 90 90" style={{filter:`drop-shadow(0 ${3*sc}px ${8*sc}px rgba(0,0,0,0.13))`}}>
+      <ellipse cx="45" cy="21" rx="27" ry="13" fill={ec}/>
+      <circle cx="45" cy="45" r="27" fill="#FDDBB4"/>
+      <circle cx="17" cy="45" r="7" fill="#F5C794"/>
+      <circle cx="73" cy="45" r="7" fill="#F5C794"/>
+      <ellipse cx="25" cy="52" rx="7" ry="4" fill="#FFB3C6" opacity="0.5"/>
+      <ellipse cx="65" cy="52" rx="7" ry="4" fill="#FFB3C6" opacity="0.5"/>
+      {emotion === "tired" ? (
+        <>
+          <path d="M 29 41 Q 36 37 43 41" stroke="#5C3A1E" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+          <path d="M 47 41 Q 54 37 61 41" stroke="#5C3A1E" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+        </>
+      ) : (
+        <>
+          <ellipse cx="35" cy="43" rx="5.5" ry="6" fill="#4A2C2A"/>
+          <ellipse cx="55" cy="43" rx="5.5" ry="6" fill="#4A2C2A"/>
+          <circle cx="37" cy="41" r="1.8" fill="white"/>
+          <circle cx="57" cy="41" r="1.8" fill="white"/>
+        </>
+      )}
+      {emotion === "angry" && (
+        <>
+          <path d="M 28 36 L 40 39" stroke="#4A2C2A" strokeWidth="2" strokeLinecap="round"/>
+          <path d="M 50 39 L 62 36" stroke="#4A2C2A" strokeWidth="2" strokeLinecap="round"/>
+        </>
+      )}
+      {emotion === "anxious" && (
+        <>
+          <path d="M 29 37 Q 35 34 41 37" stroke="#4A2C2A" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+          <path d="M 49 37 Q 55 34 61 37" stroke="#4A2C2A" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+        </>
+      )}
+      <path d={m[emotion]||m.neutral} stroke="#8B5E3C" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+      {emotion === "sad" && (
+        <>
+          <path d="M 35 50 Q 33 56 35 59" stroke="#74B9FF" strokeWidth="2" fill="none" strokeLinecap="round"/>
+          <path d="M 55 50 Q 57 56 55 59" stroke="#74B9FF" strokeWidth="2" fill="none" strokeLinecap="round"/>
+        </>
+      )}
+      {emotion === "excited" && (
+        <>
+          <path d="M 22 30 L 24 26 M 19 27 L 24 28" stroke={ec} strokeWidth="1.5" strokeLinecap="round"/>
+          <path d="M 64 28 L 66 24 M 61 25 L 66 26" stroke={ec} strokeWidth="1.5" strokeLinecap="round"/>
+        </>
+      )}
+      <rect x="31" y="75" width="28" height="13" rx="7" fill={ec} opacity="0.75"/>
+    </svg>
+  );
+}
+
+function Island({ buildings=3, currency=2000 }) {
+  return (
+    <svg viewBox="0 0 300 158" style={{width:"100%",height:"auto",borderRadius:"14px",display:"block"}}>
+      <defs>
+        <linearGradient id="wl_sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#87CEEB"/><stop offset="100%" stopColor="#E8F6FF"/></linearGradient>
+        <linearGradient id="wl_ocean" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#4DD0E1"/><stop offset="100%" stopColor="#0097A7"/></linearGradient>
+        <linearGradient id="wl_grass" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#8BC34A"/><stop offset="100%" stopColor="#558B2F"/></linearGradient>
+      </defs>
+      <rect width="300" height="158" fill="url(#wl_sky)"/>
+      <circle cx="258" cy="28" r="17" fill="#FFD54F" opacity="0.9"/>
+      <g opacity="0.88">
+        <ellipse cx="55" cy="27" rx="27" ry="11" fill="white"/><ellipse cx="74" cy="21" rx="21" ry="10" fill="white"/><ellipse cx="38" cy="24" rx="16" ry="8" fill="white"/>
+      </g>
+      <g opacity="0.88">
+        <ellipse cx="195" cy="33" rx="21" ry="9" fill="white"/><ellipse cx="212" cy="27" rx="17" ry="8" fill="white"/>
+      </g>
+      <ellipse cx="150" cy="166" rx="172" ry="44" fill="url(#wl_ocean)"/>
+      <path d="M 45 136 Q 75 131 105 136 Q 135 141 165 136 Q 195 131 225 136" stroke="white" strokeWidth="1.5" fill="none" opacity="0.25"/>
+      <ellipse cx="150" cy="146" rx="122" ry="37" fill="#F4E4BC"/>
+      <ellipse cx="150" cy="140" rx="108" ry="29" fill="url(#wl_grass)"/>
+      <path d="M 150 156 L 150 122" stroke="#D4B896" strokeWidth="13" strokeLinecap="round" opacity="0.55"/>
+      <rect x="87" y="118" width="29" height="23" rx="3" fill="#FF8A65"/>
+      <polygon points="82,118 121,118 101.5,101" fill="#E64A19"/>
+      <rect x="98" y="128" width="9" height="13" rx="2" fill="#4E342E"/>
+      <rect x="89" y="121" width="7" height="6" rx="1" fill="#B3E5FC"/>
+      <rect x="109" y="121" width="7" height="6" rx="1" fill="#B3E5FC"/>
+      {buildings >= 2 && (
+        <g>
+          <rect x="171" y="113" width="33" height="26" rx="3" fill="#AED581"/>
+          <polygon points="166,113 209,113 187.5,94" fill="#7CB342"/>
+          <rect x="183" y="127" width="9" height="12" rx="2" fill="#4E342E"/>
+          <rect x="172" y="116" width="8" height="7" rx="1" fill="#B3E5FC"/>
+          <rect x="193" y="116" width="8" height="7" rx="1" fill="#B3E5FC"/>
+        </g>
+      )}
+      {buildings >= 3 && (
+        <g>
+          <rect x="130" y="107" width="23" height="31" rx="3" fill="#CE93D8"/>
+          <rect x="127" y="103" width="29" height="9" rx="3" fill="#BA68C8"/>
+          <rect x="136" y="122" width="10" height="16" rx="2" fill="#4A148C"/>
+          <rect x="129" y="108" width="8" height="6" rx="1" fill="#F3E5F5"/>
+          <rect x="151" y="108" width="8" height="6" rx="1" fill="#F3E5F5"/>
+        </g>
+      )}
+      {buildings >= 4 && (
+        <g>
+          <rect x="54" y="122" width="25" height="18" rx="3" fill="#4FC3F7"/>
+          <polygon points="49,122 84,122 66.5,108" fill="#0288D1"/>
+          <rect x="61" y="130" width="7" height="10" rx="2" fill="#4E342E"/>
+        </g>
+      )}
+      <g><circle cx="57" cy="137" r="10" fill="#2E7D32"/><circle cx="57" cy="130" r="8" fill="#388E3C"/><rect x="55" y="139" width="4" height="8" fill="#795548"/></g>
+      <g><circle cx="230" cy="132" r="11" fill="#2E7D32"/><circle cx="230" cy="124" r="9" fill="#388E3C"/><rect x="228" y="135" width="4" height="9" fill="#795548"/></g>
+      <circle cx="75" cy="148" r="3" fill="#FF8FAB"/>
+      <circle cx="82" cy="146" r="2.5" fill="#FFD54F"/>
+      <circle cx="215" cy="147" r="3" fill="#FF8FAB"/>
+      <circle cx="222" cy="149" r="2.5" fill="#CE93D8"/>
+    </svg>
+  );
+}
+
+function WellnessTab({ emotion, setEmotion, currency, setCurrency, streak, setStreak }) {
+  const [step, setStep] = useState("idle");
+  const [qIdx, setQIdx] = useState(0);
+  const [answers, setAnswers] = useState({});
+  const [freeText, setFreeText] = useState("");
+  const [detected, setDetected] = useState(null);
+  const [done, setDone] = useState(false);
+  const [journalMode, setJournalMode] = useState(false);
+  const [jText, setJText] = useState("");
+  const [entries, setEntries] = useState([
+    { date:"May 9",    text:"Today was wonderful — walked in the sunshine. Small moments of joy.",  em:"happy"   },
+    { date:"May 8",    text:"Felt overwhelmed but finished the project. Proud of how I pushed through.", em:"content" },
+  ]);
+  const e = EM[emotion]||EM.neutral;
+
+  async function submit() {
+    if (!freeText.trim()) return;
+    setStep("loading");
+    try {
+      const r = await fetch("https://api.anthropic.com/v1/messages", {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({
+          model:"claude-sonnet-4-20250514", max_tokens:150,
+          messages:[{ role:"user", content:`Detect the primary emotion in this wellness check-in. Reply ONLY with a compact JSON object, no markdown or backticks. Fields: "emotion" (one word from: happy excited calm anxious sad tired angry content grateful neutral), "reason" (4 words max describing why). Text: "${freeText}"` }]
+        })
+      });
+      const d = await r.json();
+      const p = JSON.parse(d.content[0].text.trim());
+      setDetected(p); setEmotion(p.emotion);
+      setCurrency(c => c + 50); setDone(true); setStep("result");
+    } catch {
+      setDetected({ emotion:"neutral", reason:"Noted with care" });
+      setStep("result"); setDone(true);
+    }
+  }
+
+  function answer(v) {
+    const na = { ...answers, [QS[qIdx].id]: v };
+    setAnswers(na);
+    if (qIdx < QS.length - 1) setQIdx(q => q + 1);
+    else setStep("text");
+  }
+
+  function reset() { setStep("idle"); setQIdx(0); setAnswers({}); setFreeText(""); setDetected(null); }
+
+  function saveJournal() {
+    if (!jText.trim()) return;
+    setEntries(prev => [{ date:"Today", text:jText, em:emotion }, ...prev]);
+    setJText(""); setJournalMode(false);
+  }
+
+  if (journalMode) return (
+    <div style={anim}>
+      <div style={row("flex-start")} onClick={() => setJournalMode(false)}>
+        <span style={{cursor:"pointer",fontSize:"20px",marginRight:8}}>←</span>
+        <span style={h2}>📔 Journal Entry</span>
+      </div>
+      <div style={{...card, marginTop:12}}>
+        <div style={label}>TODAY, MAY 10</div>
+        <textarea value={jText} onChange={e => setJText(e.target.value)} autoFocus
+          placeholder="Let your thoughts flow freely... no judgment here 🌿"
+          style={{ width:"100%", minHeight:180, border:"none", outline:"none", fontSize:14, fontFamily:"'Nunito',sans-serif",
+            lineHeight:1.7, color:"#2D3748", resize:"none", background:"transparent" }}/>
+      </div>
+      <div style={{ background:"#E8F5E9", borderRadius:12, padding:"10px 14px", margin:"12px 0",
+        fontSize:12, color:"#388E3C", fontWeight:600, lineHeight:1.5 }}>
+        💡 After a month of entries, your AI companion will share personalised observations subtly through the game — no advice, just warm observations like "You tend to feel better on sunny days!"
+      </div>
+      <button style={{...btn, width:"100%", opacity: jText.trim() ? 1 : 0.4}} onClick={saveJournal}>Save Entry</button>
+    </div>
+  );
+
+  if (step === "questions") {
+    const q = QS[qIdx];
+    return (
+      <div style={anim}>
+        <div style={row("flex-start")}>
+          <span style={{cursor:"pointer",fontSize:"20px",marginRight:8}} onClick={reset}>←</span>
+          <span style={h2}>Morning Check-In</span>
+        </div>
+        <div style={{display:"flex",gap:5,margin:"12px 0 18px"}}>
+          {QS.map((_,i) => <div key={i} style={{flex:1,height:4,borderRadius:4,background: i<=qIdx?"#5B9CF6":"#E2E8F0",transition:"background .3s"}}/>)}
+        </div>
+        <div style={{...card, textAlign:"center"}}>
+          <div style={{fontSize:32,marginBottom:8}}>{q.icon}</div>
+          <div style={{...h2, marginBottom:16}}>{q.q}</div>
+          {q.opts.map((o,i) => (
+            <button key={i} onClick={() => answer(i)} style={{ width:"100%", background:"white", border:"2px solid #EDF2F7",
+              borderRadius:12, padding:"10px 14px", fontSize:13, fontWeight:700, fontFamily:"'Nunito',sans-serif",
+              cursor:"pointer", textAlign:"left", marginBottom:7, color:"#2D3748", transition:"all .15s" }}
+              onMouseOver={e => { e.currentTarget.style.borderColor="#5B9CF6"; e.currentTarget.style.background="#F0F5FF"; }}
+              onMouseOut={e => { e.currentTarget.style.borderColor="#EDF2F7"; e.currentTarget.style.background="white"; }}>
+              {o}
+            </button>
+          ))}
+        </div>
+        <div style={{textAlign:"center",color:"#A0AEC0",fontSize:12,marginTop:10}}>{qIdx+1} of {QS.length}</div>
+      </div>
+    );
+  }
+
+  if (step === "text") return (
+    <div style={anim}>
+      <div style={row("flex-start")}>
+        <span style={{cursor:"pointer",fontSize:"20px",marginRight:8}} onClick={() => setStep("questions")}>←</span>
+        <span style={h2}>One last thing…</span>
+      </div>
+      <div style={{...card, marginTop:12, marginBottom:12}}>
+        <div style={{fontSize:26,textAlign:"center",marginBottom:8}}>💬</div>
+        <div style={{...h3, textAlign:"center",marginBottom:12}}>How are you feeling in your own words?</div>
+        <textarea value={freeText} onChange={e => setFreeText(e.target.value)}
+          placeholder='E.g. "I'm feeling a bit wonky but hopeful…"'
+          style={{ width:"100%", minHeight:100, border:"2px solid #E2E8F0", borderRadius:12,
+            padding:12, fontSize:14, fontFamily:"'Nunito',sans-serif", resize:"none", outline:"none",
+            lineHeight:1.6, color:"#2D3748" }}
+          onFocus={e => e.target.style.borderColor="#5B9CF6"}
+          onBlur={e => e.target.style.borderColor="#E2E8F0"}/>
+        <div style={{fontSize:11,color:"#A0AEC0",marginTop:6}}>🔒 Entirely private — only you can see this</div>
+      </div>
+      <button style={{...btn, width:"100%", opacity: freeText.trim() ? 1 : 0.4}} onClick={submit}>
+        Analyse with AI ✨
+      </button>
+    </div>
+  );
+
+  if (step === "loading") return (
+    <div style={{...anim, display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",height:380,gap:16}}>
+      <div style={{fontSize:52,animation:"pulse 1.5s infinite"}}>🔮</div>
+      <div style={{...h2,color:"#5B9CF6"}}>Reading your feelings…</div>
+      <div style={{color:"#A0AEC0",fontSize:13,textAlign:"center",lineHeight:1.6}}>AI is detecting your emotion<br/>to update your avatar</div>
+      <div style={{width:180,height:4,borderRadius:4,background:"#E2E8F0",overflow:"hidden"}}>
+        <div style={{height:"100%",background:"linear-gradient(90deg,#5B9CF6,#B57BF6)",borderRadius:4,animation:"shimmer 1.2s infinite"}}/>
+      </div>
+    </div>
+  );
+
+  if (step === "result" && detected) {
+    const de = EM[detected.emotion]||EM.neutral;
+    return (
+      <div style={anim}>
+        <div style={{textAlign:"center",marginBottom:16}}>
+          <div style={h1}>Check-in complete! 🎉</div>
+          <div style={{color:"#718096",fontSize:13,marginTop:4}}>+50 🪙 coins earned</div>
+        </div>
+        <div style={{...card, textAlign:"center", background:`linear-gradient(145deg,${de.c}18,white)`, marginBottom:12}}>
+          <div style={{display:"flex",justifyContent:"center",marginBottom:10}}><AvatarFace emotion={detected.emotion} size={88}/></div>
+          <div style={{ display:"inline-flex",alignItems:"center",gap:8,background:`${de.c}33`,
+            borderRadius:50,padding:"5px 14px",marginBottom:6 }}>
+            <span style={{fontSize:20}}>{de.e}</span>
+            <span style={{fontWeight:800,fontSize:16,color:"#2D3748"}}>{de.l}</span>
+          </div>
+          <div style={{color:"#718096",fontSize:13,marginBottom:4}}>{detected.reason}</div>
+          <div style={{color:"#A0AEC0",fontSize:11}}>Your avatar has been updated ✨</div>
+        </div>
+        <div style={{color:"#718096",fontSize:12,fontWeight:700,marginBottom:8}}>Not quite right? Pick an emotion:</div>
+        <div style={{display:"flex",flexWrap:"wrap",gap:5,marginBottom:16}}>
+          {Object.entries(EM).map(([k,v]) => (
+            <button key={k} onClick={() => { setEmotion(k); setDetected({...detected,emotion:k}); }}
+              style={{ background: emotion===k ? `${v.c}33` : "white", border:`2px solid ${emotion===k?v.c:"#EDF2F7"}`,
+                borderRadius:50, padding:"3px 10px", fontSize:11, fontWeight:700, cursor:"pointer",
+                fontFamily:"'Nunito',sans-serif", color:"#2D3748", transition:"all .15s" }}>
+              {v.e} {v.l}
+            </button>
+          ))}
+        </div>
+        <button style={{...btnOutline, width:"100%"}} onClick={reset}>Done</button>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{paddingBottom:20}}>
+      <div style={{marginBottom:14}}>
+        <div style={{...h1,fontFamily:"'Fredoka One',cursive",fontSize:24}}>Good morning! ☀️</div>
+        <div style={{color:"#718096",fontSize:13,fontWeight:600}}>Sunday, 10 May 2026</div>
+      </div>
+
+      <div style={{...card, marginBottom:10,
+        background: done ? "linear-gradient(135deg,#E8F5E9,#F1F8E9)" : "linear-gradient(135deg,#EEF2FF,#E0E7FF)",
+        border: `1.5px solid ${done?"#A5D6A7":"#C7D2FE"}`}}>
+        <div style={row("space-between")}>
+          <div>
+            <div style={{fontWeight:800,fontSize:15,color:"#2D3748",marginBottom:3}}>
+              {done ? "✅ Check-in Complete" : "🌅 Morning Check-In"}
+            </div>
+            <div style={{color:"#718096",fontSize:12}}>
+              {done ? `Feeling ${e.l.toLowerCase()} today` : "How are you feeling today?"}
+            </div>
+          </div>
+          {done
+            ? <span style={{fontSize:28}}>{e.e}</span>
+            : <button style={{...btn,padding:"8px 16px",fontSize:13}} onClick={() => setStep("questions")}>Start</button>}
+        </div>
+      </div>
+
+      <div style={{...card, marginBottom:10, background:"linear-gradient(135deg,#FFF8E1,#FFF3CD)"}}>
+        <div style={row()}>
+          <div style={{ background:"linear-gradient(135deg,#FFD166,#FF8C42)",borderRadius:14,
+            padding:"10px 14px",fontSize:22 }}>🔥</div>
+          <div style={{flex:1,marginLeft:12}}>
+            <div style={{fontWeight:800,fontSize:15,color:"#2D3748"}}>{streak} Day Streak!</div>
+            <div style={{color:"#718096",fontSize:12}}>You're on a roll — keep going</div>
+          </div>
+          <div style={{textAlign:"center"}}>
+            <div style={{fontWeight:800,fontSize:22,color:"#FF8C42"}}>{streak}</div>
+            <div style={{fontSize:10,color:"#A0AEC0"}}>days</div>
+          </div>
+        </div>
+      </div>
+
+      {done && (
+        <div style={{...card, marginBottom:10, background:`linear-gradient(135deg,${e.c}15,white)`, border:`1.5px solid ${e.c}44`}}>
+          <div style={row()}>
+            <AvatarFace emotion={emotion} size={60}/>
+            <div style={{marginLeft:14,flex:1}}>
+              <div style={{fontWeight:800,fontSize:14,color:"#2D3748"}}>Your avatar is {e.l}</div>
+              <div style={{color:"#718096",fontSize:12,marginTop:2}}>Updated from today's check-in</div>
+              <div style={{ display:"inline-flex",alignItems:"center",gap:4,background:`${e.c}33`,
+                borderRadius:20,padding:"3px 10px",marginTop:6,fontSize:11,fontWeight:700,color:"#2D3748" }}>
+                {e.e} {e.l}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div style={{fontWeight:800,fontSize:15,color:"#2D3748",margin:"4px 0 10px"}}>📔 Journal</div>
+
+      <button onClick={() => setJournalMode(true)}
+        style={{ width:"100%", background:"white", border:"2px dashed #CBD5E0", borderRadius:16,
+          padding:14, cursor:"pointer", marginBottom:10, display:"flex", alignItems:"center",
+          gap:10, color:"#A0AEC0", fontFamily:"'Nunito',sans-serif", fontSize:14 }}>
+        <span style={{fontSize:18}}>✏️</span><span>Write today's entry…</span>
+      </button>
+
+      {entries.map((en,i) => (
+        <div key={i} style={{...card, marginBottom:8, borderLeft:`3px solid ${(EM[en.em]||EM.neutral).c}`}}>
+          <div style={row("space-between")}>
+            <span style={{fontSize:11,fontWeight:700,color:"#A0AEC0"}}>{en.date}</span>
+            <span style={{fontSize:14}}>{(EM[en.em]||EM.neutral).e}</span>
+          </div>
+          <div style={{fontSize:13,color:"#4A5568",lineHeight:1.55,marginTop:4}}>{en.text}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function PersonalTab({ emotion, currency, buildings, streak }) {
+  const e = EM[emotion]||EM.neutral;
+  return (
+    <div style={{paddingBottom:20}}>
+      <div style={{...card, marginBottom:10, background:`linear-gradient(155deg,${e.c}20,white)`, textAlign:"center", overflow:"hidden", position:"relative"}}>
+        <div style={{position:"absolute",top:-20,right:-20,width:100,height:100,background:`${e.c}12`,borderRadius:"50%"}}/>
+        <div style={{position:"relative"}}>
+          <div style={{...h2,marginBottom:2}}>Chief Alex's Land</div>
+          <div style={{color:"#A0AEC0",fontSize:12,marginBottom:14}}>Founder of Tranquil Isle</div>
+          <div style={{display:"flex",justifyContent:"center",marginBottom:10}}><AvatarFace emotion={emotion} size={88}/></div>
+          <div style={{ display:"inline-flex",alignItems:"center",gap:6,background:`${e.c}33`,
+            borderRadius:50,padding:"5px 14px" }}>
+            <span style={{fontSize:18}}>{e.e}</span>
+            <span style={{fontWeight:700,fontSize:13,color:"#2D3748"}}>Feeling {e.l}</span>
+          </div>
+        </div>
+      </div>
+
+      <div style={{display:"flex",gap:8,marginBottom:10}}>
+        {[["🪙",currency.toLocaleString(),"Coins"],["🔥",streak,"Streak"],["🏗️",buildings,"Buildings"]].map(([ic,v,lb],i) => (
+          <div key={i} style={{...card,flex:1,textAlign:"center",padding:"10px 6px"}}>
+            <div style={{fontSize:20,marginBottom:2}}>{ic}</div>
+            <div style={{fontWeight:800,fontSize:15,color:"#2D3748"}}>{v}</div>
+            <div style={{fontSize:10,color:"#A0AEC0",fontWeight:600}}>{lb}</div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{...card, marginBottom:10, padding:"12px 8px"}}>
+        <div style={{...row("space-between"),marginBottom:8,paddingLeft:4}}>
+          <span style={h3}>🏝️ Tranquil Isle</span>
+          <span style={{fontSize:11,color:"#A0AEC0",fontWeight:600}}>Develop your land</span>
+        </div>
+        <Island buildings={buildings} currency={currency}/>
+      </div>
+
+      <div style={{...card, marginBottom:10}}>
+        <div style={{...h3,marginBottom:12}}>🎨 Customise Avatar</div>
+        <div style={{display:"flex",gap:8,overflowX:"auto",paddingBottom:4}}>
+          {["👕 Outfit","👒 Hat","🌟 Powerup","🎭 Emotion"].map((item,i) => (
+            <div key={i} style={{ flexShrink:0, background:"linear-gradient(135deg,#F7FAFF,#EEF2FF)",
+              border:"1.5px solid #E2E8F0", borderRadius:12, padding:"10px 14px",
+              textAlign:"center", cursor:"pointer", fontSize:12, fontWeight:700, color:"#5B9CF6",
+              transition:"transform .2s" }}
+              onMouseOver={e => e.currentTarget.style.transform="translateY(-2px)"}
+              onMouseOut={e => e.currentTarget.style.transform="translateY(0)"}>
+              {item}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={{...card, background:"linear-gradient(135deg,#FFF8E1,#FFFDE7)"}}>
+        <div style={row()}>
+          <span style={{fontSize:32}}>🏠</span>
+          <div style={{flex:1,marginLeft:12}}>
+            <div style={{fontWeight:800,fontSize:14,color:"#2D3748"}}>Chief's Residence</div>
+            <div style={{color:"#718096",fontSize:12}}>Condition: Excellent ⭐⭐⭐⭐⭐</div>
+          </div>
+          <button style={{ background:"linear-gradient(135deg,#FFD166,#FFA500)", border:"none",
+            borderRadius:20, padding:"6px 12px", fontSize:11, fontWeight:800, color:"white",
+            cursor:"pointer", fontFamily:"'Nunito',sans-serif" }}>Upgrade</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SocialTab() {
+  const [view, setView] = useState("friends");
+  const [gifted, setGifted] = useState(null);
+
+  function sendGift(name) {
+    setGifted(name);
+    setTimeout(() => setGifted(null), 2000);
+  }
+
+  return (
+    <div style={{paddingBottom:20}}>
+      <div style={{ display:"flex", background:"rgba(0,0,0,0.05)", borderRadius:16, padding:3, marginBottom:14 }}>
+        {[{id:"friends",l:"👫 Friends"},{id:"shop",l:"🛍️ City"},{id:"games",l:"🎮 Games"}].map(v => (
+          <button key={v.id} onClick={() => setView(v.id)} style={{ flex:1, background: view===v.id?"white":"transparent",
+            border:"none", borderRadius:12, padding:"7px 4px", fontSize:12, fontWeight:700,
+            color: view===v.id?"#5B9CF6":"#718096", cursor:"pointer", fontFamily:"'Nunito',sans-serif",
+            boxShadow: view===v.id?"0 2px 8px rgba(0,0,0,0.07)":"none", transition:"all .2s" }}>
+            {v.l}
+          </button>
+        ))}
+      </div>
+
+      {view === "friends" && (
+        <div style={anim}>
+          <div style={{...h3, marginBottom:10}}>Your Connections</div>
+          {FRIENDS.map((f,i) => {
+            const fe = EM[f.em]||EM.neutral;
+            return (
+              <div key={i} style={{...card, marginBottom:8, display:"flex", alignItems:"center", gap:12}}>
+                <div style={{ width:44,height:44,borderRadius:"50%",background:`linear-gradient(135deg,${fe.c}44,${fe.c}22)`,
+                  display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,position:"relative",border:`2px solid ${fe.c}66` }}>
+                  {f.av}
+                  <div style={{ position:"absolute",bottom:-2,right:-2,width:13,height:13,
+                    background: f.online?"#48BB78":"#CBD5E0",borderRadius:"50%",border:"2px solid white" }}/>
+                </div>
+                <div style={{flex:1}}>
+                  <div style={{fontWeight:800,fontSize:14,color:"#2D3748"}}>{f.name}</div>
+                  <div style={{fontSize:11,color:"#A0AEC0"}}>🏝️ {f.land}</div>
+                  <span style={{ background:`${fe.c}22`,borderRadius:20,padding:"2px 8px",
+                    fontSize:10,fontWeight:700,color:"#2D3748" }}>{fe.e} {fe.l}</span>
+                </div>
+                <div style={{display:"flex",flexDirection:"column",gap:4}}>
+                  <button onClick={() => sendGift(f.name)} style={{ background: gifted===f.name?"#48BB78":"linear-gradient(135deg,#FD79A8,#E84393)",
+                    border:"none",borderRadius:20,padding:"5px 10px",fontSize:10,fontWeight:800,color:"white",
+                    cursor:"pointer",fontFamily:"'Nunito',sans-serif",transition:"all .3s" }}>
+                    {gifted===f.name ? "✓ Sent!" : "🎁 Gift"}
+                  </button>
+                  <button style={{ background:"linear-gradient(135deg,#5B9CF6,#7B6CF6)",border:"none",
+                    borderRadius:20,padding:"5px 10px",fontSize:10,fontWeight:800,color:"white",
+                    cursor:"pointer",fontFamily:"'Nunito',sans-serif" }}>
+                    🌉 Visit
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+          <div style={{ border:"2px dashed #CBD5E0",borderRadius:16,padding:14,textAlign:"center",
+            cursor:"pointer",color:"#A0AEC0",fontSize:13,fontWeight:600 }}>
+            + Add Friends • Earn 🪙 250
+          </div>
+        </div>
+      )}
+
+      {view === "shop" && (
+        <div style={anim}>
+          <div style={{...card, marginBottom:12, background:"linear-gradient(135deg,#E0E7FF,#EEF2FF)", textAlign:"center"}}>
+            <div style={{fontSize:28,marginBottom:4}}>🏪</div>
+            <div style={h2}>Virtual Shopping City</div>
+            <div style={{color:"#718096",fontSize:12,marginTop:2}}>4 players shopping right now</div>
+          </div>
+          {[["🛋️","Cozy Sofa","Home & Living",350,2],["🖼️","Sunset Painting","Art Gallery",280,1],["🌱","Potted Ferns","Nature Shop",120,3],["💡","Fairy Lights","Decor Haven",190,2]].map(([ic,n,s,p,pl],i) => (
+            <div key={i} style={{...card, marginBottom:8, display:"flex", alignItems:"center", gap:12}}>
+              <span style={{fontSize:28}}>{ic}</span>
+              <div style={{flex:1}}>
+                <div style={{fontWeight:800,fontSize:14,color:"#2D3748"}}>{n}</div>
+                <div style={{fontSize:11,color:"#A0AEC0"}}>{s}</div>
+                <div style={{fontSize:11,color:"#718096"}}>👥 {pl} players here</div>
+              </div>
+              <button style={{ background:"linear-gradient(135deg,#FFD166,#FFA500)",border:"none",
+                borderRadius:20,padding:"6px 12px",fontSize:11,fontWeight:800,color:"white",
+                cursor:"pointer",fontFamily:"'Nunito',sans-serif",whiteSpace:"nowrap" }}>
+                🪙 {p}
+              </button>
+            </div>
+          ))}
+          <div style={{ background:"rgba(91,156,246,0.1)",borderRadius:12,padding:"10px 14px",
+            fontSize:12,color:"#5B9CF6",fontWeight:600 }}>
+            💬 Tap any player avatar to interact • Earn 🪙 20
+          </div>
+        </div>
+      )}
+
+      {view === "games" && (
+        <div style={anim}>
+          <div style={{...h3, marginBottom:10}}>Game Arenas</div>
+          {[["🧩","Puzzle Rush","3/4 playing",true],["🎯","Mind Target","2/4 playing",true],["🃏","Trivia Blitz","0/4",false],["🌟","Wellness Quiz","1/4 playing",true]].map(([ic,n,pl,active],i) => (
+            <div key={i} style={{...card, marginBottom:8}}>
+              <div style={row()}>
+                <div style={{ width:48,height:48,background: active?"linear-gradient(135deg,#5B9CF6,#7B6CF6)":"#F7FAFF",
+                  borderRadius:14,display:"flex",alignItems:"center",justifyContent:"center",fontSize:22 }}>
+                  {ic}
+                </div>
+                <div style={{flex:1,marginLeft:12}}>
+                  <div style={{fontWeight:800,fontSize:14,color:"#2D3748"}}>{n}</div>
+                  <div style={{fontSize:11,color: active?"#48BB78":"#A0AEC0"}}>{active?"🟢 ":"⚪ "}{pl}</div>
+                  <div style={{fontSize:10,color:"#A0AEC0",marginTop:2}}>🥇 200 🥈 100 🪙</div>
+                </div>
+                <button style={{ background: active?"linear-gradient(135deg,#5B9CF6,#7B6CF6)":"linear-gradient(135deg,#E2E8F0,#EDF2F7)",
+                  border:"none",borderRadius:20,padding:"7px 14px",fontSize:11,fontWeight:800,
+                  color: active?"white":"#A0AEC0",cursor:"pointer",fontFamily:"'Nunito',sans-serif" }}>
+                  {active ? "Join" : "Wait"}
+                </button>
+              </div>
+            </div>
+          ))}
+          <div style={{ background:"rgba(255,109,128,0.1)",borderRadius:12,padding:"10px 14px",
+            fontSize:12,color:"#E84393",fontWeight:600 }}>
+            🤖 AI players fill in if no humans are available
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function RealWorldTab({ emotion }) {
+  const [selected, setSelected] = useState(null);
+  const [joined, setJoined] = useState([]);
+  const [currency, setCurrency] = useState(0);
+
+  const hints = { anxious:"Support circles & group activities", sad:"Social walks & dog meetups",
+    happy:"Yoga & outdoor adventures", excited:"Games & social events", calm:"Meditation & nature walks" };
+
+  if (selected) return (
+    <div style={anim}>
+      <div style={row("flex-start")}>
+        <span style={{cursor:"pointer",fontSize:20,marginRight:8}} onClick={() => setSelected(null)}>←</span>
+        <span style={h2}>Activity Details</span>
+      </div>
+      <div style={{...card, margin:"12px 0"}}>
+        <div style={{fontSize:40,textAlign:"center",marginBottom:8}}>{selected.icon}</div>
+        <div style={{...h1, textAlign:"center",marginBottom:4}}>{selected.t}</div>
+        <div style={{color:"#718096",fontSize:13,textAlign:"center",marginBottom:16}}>Hosted by @{selected.host}</div>
+        {[["📅","Date & Time",selected.date],["📍","Location",selected.loc],["👥","Participants",`${selected.joined}/${selected.max} joined`]].map(([ic,lb,v],i) => (
+          <div key={i} style={{display:"flex",gap:10,padding:"8px 0",borderBottom: i<2?"1px solid #F7FAFF":"none"}}>
+            <span>{ic}</span>
+            <div><div style={{fontSize:11,color:"#A0AEC0",fontWeight:700}}>{lb}</div><div style={{fontSize:13,color:"#2D3748",fontWeight:600}}>{v}</div></div>
+          </div>
+        ))}
+      </div>
+      <div style={{ background:"rgba(72,187,120,0.1)",borderRadius:12,padding:"10px 14px",
+        marginBottom:12,fontSize:12,color:"#276749",fontWeight:600 }}>
+        🔒 Public location. Joining earns you 🪙 1,000!
+      </div>
+      {joined.includes(selected.id)
+        ? <div style={{ background:"linear-gradient(135deg,#E8F5E9,#F1F8E9)",border:"2px solid #A5D6A7",
+            borderRadius:16,padding:14,textAlign:"center",fontWeight:800,color:"#2E7D32",fontSize:14 }}>
+            ✅ You've joined — see you there! +🪙 1,000
+          </div>
+        : <button style={{...btn,width:"100%"}} onClick={() => { setJoined(j=>[...j,selected.id]); }}>
+            Join Activity • Earn 🪙 1,000
+          </button>}
+    </div>
+  );
+
+  return (
+    <div style={{paddingBottom:20}}>
+      <div style={{ background:"linear-gradient(160deg,#E8F5E9 0%,#E3F2FD 55%,#FFF8E1 100%)",
+        borderRadius:20,height:118,marginBottom:12,position:"relative",overflow:"hidden",
+        border:"1.5px solid rgba(255,255,255,0.8)",boxShadow:"0 4px 15px rgba(0,0,0,0.05)" }}>
+        {[0,1,2,3].map(i=><div key={i} style={{position:"absolute",left:`${25*i}%`,top:0,bottom:0,width:1,background:"rgba(0,0,0,0.05)"}}/>)}
+        {[0,1,2].map(i=><div key={i} style={{position:"absolute",top:`${33*(i+1)}%`,left:0,right:0,height:1,background:"rgba(0,0,0,0.05)"}}/>)}
+        {[{x:"18%",y:"22%",ic:"🐕",pulse:true},{x:"55%",y:"40%",ic:"🧘",pulse:false},{x:"74%",y:"18%",ic:"🧠",pulse:true},{x:"38%",y:"60%",ic:"🎲",pulse:false}].map((p,i) => (
+          <div key={i} onClick={() => setSelected(ACTS[i])} style={{ position:"absolute",left:p.x,top:p.y,
+            display:"flex",flexDirection:"column",alignItems:"center",cursor:"pointer",
+            animation: p.pulse?"pulse 2s infinite":"none" }}>
+            <div style={{ background:"white",borderRadius:"50%",width:30,height:30,
+              display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,
+              boxShadow:"0 2px 8px rgba(0,0,0,0.14)",border:"2px solid white" }}>{p.ic}</div>
+            <div style={{width:2,height:7,background:"#5B9CF6",marginTop:-2}}/>
+          </div>
+        ))}
+        <div style={{ position:"absolute",left:"48%",top:"47%",width:14,height:14,
+          background:"#5B9CF6",borderRadius:"50%",border:"3px solid white",
+          boxShadow:"0 0 0 5px rgba(91,156,246,0.25)" }}/>
+        <div style={{ position:"absolute",bottom:8,right:10,fontSize:10,color:"#718096",fontWeight:600,
+          background:"rgba(255,255,255,0.85)",borderRadius:6,padding:"2px 7px" }}>📍 Singapore</div>
+      </div>
+
+      <div style={{ background:"linear-gradient(135deg,#EEF2FF,#E0E7FF)",borderRadius:12,
+        padding:"10px 14px",marginBottom:12,display:"flex",gap:10,alignItems:"center" }}>
+        <span style={{fontSize:20}}>🤖</span>
+        <div>
+          <div style={{fontWeight:700,fontSize:12,color:"#5B9CF6"}}>AI Suggestion for you</div>
+          <div style={{fontSize:12,color:"#4A5568"}}>{hints[emotion]||"Activities near you"}</div>
+        </div>
+      </div>
+
+      <div style={{...row("space-between"),marginBottom:10}}>
+        <span style={h3}>📍 Activities Near You</span>
+        <button style={{ background:"linear-gradient(135deg,#5B9CF6,#7B6CF6)",border:"none",borderRadius:20,
+          padding:"5px 12px",fontSize:11,fontWeight:800,color:"white",cursor:"pointer",
+          fontFamily:"'Nunito',sans-serif" }}>+ Drop Pin</button>
+      </div>
+
+      {ACTS.map((a,i) => (
+        <div key={i} style={{...card,marginBottom:8,cursor:"pointer",transition:"transform .15s"}}
+          onClick={() => setSelected(a)}
+          onMouseOver={e => e.currentTarget.style.transform="translateY(-1px)"}
+          onMouseOut={e => e.currentTarget.style.transform="translateY(0)"}>
+          <div style={{display:"flex",gap:12,alignItems:"flex-start"}}>
+            <div style={{ width:44,height:44,flexShrink:0,background:"linear-gradient(135deg,#EEF2FF,#E0E7FF)",
+              borderRadius:14,display:"flex",alignItems:"center",justifyContent:"center",fontSize:22 }}>
+              {a.icon}
+            </div>
+            <div style={{flex:1,minWidth:0}}>
+              <div style={{fontWeight:800,fontSize:14,color:"#2D3748",marginBottom:2}}>{a.t}</div>
+              <div style={{fontSize:11,color:"#A0AEC0",marginBottom:3}}>📅 {a.date}</div>
+              <div style={{fontSize:11,color:"#718096",marginBottom:6}}>📍 {a.loc}</div>
+              <div style={{background:"#F0F4FF",borderRadius:4,height:5,overflow:"hidden"}}>
+                <div style={{ width:`${(a.joined/a.max)*100}%`,background:"linear-gradient(90deg,#5B9CF6,#7B6CF6)",
+                  height:"100%",borderRadius:4 }}/>
+              </div>
+              <div style={{fontSize:10,color:"#A0AEC0",marginTop:3}}>{a.joined}/{a.max} joined</div>
+            </div>
+            {joined.includes(a.id)
+              ? <span style={{fontSize:18,color:"#48BB78"}}>✅</span>
+              : <div style={{ background:"linear-gradient(135deg,#5B9CF6,#7B6CF6)",borderRadius:20,
+                  padding:"5px 12px",fontSize:11,fontWeight:800,color:"white",flexShrink:0 }}>View →</div>}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+const card = { background:"rgba(255,255,255,0.9)", borderRadius:18, padding:16,
+  boxShadow:"0 3px 16px rgba(0,0,0,0.055)", backdropFilter:"blur(10px)" };
+const btn = { background:"linear-gradient(135deg,#5B9CF6,#7B6CF6)", color:"white", border:"none",
+  borderRadius:50, padding:"12px 28px", fontSize:15, fontWeight:700, fontFamily:"'Nunito',sans-serif",
+  cursor:"pointer", boxShadow:"0 4px 14px rgba(91,156,246,0.35)", transition:"all .2s" };
+const btnOutline = { background:"white", color:"#5B9CF6", border:"2px solid #5B9CF6",
+  borderRadius:50, padding:"10px 24px", fontSize:14, fontWeight:700, fontFamily:"'Nunito',sans-serif", cursor:"pointer" };
+const h1 = { fontFamily:"'Fredoka One',cursive", fontSize:22, color:"#2D3748", margin:0 };
+const h2 = { fontFamily:"'Nunito',sans-serif", fontWeight:800, fontSize:16, color:"#2D3748", margin:0 };
+const h3 = { fontFamily:"'Nunito',sans-serif", fontWeight:800, fontSize:15, color:"#2D3748", margin:0 };
+const label = { fontSize:11, fontWeight:700, color:"#A0AEC0", letterSpacing:"0.5px", marginBottom:6 };
+const anim = { animation:"fadeIn .35s ease", paddingBottom:20 };
+const row = (j="center") => ({ display:"flex", alignItems:"center", justifyContent: j });
+
+export default function WellnessLandApp() {
+  const [tab, setTab] = useState("wellness");
+  const [emotion, setEmotion] = useState("calm");
+  const [currency, setCurrency] = useState(2450);
+  const [buildings, setBuildings] = useState(3);
+  const [streak] = useState(7);
+
+  const e = EM[emotion]||EM.neutral;
+
+  const TABS = [
+    {id:"wellness",ic:"💚",lb:"Wellness"},
+    {id:"personal",ic:"🏝️",lb:"My Land"},
+    {id:"social",ic:"👫",lb:"Social"},
+    {id:"realworld",ic:"🗺️",lb:"Real World"},
+  ];
+
+  return (
+    <>
+      <style>{`@import url('${FONT_URL}');`}</style>
+      <style>{`
+        * { box-sizing: border-box; }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(7px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
+        @keyframes shimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(200%)} }
+        ::-webkit-scrollbar { width:0; }
+      `}</style>
+
+      <div style={{ display:"flex", justifyContent:"center", alignItems:"center",
+        minHeight:"100vh", background:"linear-gradient(135deg,#1a1a2e,#16213e,#0f3460)", padding:20,
+        fontFamily:"'Nunito',sans-serif" }}>
+        <div style={{ width:375, maxHeight:720, minHeight:680, background:"linear-gradient(160deg,#E8F6FF 0%,#F0F8FF 45%,#EEF5EE 100%)",
+          borderRadius:44, overflow:"hidden", boxShadow:"0 28px 80px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.25)",
+          display:"flex", flexDirection:"column", border:"2px solid rgba(255,255,255,0.12)" }}>
+
+          <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",
+            padding:"12px 22px 4px", background:"rgba(255,255,255,0.4)" }}>
+            <span style={{fontSize:12,fontWeight:700,color:"#2D3748"}}>9:41 AM</span>
+            <div style={{display:"flex",gap:5,fontSize:11}}>📶 🔋</div>
+          </div>
+
+          <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",
+            padding:"6px 20px 10px", background:"rgba(255,255,255,0.45)" }}>
+            <div>
+              <div style={{fontFamily:"'Fredoka One',cursive",fontSize:23,color:"#5B9CF6",lineHeight:1}}>Wellness Land</div>
+              <div style={{fontSize:11,color:"#718096",fontWeight:600}}>🔥 {streak} day streak</div>
+            </div>
+            <div style={{display:"flex",alignItems:"center",gap:8}}>
+              <div style={{ background:"linear-gradient(135deg,#FFD166,#FFA500)",borderRadius:50,
+                padding:"5px 12px",display:"flex",alignItems:"center",gap:5,
+                boxShadow:"0 2px 8px rgba(255,165,0,0.3)" }}>
+                <span style={{fontSize:14}}>🪙</span>
+                <span style={{fontSize:13,fontWeight:800,color:"white"}}>{currency.toLocaleString()}</span>
+              </div>
+              <div style={{ width:36,height:36,background:`linear-gradient(135deg,${e.c}44,${e.c}22)`,
+                borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",
+                fontSize:18,border:`2px solid ${e.c}66` }}>
+                {e.e}
+              </div>
+            </div>
+          </div>
+
+          <div style={{ flex:1, overflowY:"auto", padding:"10px 16px 0" }}>
+            {tab === "wellness"   && <WellnessTab emotion={emotion} setEmotion={setEmotion} currency={currency} setCurrency={setCurrency} streak={streak} setStreak={()=>{}}/>}
+            {tab === "personal"   && <PersonalTab emotion={emotion} currency={currency} buildings={buildings} streak={streak}/>}
+            {tab === "social"     && <SocialTab/>}
+            {tab === "realworld"  && <RealWorldTab emotion={emotion}/>}
+          </div>
+
+          <div style={{ display:"flex", background:"rgba(255,255,255,0.92)",
+            backdropFilter:"blur(20px)", borderTop:"1px solid rgba(0,0,0,0.055)", padding:"8px 0 18px" }}>
+            {TABS.map(t => (
+              <button key={t.id} onClick={() => setTab(t.id)} style={{ flex:1, background:"none",
+                border:"none", cursor:"pointer", display:"flex", flexDirection:"column",
+                alignItems:"center", gap:3, padding:4 }}>
+                <span style={{ fontSize:22, lineHeight:1,
+                  transform: tab===t.id?"scale(1.18)":"scale(1)", transition:"transform .2s",
+                  display:"block" }}>{t.ic}</span>
+                <span style={{ fontSize:10, fontWeight: tab===t.id?800:600,
+                  color: tab===t.id?"#5B9CF6":"#A0AEC0", fontFamily:"'Nunito',sans-serif" }}>
+                  {t.lb}
+                </span>
+                {tab===t.id && <div style={{width:4,height:4,borderRadius:"50%",background:"#5B9CF6"}}/>}
+              </button>
+            ))}
+          </div>
+
+        </div>
+      </div>
+    </>
+  );
+}
