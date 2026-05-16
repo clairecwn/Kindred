@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
-import { CalendarPlus, MapPin } from "lucide-react";
-import { EMOTIONS } from "../utils/emotion.js";
+import { CalendarPlus, MapPin, Users } from "lucide-react";
 
-export default function RealWorldView({ emotion, activities, setActivities }) {
+export default function RealWorldView({ character, activities, setActivities }) {
   const mapRef = useRef(null);
   const mapNodeRef = useRef(null);
   const markersRef = useRef([]);
@@ -45,16 +44,31 @@ export default function RealWorldView({ emotion, activities, setActivities }) {
       lng: Number(form.get("lng") || 103.8198),
       capacity: Number(form.get("capacity") || 8),
       joined: 1,
-      type: String(form.get("type") || "Social")
+      type: String(form.get("type") || "Social"),
+      description: String(form.get("description") || ""),
+      hostCharacter: character,
+      participants: ["you"]
     };
     setActivities((items) => [activity, ...items]);
     setCreating(false);
+    mapRef.current?.flyTo([activity.lat, activity.lng], 14, { duration: 0.8 });
   }
 
   function joinActivity(id) {
     setActivities((items) => items.map((activity) => (
-      activity.id === id ? { ...activity, joined: Math.min(activity.capacity, activity.joined + 1) } : activity
+      activity.id === id
+        ? {
+            ...activity,
+            joined: Math.min(activity.capacity, activity.joined + 1),
+            participants: Array.from(new Set([...(activity.participants || []), "you"]))
+          }
+        : activity
     )));
+  }
+
+  function focusActivity(activity) {
+    setSelected(activity);
+    mapRef.current?.flyTo([activity.lat, activity.lng], 14, { duration: 0.8 });
   }
 
   return (
@@ -62,13 +76,13 @@ export default function RealWorldView({ emotion, activities, setActivities }) {
       <section className="hero-panel map-hero">
         <div>
           <p className="eyebrow">Real world</p>
-          <h1>Map-based activities, saved when you create them.</h1>
-          <p>Suggestions use your current mood. Activities live in local storage for this prototype.</p>
+        <h1>Host or join nearby activities.</h1>
+          <p>Create your own activity, drop it onto the map, and browse everything available around you.</p>
         </div>
-        <div className="suggestion-card" style={{ "--accent": EMOTIONS[emotion].color }}>
+        <div className="suggestion-card">
           <MapPin size={24} />
-          <strong>{EMOTIONS[emotion].label} suggestion</strong>
-          <span>{emotion === "anxious" ? "Small support circles or calm walks" : emotion === "tired" ? "Low energy meetups nearby" : "Social activities near you"}</span>
+          <strong>{activities.length} activities</strong>
+          <span>Inspect host characters, see who joined, or create your own pin.</span>
         </div>
       </section>
 
@@ -80,7 +94,7 @@ export default function RealWorldView({ emotion, activities, setActivities }) {
         <div className="section-heading">
           <div>
             <h2>Activities Near You</h2>
-            <p>Create your own activity and it appears on the map.</p>
+            <p>Browse all available activities and focus their pins on the map.</p>
           </div>
           <button className="primary-button small" type="button" onClick={() => setCreating(true)}>
             <CalendarPlus size={17} /> Create
@@ -89,12 +103,15 @@ export default function RealWorldView({ emotion, activities, setActivities }) {
         <div className="activity-list">
           {activities.map((activity) => (
             <article className="activity-card" key={activity.id}>
+              <button className="host-avatar" type="button" onClick={() => focusActivity(activity)} aria-label={`Show ${activity.title} on map`}>
+                <span className={`mini-avatar ${activity.hostCharacter?.animal || "fox"}`} />
+              </button>
               <div>
                 <strong>{activity.title}</strong>
-                <span>{activity.location} · {activity.type}</span>
-                <small>{activity.date} · {activity.joined}/{activity.capacity} joined</small>
+                <span>{activity.location} - {activity.type}</span>
+                <small>{activity.date} - @{activity.host} - {activity.joined}/{activity.capacity} joined</small>
               </div>
-              <button type="button" onClick={() => joinActivity(activity.id)}>Join</button>
+              <button type="button" onClick={() => focusActivity(activity)}>View</button>
             </article>
           ))}
         </div>
@@ -111,6 +128,7 @@ export default function RealWorldView({ emotion, activities, setActivities }) {
             <input name="location" placeholder="Location name" required />
             <input name="date" type="datetime-local" required />
             <input name="type" placeholder="Type, e.g. Walk, Support, Games" />
+            <input name="description" placeholder="What should people know?" />
             <div className="two-col">
               <input name="lat" type="number" step="0.0001" placeholder="Latitude" defaultValue="1.3521" />
               <input name="lng" type="number" step="0.0001" placeholder="Longitude" defaultValue="103.8198" />
@@ -127,7 +145,14 @@ export default function RealWorldView({ emotion, activities, setActivities }) {
             <h2>{selected.title}</h2>
             <button type="button" onClick={() => setSelected(null)}>Close</button>
           </div>
-          <p>{selected.location} · hosted by @{selected.host}</p>
+          <p>{selected.location} - hosted by @{selected.host}</p>
+          {selected.description && <p>{selected.description}</p>}
+          <div className="participant-strip">
+            <Users size={17} />
+            {(selected.participants || ["Mia", "Kai", "Zoe"]).slice(0, 5).map((name) => (
+              <span key={name}>{name}</span>
+            ))}
+          </div>
           <button className="primary-button" type="button" onClick={() => joinActivity(selected.id)}>Join activity</button>
         </div>
       )}
