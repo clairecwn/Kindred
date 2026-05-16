@@ -1,9 +1,27 @@
 import { Minus, Plus, Scan, Move } from "lucide-react";
+import { useRef } from "react";
 
 export default function SceneViewport({ title, subtitle, zoom, setZoom, pan, setPan, children }) {
+  const dragRef = useRef(null);
   const clampZoom = (next) => Math.min(1.75, Math.max(0.75, next));
 
   function move(dx, dy) {
+    setPan((current) => ({
+      x: Math.min(80, Math.max(-80, current.x + dx)),
+      y: Math.min(60, Math.max(-60, current.y + dy))
+    }));
+  }
+
+  function startPan(event) {
+    if (event.target.closest("button")) return;
+    dragRef.current = { x: event.clientX, y: event.clientY };
+  }
+
+  function dragPan(event) {
+    if (!dragRef.current) return;
+    const dx = event.clientX - dragRef.current.x;
+    const dy = event.clientY - dragRef.current.y;
+    dragRef.current = { x: event.clientX, y: event.clientY };
     setPan((current) => ({
       x: Math.min(80, Math.max(-80, current.x + dx)),
       y: Math.min(60, Math.max(-60, current.y + dy))
@@ -31,7 +49,13 @@ export default function SceneViewport({ title, subtitle, zoom, setZoom, pan, set
         </div>
       </div>
 
-      <div className="scene-frame">
+      <div
+        className="scene-frame"
+        onPointerDown={startPan}
+        onPointerMove={dragPan}
+        onPointerUp={() => { dragRef.current = null; }}
+        onPointerCancel={() => { dragRef.current = null; }}
+      >
         <div
           className="scene-world"
           style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})` }}

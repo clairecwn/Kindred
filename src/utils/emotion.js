@@ -1,14 +1,14 @@
 export const EMOTIONS = {
-  happy: { label: "Happy", color: "#f6c65b", tone: "bright and open" },
-  excited: { label: "Excited", color: "#ee6f8f", tone: "high energy" },
-  calm: { label: "Calm", color: "#5dbb9d", tone: "settled and steady" },
-  anxious: { label: "Anxious", color: "#f49f58", tone: "uneasy or worried" },
-  sad: { label: "Sad", color: "#5d8edb", tone: "heavy or low" },
-  tired: { label: "Tired", color: "#8e7cc3", tone: "drained or foggy" },
-  angry: { label: "Angry", color: "#e85d5d", tone: "frustrated or tense" },
-  content: { label: "Content", color: "#4fbf7f", tone: "quietly okay" },
-  grateful: { label: "Grateful", color: "#d76ba8", tone: "appreciative" },
-  neutral: { label: "Neutral", color: "#8b99a7", tone: "even or unclear" }
+  happy: { label: "Happy", color: "#f6c65b", tone: "bright and open", behavior: "smiling idle", speed: 1.08 },
+  excited: { label: "Excited", color: "#ee6f8f", tone: "high energy", behavior: "energetic bounce", speed: 1.38 },
+  calm: { label: "Calm", color: "#5dbb9d", tone: "settled and steady", behavior: "slow breathing", speed: 0.86 },
+  anxious: { label: "Anxious", color: "#f49f58", tone: "uneasy or worried", behavior: "small nervous sway", speed: 1.12 },
+  sad: { label: "Sad", color: "#5d8edb", tone: "heavy or low", behavior: "slower lowered idle", speed: 0.68 },
+  tired: { label: "Tired", color: "#8e7cc3", tone: "drained or foggy", behavior: "soft sleepy sway", speed: 0.62 },
+  angry: { label: "Angry", color: "#e85d5d", tone: "frustrated or tense", behavior: "tight stance", speed: 1 },
+  content: { label: "Content", color: "#4fbf7f", tone: "quietly okay", behavior: "relaxed smile", speed: 0.92 },
+  grateful: { label: "Grateful", color: "#d76ba8", tone: "appreciative", behavior: "warm nod", speed: 0.95 },
+  neutral: { label: "Neutral", color: "#8b99a7", tone: "even or unclear", behavior: "neutral idle", speed: 0.9 }
 };
 
 const LEXICON = {
@@ -24,6 +24,20 @@ const LEXICON = {
 };
 
 const NEGATORS = ["not", "never", "hardly", "barely", "isn't", "wasn't", "dont", "don't"];
+
+const LANGUAGE_HINTS = [
+  { language: "Spanish", pattern: /\b(hola|triste|feliz|ansioso|cansado|gracias|preocupado)\b/i },
+  { language: "French", pattern: /\b(bonjour|triste|heureux|anxieux|fatigue|merci|calme)\b/i },
+  { language: "Malay", pattern: /\b(sedih|gembira|risau|letih|tenang|terima kasih)\b/i },
+  { language: "Chinese", pattern: /[\u4e00-\u9fff]/ },
+  { language: "Japanese", pattern: /[\u3040-\u30ff]/ },
+  { language: "Korean", pattern: /[\uac00-\ud7af]/ }
+];
+
+export function detectLanguage(text) {
+  const match = LANGUAGE_HINTS.find((item) => item.pattern.test(text));
+  return match?.language || "English";
+}
 
 export function inferEmotion(text) {
   const normalized = text.toLowerCase().replace(/[^\w\s']/g, " ");
@@ -55,6 +69,54 @@ export function inferEmotion(text) {
   return {
     emotion,
     confidence,
+    language: detectLanguage(text),
+    behavior: EMOTIONS[emotion].behavior,
     reason: matches.length ? `Matched ${matches.slice(0, 3).join(", ")}` : "No strong signal yet"
   };
+}
+
+function parseEmotionPayload(payload) {
+  const text = typeof payload === "string" ? payload : payload?.emotion ? JSON.stringify(payload) : "";
+  const parsed = typeof payload === "object" && payload?.emotion ? payload : JSON.parse(text);
+  const emotion = EMOTIONS[parsed.emotion] ? parsed.emotion : "neutral";
+  return {
+    emotion,
+    confidence: Number(parsed.confidence || 82),
+    language: String(parsed.language || "Detected"),
+    behavior: EMOTIONS[emotion].behavior,
+    reason: String(parsed.reason || "Language model reflection")
+  };
+}
+
+export async function reflectEmotionWithLLM(text) {
+  const fallback = inferEmotion(text);
+  const endpoint = import.meta.env.VITE_EMOTION_LLM_ENDPOINT;
+
+  if (!endpoint) {
+    return {
+      ...fallback,
+      source: "local-reflection"
+    };
+  }
+
+  try {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        text,
+        instruction:
+          "Detect language and primary reflected emotion. Return JSON only with emotion, confidence, language, and reason. Emotion must be one of: happy, excited, calm, anxious, sad, tired, angry, content, grateful, neutral. Keep the reflection subtle and non-clinical."
+      })
+    });
+
+    if (!response.ok) throw new Error("Emotion model unavailable");
+    const data = await response.json();
+    return { ...parseEmotionPayload(data), source: "llm" };
+  } catch {
+    return {
+      ...fallback,
+      source: "local-reflection"
+    };
+  }
 }
