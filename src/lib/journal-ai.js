@@ -244,13 +244,8 @@ export class EmotionDetector {
       return { trend: "unknown", label: "Your story is just beginning" };
     }
 
-    const WELLNESS = {
-      happy: 9, excited: 9, grateful: 8, content: 7, calm: 7,
-      neutral: 5, tired: 3, anxious: 3, angry: 3, sad: 2,
-    };
-
     const recent = pastEntries.slice(0, 6);
-    const scores = recent.map(e => WELLNESS[e.emotion] ?? 5);
+    const scores = recent.map(e => getWellnessScore(e.emotion));
 
     // Recent entries come first — split into "now" and "then" halves
     const half      = Math.ceil(scores.length / 2);
@@ -373,160 +368,144 @@ const WIN_CELEBRATIONS = [
 
 export class AIJournalist {
   constructor() {
-    // Google Gemini — free tier at aistudio.google.com (1,500 req/day, CORS-friendly)
-    this.geminiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    this.groqKey = import.meta.env.VITE_GROQ_API_KEY;
   }
 
-  /**
-   * Generates a warm, conversational companion response.
-   * Uses Google Gemini 2.0 Flash when VITE_GEMINI_API_KEY is set.
-   * Falls back to the rich template system — still warm and personal.
-   * 
-   * NOW: Returns nuanced emotions as detected by Gemini, without forcing
-   * them into a preset category list.
-   */
   async generateResponse(text, analysis, pastEntries = [], playerName = "friend") {
-    if (this.geminiKey) {
+    if (this.groqKey) {
       try {
-        return await this._geminiResponse(text, analysis, pastEntries, playerName);
+        return await this._groqResponse(text, analysis, pastEntries, playerName);
       } catch (err) {
-        console.warn("[Kindred] Gemini fallback activated:", err.message);
+        console.warn("[Kindred] Groq fallback activated:", err.message);
       }
     }
     return this._templateResponse(text, analysis, pastEntries);
   }
 
-  async _geminiResponse(text, analysis, pastEntries, playerName) {
+  async _groqResponse(text, analysis, pastEntries, playerName) {
     const recentContext = pastEntries.slice(0, 4).map(e =>
       `${e.date}: Felt ${e.emotion}. "${e.text.slice(0, 100)}${e.text.length > 100 ? "..." : ""}"`
     ).join("\n");
 
-    const systemInstruction = `You are an emotional intelligence expert reading journal entries. Your job is NOT to match keywords. Your job is to READ THE WHOLE MESSAGE like a human friend would — understanding tone, subtext, metaphor, narrative, and emotional context.
+    const systemPrompt = `You are an emotional intelligence expert reading journal entries. Your job is NOT to match keywords. Your job is to READ THE WHOLE MESSAGE like a human friend would — understanding tone, subtext, metaphor, narrative, and emotional context.
 
 You will encounter:
-- Colloquial language ("idk", "lol", "ugh", "tbh", "ngl")
+- Colloquial language ("idk", "lol", "ugh", "tbh")
 - Broken English, short forms, sentence fragments
-- Metaphors and symbolic language ("cloudy" = mental fog, "stagnant" = stuck/frustrated, "weight" = burden, "light" = relief/joy)
-- Subtext (what's unsaid but implied by tone and context)
-- Mixed emotions (frustrated yet hopeful, exhausted but trying, sad but grateful)
-- Positive emotions expressed simply ("had a good day", "felt better", "things are improving")
+- Metaphors and symbolic language ("cloudy" = mental fog, "stagnant" = stuck/frustrated, "weight" = burden)
+- Subtext (what's unsaid but implied by tone)
+- Mixed emotions (frustrated yet hopeful, exhausted but trying)
+- Positive emotions expressed simply ("had a good day", "felt better", "things improving")
 
 Read for:
-- TONE & VOICE: What emotional tone does this voice have? Frustrated? Weary? Excited? Content? Hopeful? Read how they're saying it, not just what they say.
-- NARRATIVE: What's the story? What happened? What's their situation? What matters to them?
-- SUBTEXT: What emotions are underneath? What are they really conveying? A complaint about work + "don't like" + "stagnant" = frustration + feeling trapped.
-- METAPHORS & SYMBOLS: "Cloudy" = mental fog/confusion/emotional haze. "Heavy" = burden. "Light" = relief/hope. "Flowing" = ease/progress. Understand symbolic language.
-- SENTIMENT & CONTEXT: Is this positive, negative, or mixed overall? Is there growth, struggle, acceptance, joy, dissatisfaction, contentment?
-- EFFORT & RESILIENCE: Are they trying? Giving up? Finding ways forward? This matters for emotional read.
+1. TONE & VOICE: What emotional tone? Frustrated? Weary? Excited? Content?
+2. NARRATIVE: What's the story? What happened? What's their situation?
+3. SUBTEXT: What emotions are underneath? What are they really saying?
+4. METAPHORS: "Cloudy" = mental fog. "Heavy" = burden. "Light" = relief. "Flowing" = ease.
+5. SENTIMENT: Overall positive, negative, or mixed? Growing? Struggling? Accepting?
 
-BOTH POSITIVE AND NEGATIVE:
-- Detect joy, contentment, hope, relief, pride, excitement equally as you detect frustration, sadness, exhaustion
-- A person saying "I finally finished that project and felt proud" is NOT neutral — it's pride/accomplishment
-- A person saying "things are settling down and I feel more at peace" is NOT neutral — it's calm/relief
+BOTH POSITIVE AND NEGATIVE equally:
+- Detect joy, contentment, hope, relief, pride equally as frustration, sadness, exhaustion
+- A person saying "I finished that project and felt proud" is NOT neutral — it's pride
 - Don't bias toward negative emotions just because someone is venting
 
 You are NOT looking for specific emotion words. You are reading what a human would read.`;
 
-    const prompt = `Read this journal entry like a friend understanding their friend's actual emotional state. Understand the full context.
+    const userPrompt = `Read this journal entry like a friend understanding their friend's actual emotional state.
 
 TASK: What is this person's ACTUAL emotional state right now?
 
 Instructions:
 - Read the entire message for tone, sentiment, and narrative
-- Look for subtext, metaphor, implied meanings, and what's really being said
-- Treat colloquial language ("idk", "ugh", etc.) as valid emotional signals
-- Understand metaphors: "cloudy" = mental fog/exhaustion, "stagnant" = stuck/frustrated, "weight" = burden, "flowing" = ease
-- Don't just look for explicit emotion words — read the narrative and tone
-- Recognize positive emotions equally: pride in accomplishments, relief, contentment, peace, excitement, gratitude, hope
-- Recognize negative emotions: frustration, exhaustion, overwhelm, dissatisfaction, sadness, anxiety, loneliness
-- Recognize mixed emotions: "tired but grateful", "frustrated yet hopeful", "exhausted but determined"
+- Look for subtext, metaphor, implied meanings
+- Treat colloquial language as valid emotional signals
+- Understand metaphors: "cloudy" = mental fog, "stagnant" = stuck, "weight" = burden, "flowing" = ease
+- Don't just look for emotion words — read the narrative and tone
+- Recognize positive emotions equally: pride, relief, contentment, peace, excitement, gratitude, hope
+- Recognize negative emotions: frustration, exhaustion, overwhelm, dissatisfaction, sadness, anxiety
+- Recognize mixed emotions: "tired but grateful", "frustrated yet hopeful"
 
-Examples of what to detect (POSITIVE):
-- "Finally finished the project and felt proud" → Pride, accomplishment, relief
-- "Had a really good conversation with my friend, felt heard" → Connection, gratitude, warmth
-- "Things are settling down, feeling more at peace" → Calm, relief, contentment
-- "Started working on my goal and it feels exciting" → Hopeful, excited, motivated
+Examples of what to detect:
+- "The day feels long, so much work, don't like my 9-6, feel cloudy/stagnant" → frustrated, exhausted, drained, trapped
+- "Finally finished that project, felt proud" → pride, accomplishment, relief
+- "Things settling down, feeling more at peace" → calm, relief, contentment
 
-Examples of what to detect (NEGATIVE):
-- "The day feels long, so much work, don't like my 9-6, feel cloudy/stagnant" → Frustrated, exhausted, drained, trapped
-- "Can't stop thinking about what happened, worried" → Anxious, ruminating, worried
-- "Haven't heard from anyone in days, feel invisible" → Lonely, isolated, unseen
-
-Examples of what NOT to do:
-- DON'T return "neutral" for complaints, venting, or dissatisfaction (this is WRONG)
-- DON'T ignore positive emotions just because someone uses simple language
-- DON'T keyword-match; read the full context
-- DON'T assume broken English means neutral; understand the person's actual feeling
-
-Player name: ${playerName}
-Recent history: ${recentContext || "First entry."}
-Trajectory: ${analysis.trajectory?.label || "Early days"}
-
-Return ONLY valid JSON, no markdown:
-{"detectedEmotion": "honest read of their emotional state (can be nuanced, mixed, simple — whatever you actually detect)", "companionResponse": "your warm, understanding response that matches their emotional tone"}
+Return ONLY valid JSON:
+{"detectedEmotion": "honest read of their emotional state", "companionResponse": "warm response matching their tone"}
 
 Journal entry:
 "${text}"`;
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${this.geminiKey}`;
+    const apiKey = import.meta.env.VITE_GROQ_API_KEY;
+    if (!apiKey) throw new Error("VITE_GROQ_API_KEY not set");
 
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: systemInstruction }] },
-        contents: [{ role: "user", parts: [{ text: prompt }] }],
-        generationConfig: { maxOutputTokens: 500, temperature: 0.9 },
-      }),
-    });
+    try {
+      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${apiKey}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "llama-3.3-70b-versatile",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt }
+          ],
+          temperature: 0.9,
+          max_tokens: 500
+        })
+      });
 
-    if (!res.ok) {
-      const errBody = await res.json().catch(() => ({}));
-      throw new Error(`Gemini API ${res.status}: ${errBody?.error?.message ?? "unknown"}`);
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new Error(`Groq API ${response.status}: ${error.error?.message || "unknown error"}`);
+      }
+
+      const data = await response.json();
+      const raw = data.choices?.[0]?.message?.content;
+
+      if (!raw) throw new Error("Empty Groq response");
+
+      const jsonMatch = raw.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) throw new Error("No JSON in Groq response");
+
+      const parsed = JSON.parse(jsonMatch[0]);
+      const detectedEmotion = parsed.detectedEmotion?.trim();
+      const companionResponse = parsed.companionResponse?.trim();
+
+      if (!detectedEmotion) throw new Error("No detectedEmotion in response");
+      if (!companionResponse) throw new Error("No companionResponse in response");
+
+      console.info("[Kindred] Groq detected:", detectedEmotion);
+      return { text: companionResponse, source: "groq", emotion: detectedEmotion };
+
+    } catch (err) {
+      console.error("[Kindred] Groq error:", err.message);
+      throw err;
     }
-
-    const data = await res.json();
-    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!raw) throw new Error("Empty Gemini response");
-
-    // Extract JSON even if the model wraps it in prose
-    const jsonMatch = raw.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error("No JSON in Gemini response");
-
-    const parsed = JSON.parse(jsonMatch[0]);
-    const detectedEmotion = parsed.detectedEmotion?.trim();
-    const companionResponse = parsed.companionResponse?.trim();
-    
-    if (!detectedEmotion) throw new Error("Empty detectedEmotion in Gemini JSON");
-    if (!companionResponse) throw new Error("Empty companionResponse in Gemini JSON");
-
-    console.info("[Kindred] Gemini freely detected:", detectedEmotion);
-    return { text: companionResponse, source: "gemini", emotion: detectedEmotion };
   }
 
-  /**
-   * Detects emotion from a quiz summary text using Gemini.
-   * Returns the emotion string (nuanced, not preset), or null if unavailable.
-   */
   async detectEmotion(summaryText, pastEntries = []) {
-    if (!this.geminiKey) return null;
+    const apiKey = import.meta.env.VITE_GROQ_API_KEY;
+    if (!apiKey) return null;
 
     const recentContext = pastEntries.slice(0, 3).map(e =>
       `${e.date}: ${e.emotion}`
     ).join(", ");
 
-    const systemInstruction = `You are a mental wellness expert analyzing wellbeing check-in data. Your job is to understand the person's overall emotional and mental state from the quiz results.
+    const systemPrompt = `You are a mental wellness expert analyzing wellbeing check-in data. Understand the person's overall emotional and mental state from the quiz results.
 
 Read the FULL PICTURE:
 - High energy + meaningful work + good sleep = energized, capable, engaged
 - Low energy + difficulty with tasks + good relationships = tired but supported, content
-- Mixed scores across dimensions = complex state (might be "balanced but uncertain", "growing", "adjusting")
-- Don't assume low scores = depression; might be "recovering", "tired but hopeful", "introspective"
-- High scores might not mean "happy"; might mean "anxious energy", "overwhelmed busyness", "manic-like productivity"
+- Mixed scores = complex state ("balanced but uncertain", "growing", "adjusting")
+- Don't assume low scores = depression; might be "recovering", "tired but hopeful"
+- High scores might not mean "happy"; might mean "anxious energy", "overwhelmed busyness"
 
 Look at the whole story, not individual low numbers.`;
 
-    const prompt = `Someone completed a mental wellbeing check-in. Read ALL dimensions together to understand their actual emotional and mental state right now.
+    const userPrompt = `Someone completed a mental wellbeing check-in. Read ALL dimensions together to understand their actual emotional and mental state.
 
 ${summaryText}
 ${recentContext ? `\nRecent emotional history: ${recentContext}` : ""}
@@ -537,38 +516,40 @@ Read the full wellness picture:
 - If everything is balanced → "grounded", "stable", "in equilibrium"
 - If mood is low but purpose is high → "struggling but driven" or "exhausted but committed"
 - If everything is high → "thriving", "energized", "in flow"
-- If everything is low → "depleted", "burnt out", "struggling across the board"
+- If everything is low → "depleted", "burnt out", "struggling"
 
-Don't assume low scores = depression. Low sleep + high productivity = "pushing hard", not necessarily sad.
-High anxiety + good relationships = "worried but held", not just "anxious".
-
-Name the actual emotional state you detect. Examples:
+Name the actual emotional state. Examples:
 - "energized and engaged"
 - "tired but supported"
 - "overwhelmed and isolated"
 - "recovering and rebuilding"
 - "stable and content"
-- "anxious but grounded"
-- "burnt out but hopeful"
 
 Return ONLY valid JSON:
 {"emotion": "your honest read of their wellness state"}`;
 
     try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${this.geminiKey}`;
-      const res = await fetch(url, {
+      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Authorization": `Bearer ${apiKey}`,
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({
-          systemInstruction: { parts: [{ text: systemInstruction }] },
-          contents: [{ role: "user", parts: [{ text: prompt }] }],
-          generationConfig: { maxOutputTokens: 150, temperature: 0.9 },
-        }),
+          model: "llama-3.3-70b-versatile",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt }
+          ],
+          temperature: 0.75,
+          max_tokens: 200
+        })
       });
 
-      if (!res.ok) throw new Error(`Gemini API ${res.status}`);
-      const data = await res.json();
-      const raw = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!response.ok) throw new Error(`Groq API ${response.status}`);
+
+      const data = await response.json();
+      const raw = data.choices?.[0]?.message?.content;
       if (!raw) return null;
 
       const jsonMatch = raw.match(/\{[^}]+\}/);
@@ -576,7 +557,8 @@ Return ONLY valid JSON:
 
       const parsed = JSON.parse(jsonMatch[0]);
       const emotion = parsed.emotion?.trim();
-      console.info("[Kindred] Quiz Gemini detected:", emotion);
+
+      console.info("[Kindred] Quiz Groq detected:", emotion);
       return emotion;
     } catch (err) {
       console.warn("[Kindred] Quiz emotion detection failed:", err.message);
@@ -609,6 +591,23 @@ Return ONLY valid JSON:
 
     return { text: response, source: "companion" };
   }
+}
+
+function getWellnessScore(emotion) {
+  if (!emotion) return 5;
+  const PRESET = { happy: 9, excited: 9, grateful: 8, content: 7, calm: 7, neutral: 5, tired: 3, anxious: 3, angry: 3, sad: 2 };
+  if (PRESET[emotion] !== undefined) return PRESET[emotion];
+  const lower = emotion.toLowerCase();
+  if (lower.includes("happy") || lower.includes("joy") || lower.includes("thrill") || lower.includes("elat")) return 9;
+  if (lower.includes("excit") || lower.includes("energiz") || lower.includes("buzzing")) return 9;
+  if (lower.includes("grateful") || lower.includes("thankful") || lower.includes("hopeful") || lower.includes("appreciat")) return 8;
+  if (lower.includes("calm") || lower.includes("peace") || lower.includes("ground") || lower.includes("settl")) return 7;
+  if (lower.includes("content") || lower.includes("okay") || lower.includes("fine") || lower.includes("steady")) return 7;
+  if (lower.includes("tired") || lower.includes("exhaust") || lower.includes("drain") || lower.includes("weary")) return 3;
+  if (lower.includes("anxious") || lower.includes("worried") || lower.includes("overwhelm") || lower.includes("panic")) return 3;
+  if (lower.includes("angry") || lower.includes("frustrat") || lower.includes("irritat") || lower.includes("trap")) return 3;
+  if (lower.includes("sad") || lower.includes("lone") || lower.includes("depress") || lower.includes("hollow")) return 2;
+  return 5;
 }
 
 // ── JournalMemory ─────────────────────────────────────────────────────────────
@@ -655,12 +654,11 @@ export class JournalMemory {
 
   /** Returns moments where emotional wellbeing jumped significantly. */
   getGrowthMoments() {
-    const WELLNESS = { happy: 9, excited: 9, grateful: 8, content: 7, calm: 7, neutral: 5, tired: 3, anxious: 3, angry: 3, sad: 2 };
     const moments  = [];
     for (let i = 1; i < this.entries.length; i++) {
       const prev = this.entries[i];
       const curr = this.entries[i - 1];
-      const diff = (WELLNESS[curr.emotion] ?? 5) - (WELLNESS[prev.emotion] ?? 5);
+      const diff = getWellnessScore(curr.emotion) - getWellnessScore(prev.emotion);
       if (diff >= 3) moments.push({ date: curr.date, from: prev.emotion, to: curr.emotion });
     }
     return moments.slice(0, 3);

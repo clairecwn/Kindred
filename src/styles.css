@@ -2265,6 +2265,81 @@ input:focus, select:focus {
   white-space: nowrap;
 }
 
+/* ── Duolingo-style gamified check-in ───────────────────────────── */
+@keyframes quiz-select {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(0.91); }
+  65%  { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+@keyframes reaction-up {
+  from { transform: translateY(110%); }
+  to   { transform: translateY(0); }
+}
+
+@keyframes ring-expand {
+  0%   { transform: scale(0.55); opacity: 0.75; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+
+@keyframes coin-pop {
+  0%   { transform: translateY(0) scale(0.7); opacity: 0; }
+  40%  { transform: translateY(-18px) scale(1.15); opacity: 1; }
+  100% { transform: translateY(-44px) scale(1); opacity: 0; }
+}
+
+@keyframes celebration-bounce {
+  0%   { transform: scale(0.5) rotate(-8deg); opacity: 0; }
+  55%  { transform: scale(1.1) rotate(3deg); opacity: 1; }
+  75%  { transform: scale(0.97) rotate(-1deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+.quiz-visual-card {
+  flex: 1;
+  min-width: 0;
+  border-radius: var(--r-md);
+  border: 2.5px solid var(--border);
+  background: var(--surface);
+  padding: 14px 8px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  transition: border-color 0.16s, background 0.16s, transform 0.16s, box-shadow 0.16s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  text-align: center;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.quiz-visual-card:not(:disabled):hover {
+  background: rgba(232,132,90,0.07);
+  border-color: var(--brand);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(232,132,90,0.18);
+}
+
+.quiz-visual-card.selected {
+  animation: quiz-select 0.38s cubic-bezier(0.22,1,0.36,1) forwards;
+}
+
+.quiz-visual-card:disabled { cursor: default; }
+
+.quiz-reaction-panel {
+  position: fixed;
+  bottom: 72px;
+  left: 0;
+  right: 0;
+  padding: 15px 22px 17px;
+  animation: reaction-up 0.28s cubic-bezier(0.22,1,0.36,1) forwards;
+  z-index: 100;
+  border-top: 1px solid rgba(255,255,255,0.18);
+  box-shadow: 0 -6px 28px rgba(0,0,0,0.18);
+}
+
 /* ── Scrollbar styled ───────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
