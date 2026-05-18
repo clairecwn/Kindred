@@ -150,226 +150,425 @@ function EmotionBadge({ emotion, size = "normal" }) {
   );
 }
 
-// ── Quiz SVG visuals ─────────────────────────────────────────────────────────
+// ── Quiz mini-game components ────────────────────────────────────────────────
 
-function BatterySVG({ level, color }) {
+// PowerBarGame — tap nodes to set charge level, confirm to submit
+function PowerBarGame({ opts, disabled, onConfirm }) {
+  const [level, setLevel] = useState(0);
+  const color = getEmotionStyle(opts[level].emotion).color;
   return (
-    <svg width="62" height="30" viewBox="0 0 62 30" fill="none">
-      <rect x="1" y="4" width="52" height="22" rx="5" stroke={color} strokeWidth="2.5"/>
-      <rect x="53" y="11" width="8" height="8" rx="3" fill={color} opacity="0.5"/>
-      {[0,1,2,3].map(i => (
-        <rect key={i} x={5 + i * 12} y="8" width="9" height="14" rx="3"
-          fill={i <= level ? color : "transparent"}
-          stroke={color} strokeWidth="1.5"
-          opacity={i <= level ? (level === 0 ? 0.5 : 1) : 0.18}/>
-      ))}
-    </svg>
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 20, padding: "10px 0 4px" }}>
+      {/* Large battery SVG */}
+      <svg width="200" height="62" viewBox="0 0 200 62" fill="none">
+        <rect x="1" y="5" width="178" height="52" rx="10" stroke={color} strokeWidth="2.5"/>
+        <rect x="179" y="22" width="18" height="18" rx="6" fill={color} opacity="0.45"/>
+        {[0,1,2,3].map(i => (
+          <rect key={i} x={8 + i * 43} y="12" width="36" height="38" rx="7"
+            fill={i <= level ? color : "transparent"}
+            stroke={color} strokeWidth="1.8"
+            opacity={i <= level ? (level === 0 ? 0.55 : 1) : 0.15}/>
+        ))}
+      </svg>
+      {/* Tap nodes */}
+      <div style={{ display: "flex", gap: 14 }}>
+        {opts.map((opt, i) => {
+          const c = getEmotionStyle(opt.emotion).color;
+          const active = i <= level;
+          return (
+            <button key={i} onClick={() => !disabled && setLevel(i)}
+              style={{
+                width: 52, height: 52, borderRadius: "50%",
+                border: `2.5px solid ${active ? c : c + "40"}`,
+                background: active ? c + "28" : "transparent",
+                cursor: disabled ? "default" : "pointer",
+                display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                gap: 2, transition: "all 0.18s",
+                boxShadow: active ? `0 0 12px ${c}50` : "none",
+              }}>
+              <span style={{ fontSize: "0.62rem", fontWeight: 800, color: active ? c : "var(--text-3)", lineHeight: 1.1, textAlign: "center" }}>
+                {opt.label}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+      <button className="btn-primary" disabled={disabled} onClick={() => onConfirm(opts[level])}
+        style={{ background: `linear-gradient(135deg, ${color}, ${color}bb)`, minWidth: 130 }}>
+        That's it
+      </button>
+    </div>
   );
 }
 
-function WeatherSVG({ level, color }) {
-  if (level === 3) return (
-    <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
-      <circle cx="26" cy="26" r="11" fill={color}/>
-      {[0,45,90,135,180,225,270,315].map((deg, i) => {
-        const r = deg * Math.PI / 180;
-        return <line key={i} x1={26+15*Math.cos(r)} y1={26+15*Math.sin(r)} x2={26+21*Math.cos(r)} y2={26+21*Math.sin(r)} stroke={color} strokeWidth="2.5" strokeLinecap="round"/>;
+// SkyScenesGame — 4 weather scene cards, tap to advance
+function SkyScenesGame({ opts, disabled, onPick }) {
+  const SCENE_STYLES = [
+    { bg: "linear-gradient(160deg, #2C3A52 0%, #3D4F6A 60%, #4A5A7A 100%)", label: "Storm" },
+    { bg: "linear-gradient(160deg, #6B7A8D 0%, #8A97A8 60%, #9EAAB8 100%)", label: "Cloudy" },
+    { bg: "linear-gradient(160deg, #4A8BBF 0%, #6AAED6 60%, #89C4E1 100%)", label: "Partly sunny" },
+    { bg: "linear-gradient(160deg, #E8A830 0%, #F2C050 60%, #F8D878 100%)", label: "Sunny" },
+  ];
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, padding: "4px 0" }}>
+      {opts.map((opt, i) => {
+        const scene = SCENE_STYLES[i];
+        return (
+          <button key={i} onClick={() => !disabled && onPick(opt)} disabled={disabled}
+            style={{
+              borderRadius: 18, border: "none", cursor: disabled ? "default" : "pointer",
+              background: scene.bg, overflow: "hidden", position: "relative",
+              height: 108, padding: 0, transition: "transform 0.18s, box-shadow 0.18s",
+            }}
+            onMouseEnter={e => { if (!disabled) { e.currentTarget.style.transform = "scale(1.04)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.25)"; }}}
+            onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = ""; }}>
+            {/* Animated weather element */}
+            {i === 0 && (
+              <div style={{ position: "absolute", inset: 0, overflow: "hidden" }}>
+                {[...Array(6)].map((_, r) => (
+                  <div key={r} style={{
+                    position: "absolute", width: 2, height: 10, borderRadius: 2,
+                    background: "rgba(150,180,220,0.7)",
+                    left: `${12 + r * 14}%`, top: "10%",
+                    animation: `rain-fall 0.9s linear ${r * 0.12}s infinite`,
+                  }}/>
+                ))}
+              </div>
+            )}
+            {i === 1 && (
+              <div style={{ position: "absolute", inset: 0, overflow: "hidden" }}>
+                {[0, 1].map(c => (
+                  <div key={c} style={{
+                    position: "absolute", width: 50, height: 18, borderRadius: 20,
+                    background: "rgba(255,255,255,0.18)",
+                    top: `${28 + c * 28}%`, left: `${5 + c * 30}%`,
+                    animation: `cloud-drift 4s ease-in-out ${c * 1.5}s infinite alternate`,
+                  }}/>
+                ))}
+              </div>
+            )}
+            {i === 3 && (
+              <div style={{ position: "absolute", top: 12, right: 14 }}>
+                <div style={{
+                  width: 26, height: 26,
+                  background: "rgba(255,240,160,0.85)",
+                  borderRadius: "50%",
+                  boxShadow: "0 0 14px rgba(255,220,80,0.8)",
+                  animation: `sun-rotate 6s linear infinite`,
+                }}/>
+              </div>
+            )}
+            {/* Label */}
+            <div style={{
+              position: "absolute", bottom: 10, left: 0, right: 0, textAlign: "center",
+            }}>
+              <span style={{
+                fontWeight: 900, fontSize: "0.82rem", color: i <= 1 ? "rgba(255,255,255,0.92)" : "#1a2030",
+                textShadow: i <= 1 ? "0 1px 4px rgba(0,0,0,0.4)" : "none",
+              }}>{opt.label}</span>
+              <div style={{ fontSize: "0.65rem", color: i <= 1 ? "rgba(255,255,255,0.65)" : "rgba(0,0,0,0.5)", marginTop: 2 }}>
+                {opt.desc}
+              </div>
+            </div>
+          </button>
+        );
       })}
-    </svg>
-  );
-  if (level === 2) return (
-    <svg width="54" height="48" viewBox="0 0 54 48" fill="none">
-      <circle cx="36" cy="17" r="8" fill={color} opacity="0.75"/>
-      {[0,45,90,135,180].map((deg, i) => {
-        const r = deg * Math.PI / 180;
-        return <line key={i} x1={36+11*Math.cos(r)} y1={17+11*Math.sin(r)} x2={36+15*Math.cos(r)} y2={17+15*Math.sin(r)} stroke={color} strokeWidth="2" strokeLinecap="round" opacity="0.7"/>;
-      })}
-      <ellipse cx="22" cy="34" rx="16" ry="10" fill="white" stroke={color} strokeWidth="1.5"/>
-      <circle cx="14" cy="31" r="9" fill="white" stroke={color} strokeWidth="1.5"/>
-      <circle cx="30" cy="29" r="8" fill="white" stroke={color} strokeWidth="1.5"/>
-    </svg>
-  );
-  if (level === 1) return (
-    <svg width="54" height="42" viewBox="0 0 54 42" fill="none">
-      <ellipse cx="27" cy="28" rx="20" ry="11" fill="white" stroke={color} strokeWidth="2" opacity="0.6"/>
-      <circle cx="17" cy="25" r="10" fill="white" stroke={color} strokeWidth="2" opacity="0.7"/>
-      <circle cx="36" cy="24" r="9" fill="white" stroke={color} strokeWidth="2" opacity="0.7"/>
-      <ellipse cx="27" cy="32" rx="18" ry="9" fill="white" stroke={color} strokeWidth="2"/>
-      <circle cx="17" cy="29" r="9" fill="white" stroke={color} strokeWidth="2"/>
-      <circle cx="36" cy="28" r="8" fill="white" stroke={color} strokeWidth="2"/>
-    </svg>
-  );
-  return (
-    <svg width="54" height="52" viewBox="0 0 54 52" fill="none">
-      <ellipse cx="27" cy="24" rx="21" ry="13" fill="white" stroke={color} strokeWidth="2" opacity="0.5"/>
-      <circle cx="16" cy="21" r="10" fill="white" stroke={color} strokeWidth="2" opacity="0.6"/>
-      <circle cx="37" cy="20" r="9" fill="white" stroke={color} strokeWidth="2" opacity="0.6"/>
-      <path d="M28 34 L21 45 L27 43 L20 52" stroke={color} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
+    </div>
   );
 }
 
-function StarsSVG({ level, color }) {
-  const pts = (cx) => `${cx},4 ${cx+3.5},12 ${cx+12},12 ${cx+5},17 ${cx+8},26 ${cx},21 ${cx-8},26 ${cx-5},17 ${cx-12},12 ${cx-3.5},12`;
+// StarTapGame — 3 stars, tap to cycle 0→3 stars filled, confirm to submit
+function StarTapGame({ opts, disabled, onConfirm }) {
+  const [filled, setFilled] = useState(0);
+  const color = getEmotionStyle(opts[Math.min(filled, opts.length - 1)].emotion).color;
+  const starPts = (cx, cy, r1 = 28, r2 = 12) => {
+    const pts = [];
+    for (let i = 0; i < 10; i++) {
+      const angle = (i * Math.PI) / 5 - Math.PI / 2;
+      const r = i % 2 === 0 ? r1 : r2;
+      pts.push(`${cx + r * Math.cos(angle)},${cy + r * Math.sin(angle)}`);
+    }
+    return pts.join(" ");
+  };
   return (
-    <svg width="76" height="30" viewBox="0 0 76 30" fill="none">
-      {[0,1,2].map(i => (
-        <polygon key={i} points={pts(13 + i * 25)}
-          fill={i < level ? color : "transparent"}
-          stroke={color} strokeWidth="1.5"
-          opacity={i < level ? 1 : 0.25}/>
-      ))}
-    </svg>
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 18, padding: "10px 0 4px" }}>
+      <svg width="220" height="72" viewBox="0 0 220 72" fill="none"
+        style={{ cursor: disabled ? "default" : "pointer" }}
+        onClick={() => !disabled && setFilled(f => (f + 1) % 4)}>
+        {[0, 1, 2].map(i => {
+          const lit = i < filled;
+          const c = lit ? getEmotionStyle(opts[filled - 1]?.emotion ?? opts[0].emotion).color : "#ccc";
+          return (
+            <g key={i}>
+              <polygon points={starPts(36 + i * 74, 36)}
+                fill={lit ? c : "transparent"}
+                stroke={lit ? c : "#bbb"}
+                strokeWidth="2"
+                style={{ filter: lit ? `drop-shadow(0 0 8px ${c}99)` : "none", transition: "all 0.2s" }}/>
+            </g>
+          );
+        })}
+      </svg>
+      <div style={{ fontSize: "0.82rem", color: "var(--text-2)", fontWeight: 700 }}>
+        {filled === 0 ? "Tap to add stars" : opts[Math.min(filled - 1, opts.length - 1)].label}
+      </div>
+      <button className="btn-primary" disabled={disabled} onClick={() => onConfirm(opts[Math.min(filled, opts.length - 1)])}
+        style={{ background: `linear-gradient(135deg, ${color}, ${color}bb)`, minWidth: 130 }}>
+        That's it
+      </button>
+    </div>
   );
 }
 
-function RippleSVG({ level, color }) {
-  const dots = [{ x:44, y:38 },{ x:37, y:30 },{ x:30, y:24 },{ x:26, y:26 }];
-  const p = dots[level];
+// RippleZoneGame — concentric rings, tap a zone to advance
+function RippleZoneGame({ opts, disabled, onPick }) {
+  const ZONES = [
+    { r: 88, label: "Far away", idx: 0 },
+    { r: 64, label: "Some distance", idx: 1 },
+    { r: 40, label: "Close by", idx: 2 },
+    { r: 20, label: "Right here", idx: 3 },
+  ];
+  const [hovered, setHovered] = useState(null);
+  const cx = 100, cy = 100;
   return (
-    <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
-      <circle cx="26" cy="26" r="22" stroke={color} strokeWidth="1.5" opacity="0.18"/>
-      <circle cx="26" cy="26" r="15" stroke={color} strokeWidth="1.5" opacity="0.32"/>
-      <circle cx="26" cy="26" r="8"  stroke={color} strokeWidth="1.5" opacity="0.52"/>
-      <circle cx="26" cy="26" r="3"  fill={color} opacity="0.6"/>
-      <circle cx={p.x} cy={p.y} r="5"   fill={color}/>
-      <circle cx={p.x} cy={p.y} r="8.5" stroke={color} strokeWidth="1.5" opacity="0.35"/>
-    </svg>
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "8px 0 4px" }}>
+      <svg width="200" height="200" viewBox="0 0 200 200" style={{ overflow: "visible" }}>
+        {ZONES.map(({ r, label, idx }) => {
+          const opt = opts[idx];
+          const c = getEmotionStyle(opt.emotion).color;
+          const isHov = hovered === idx;
+          return (
+            <g key={idx} style={{ cursor: disabled ? "default" : "pointer" }}
+              onClick={() => !disabled && onPick(opt)}
+              onMouseEnter={() => setHovered(idx)}
+              onMouseLeave={() => setHovered(null)}>
+              <circle cx={cx} cy={cy} r={r}
+                fill={isHov ? c + "22" : c + "09"}
+                stroke={c}
+                strokeWidth={isHov ? 2.5 : 1.5}
+                opacity={0.3 + idx * 0.18}
+                style={{ transition: "all 0.15s" }}/>
+              <text x={cx + r - 6} y={cy - 5} textAnchor="end"
+                style={{ fontSize: "9px", fontWeight: 700, fill: c, opacity: 0.85, pointerEvents: "none" }}>
+                {label}
+              </text>
+            </g>
+          );
+        })}
+        <circle cx={cx} cy={cy} r="6" fill="#aaa" opacity="0.35"/>
+      </svg>
+    </div>
   );
 }
 
-function JarSVG({ level, color }) {
-  const fillY = [48, 38, 28, 14][level];
+// JarFillGame — large jar with +/- controls, confirm to submit
+function JarFillGame({ opts, disabled, onConfirm }) {
+  const [level, setLevel] = useState(0);
+  const color = getEmotionStyle(opts[level].emotion).color;
+  const fillFractions = [0, 0.25, 0.5, 1];
+  const jarH = 110, jarW = 60, jarY = 14, jarX = 20, lidH = 12;
+  const fillH = fillFractions[level] * jarH;
+  const fillY = jarY + jarH - fillH;
   return (
-    <svg width="36" height="52" viewBox="0 0 36 52" fill="none">
-      <defs>
-        <clipPath id={`jc${level}`}>
-          <path d="M4 13 Q4 9 9 9 L27 9 Q32 9 32 13 L32 46 Q32 50 27 50 L9 50 Q4 50 4 46 Z"/>
-        </clipPath>
-      </defs>
-      <rect x="9" y="2" width="18" height="8" rx="3" fill={color} opacity="0.55"/>
-      <path d="M4 13 Q4 9 9 9 L27 9 Q32 9 32 13 L32 46 Q32 50 27 50 L9 50 Q4 50 4 46 Z" fill="none" stroke={color} strokeWidth="2.2"/>
-      {level > 0 && <rect x="4" y={fillY} width="28" height={52} fill={color} opacity="0.35" clipPath={`url(#jc${level})`}/>}
-      <line x1="10" y1="15" x2="10" y2="44" stroke="white" strokeWidth="2.5" strokeLinecap="round" opacity="0.35"/>
-    </svg>
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16, padding: "8px 0 4px" }}>
+      <svg width="100" height="150" viewBox="0 0 100 150" fill="none">
+        <defs>
+          <clipPath id="jar-clip">
+            <path d={`M${jarX} ${jarY + lidH} Q${jarX} ${jarY + lidH - 4} ${jarX + 6} ${jarY + lidH - 4} L${jarX + jarW - 6} ${jarY + lidH - 4} Q${jarX + jarW} ${jarY + lidH - 4} ${jarX + jarW} ${jarY + lidH} L${jarX + jarW} ${jarY + jarH + lidH - 6} Q${jarX + jarW} ${jarY + jarH + lidH} ${jarX + jarW - 6} ${jarY + jarH + lidH} L${jarX + 6} ${jarY + jarH + lidH} Q${jarX} ${jarY + jarH + lidH} ${jarX} ${jarY + jarH + lidH - 6} Z`}/>
+          </clipPath>
+        </defs>
+        {/* Lid */}
+        <rect x={jarX + 8} y={jarY} width={jarW - 16} height={lidH} rx="4" fill={color} opacity="0.5"/>
+        {/* Jar body outline */}
+        <path d={`M${jarX} ${jarY + lidH} Q${jarX} ${jarY + lidH - 4} ${jarX + 6} ${jarY + lidH - 4} L${jarX + jarW - 6} ${jarY + lidH - 4} Q${jarX + jarW} ${jarY + lidH - 4} ${jarX + jarW} ${jarY + lidH} L${jarX + jarW} ${jarY + jarH + lidH - 6} Q${jarX + jarW} ${jarY + jarH + lidH} ${jarX + jarW - 6} ${jarY + jarH + lidH} L${jarX + 6} ${jarY + jarH + lidH} Q${jarX} ${jarY + jarH + lidH} ${jarX} ${jarY + jarH + lidH - 6} Z`}
+          fill="none" stroke={color} strokeWidth="2.5"/>
+        {/* Fill */}
+        {level > 0 && (
+          <rect x={jarX} y={fillY + lidH} width={jarW} height={fillH}
+            fill={color} opacity="0.35" clipPath="url(#jar-clip)"/>
+        )}
+        {/* Shine line */}
+        <line x1={jarX + 8} y1={jarY + lidH + 8} x2={jarX + 8} y2={jarY + jarH + lidH - 8}
+          stroke="white" strokeWidth="3" strokeLinecap="round" opacity="0.28"/>
+      </svg>
+      {/* Controls */}
+      <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+        <button onClick={() => !disabled && setLevel(l => Math.max(0, l - 1))} disabled={disabled || level === 0}
+          style={{ width: 42, height: 42, borderRadius: "50%", border: `2px solid ${color}50`, background: color + "15",
+            fontSize: "1.4rem", fontWeight: 700, cursor: level === 0 || disabled ? "default" : "pointer",
+            color: color, opacity: level === 0 ? 0.3 : 1, display: "grid", placeItems: "center" }}>
+          –
+        </button>
+        <span style={{ fontWeight: 800, fontSize: "0.88rem", color: "var(--text-2)", minWidth: 80, textAlign: "center" }}>
+          {opts[level].label}
+        </span>
+        <button onClick={() => !disabled && setLevel(l => Math.min(opts.length - 1, l + 1))} disabled={disabled || level === opts.length - 1}
+          style={{ width: 42, height: 42, borderRadius: "50%", border: `2px solid ${color}50`, background: color + "15",
+            fontSize: "1.4rem", fontWeight: 700, cursor: level === opts.length - 1 || disabled ? "default" : "pointer",
+            color: color, opacity: level === opts.length - 1 ? 0.3 : 1, display: "grid", placeItems: "center" }}>
+          +
+        </button>
+      </div>
+      <button className="btn-primary" disabled={disabled} onClick={() => onConfirm(opts[level])}
+        style={{ background: `linear-gradient(135deg, ${color}, ${color}bb)`, minWidth: 130 }}>
+        That's it
+      </button>
+    </div>
   );
 }
 
-function MoonSVG({ level, color }) {
-  if (level === 3) return (
-    <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-      <circle cx="24" cy="24" r="17" fill={color} opacity="0.85"/>
-      <circle cx="7"  cy="11" r="2"   fill={color} opacity="0.45"/>
-      <circle cx="40" cy="9"  r="1.5" fill={color} opacity="0.4"/>
-      <circle cx="41" cy="35" r="2"   fill={color} opacity="0.45"/>
-      <circle cx="6"  cy="38" r="1.5" fill={color} opacity="0.35"/>
-    </svg>
-  );
-  const clipW = [7, 14, 22, 34][level];
+// MoonCarouselGame — cycle through moon phases with arrows, confirm to submit
+function MoonCarouselGame({ opts, disabled, onConfirm }) {
+  const [phase, setPhase] = useState(0);
+  const color = getEmotionStyle(opts[phase].emotion).color;
+  // phase 0=thin crescent, 1=quarter, 2=half, 3=full
+  const clipWidths = [12, 22, 34, 68];
+  const cw = clipWidths[phase];
   return (
-    <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-      <defs>
-        <clipPath id={`mc${level}`}>
-          <rect x={24 - clipW/2} y="6" width={clipW} height="36"/>
-        </clipPath>
-      </defs>
-      <circle cx="24" cy="24" r="17" fill="transparent" stroke={color} strokeWidth="1.5" opacity="0.25"/>
-      <circle cx="24" cy="24" r="17" fill={color} opacity="0.82" clipPath={`url(#mc${level})`}/>
-      <circle cx="9"  cy="13" r="1.5" fill={color} opacity="0.38"/>
-      <circle cx="38" cy="11" r="2"   fill={color} opacity="0.32"/>
-    </svg>
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16, padding: "8px 0 4px" }}>
+      <svg width="130" height="130" viewBox="0 0 130 130" fill="none">
+        <defs>
+          <clipPath id={`moon-phase-${phase}`}>
+            <rect x={65 - cw / 2} y="10" width={cw} height="110"/>
+          </clipPath>
+        </defs>
+        {/* Star dots around */}
+        {[[18,22],[110,18],[115,95],[20,100],[60,12],[100,50]].map(([x,y], i) => (
+          <circle key={i} cx={x} cy={y} r={i % 2 === 0 ? 1.5 : 2} fill={color} opacity={0.2 + i * 0.05}/>
+        ))}
+        {/* Moon outline */}
+        <circle cx="65" cy="65" r="46" fill="transparent" stroke={color} strokeWidth="1.5" opacity="0.2"/>
+        {/* Moon fill */}
+        {phase < 3
+          ? <circle cx="65" cy="65" r="46" fill={color} opacity="0.85" clipPath={`url(#moon-phase-${phase})`}/>
+          : <circle cx="65" cy="65" r="46" fill={color} opacity="0.85"/>
+        }
+        {/* Craters on full moon */}
+        {phase === 3 && <>
+          <circle cx="52" cy="52" r="5" fill={color} opacity="0.5"/>
+          <circle cx="78" cy="44" r="3.5" fill={color} opacity="0.4"/>
+          <circle cx="72" cy="74" r="4" fill={color} opacity="0.45"/>
+        </>}
+      </svg>
+      <div style={{ display: "flex", alignItems: "center", gap: 22 }}>
+        <button onClick={() => !disabled && setPhase(p => Math.max(0, p - 1))} disabled={disabled || phase === 0}
+          style={{ width: 38, height: 38, borderRadius: "50%", border: `2px solid ${color}40`, background: color + "15",
+            fontSize: "1.2rem", cursor: phase === 0 || disabled ? "default" : "pointer",
+            color: color, opacity: phase === 0 ? 0.3 : 1, display: "grid", placeItems: "center" }}>
+          ‹
+        </button>
+        <div style={{ textAlign: "center", minWidth: 120 }}>
+          <div style={{ fontWeight: 800, fontSize: "0.9rem", color }}>
+            {opts[phase].label}
+          </div>
+          <div style={{ fontSize: "0.67rem", color: "var(--text-3)", marginTop: 3 }}>
+            {opts[phase].desc}
+          </div>
+        </div>
+        <button onClick={() => !disabled && setPhase(p => Math.min(opts.length - 1, p + 1))} disabled={disabled || phase === opts.length - 1}
+          style={{ width: 38, height: 38, borderRadius: "50%", border: `2px solid ${color}40`, background: color + "15",
+            fontSize: "1.2rem", cursor: phase === opts.length - 1 || disabled ? "default" : "pointer",
+            color: color, opacity: phase === opts.length - 1 ? 0.3 : 1, display: "grid", placeItems: "center" }}>
+          ›
+        </button>
+      </div>
+      <button className="btn-primary" disabled={disabled} onClick={() => onConfirm(opts[phase])}
+        style={{ background: `linear-gradient(135deg, ${color}, ${color}bb)`, minWidth: 130 }}>
+        That's it
+      </button>
+    </div>
   );
 }
 
-function MountainSVG({ level, color }) {
-  const dots = [{ x:26, y:44 },{ x:25, y:34 },{ x:24, y:22 },{ x:24, y:11 }];
-  const p = dots[level];
+// MountainWaypointGame — mountain SVG with labeled tap zones, tap to advance
+function MountainWaypointGame({ opts, disabled, onPick }) {
+  const WAYPOINTS = [
+    { label: "Base",         cx: 130, cy: 178, idx: 0 },
+    { label: "Lower slope",  cx: 108, cy: 148, idx: 1 },
+    { label: "Near summit",  cx:  88, cy: 110, idx: 2 },
+    { label: "Peak",         cx:  80, cy:  64, idx: 3 },
+  ];
+  const [hovered, setHovered] = useState(null);
   return (
-    <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
-      <path d="M2 48 L24 4 L46 48 Z" fill={color} opacity="0.15" stroke={color} strokeWidth="2" strokeLinejoin="round"/>
-      <path d="M25 46 L24 34 L24 12" stroke={color} strokeWidth="1.5" strokeDasharray="3 3" opacity="0.4" strokeLinecap="round"/>
-      {level === 3 && <>
-        <line x1="24" y1="4" x2="24" y2="0" stroke={color} strokeWidth="1.5"/>
-        <polygon points="24,0 30,3 24,6" fill={color}/>
-      </>}
-      <circle cx={p.x} cy={p.y} r="5.5" fill={color}/>
-      <circle cx={p.x} cy={p.y} r="9"   stroke={color} strokeWidth="1.5" opacity="0.32"/>
-    </svg>
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "4px 0 4px" }}>
+      <svg width="200" height="210" viewBox="0 0 200 210" fill="none">
+        {/* Mountain body */}
+        <path d="M10 200 L80 40 L180 200 Z"
+          fill="var(--bg-2)" stroke="var(--text-3)" strokeWidth="2" strokeLinejoin="round" opacity="0.7"/>
+        {/* Snow cap */}
+        <path d="M80 40 L64 88 L96 88 Z" fill="white" opacity="0.55"/>
+        {/* Trail dashes */}
+        <path d="M130 178 L108 148 L88 110 L80 64"
+          stroke="var(--text-3)" strokeWidth="1.5" strokeDasharray="4 4" opacity="0.35" strokeLinecap="round"/>
+        {/* Tap zones */}
+        {WAYPOINTS.map(({ label, cx, cy, idx }) => {
+          const opt = opts[idx];
+          const c = getEmotionStyle(opt.emotion).color;
+          const isHov = hovered === idx;
+          return (
+            <g key={idx} style={{ cursor: disabled ? "default" : "pointer" }}
+              onClick={() => !disabled && onPick(opt)}
+              onMouseEnter={() => setHovered(idx)}
+              onMouseLeave={() => setHovered(null)}>
+              <circle cx={cx} cy={cy} r={isHov ? 16 : 12}
+                fill={isHov ? c + "35" : c + "20"}
+                stroke={c} strokeWidth={isHov ? 2.5 : 1.8}
+                style={{ transition: "all 0.15s" }}/>
+              <circle cx={cx} cy={cy} r="5" fill={c} opacity="0.9"/>
+              <text x={cx + 18} y={cy + 4} style={{ fontSize: "9.5px", fontWeight: 800, fill: c, pointerEvents: "none" }}>
+                {label}
+              </text>
+            </g>
+          );
+        })}
+      </svg>
+    </div>
   );
 }
 
-// ── Quiz metadata: playful questions + companion reactions + SVG visuals ───────
+// ── Quiz metadata ─────────────────────────────────────────────────────────────
 const QUIZ_META = {
-  energy: {
-    friendlyQ: "What's your battery at right now?",
-    visual: (score, color) => <BatterySVG level={score} color={color} />,
-    reactions: [
-      "Even a dim light is still a light.",
-      "Running low but still running. That counts.",
-      "Steady is more than it sounds.",
-      "This energy is real. Carry it with you.",
-    ],
-  },
-  mood: {
-    friendlyQ: "Today's weather report?",
-    visual: (score, color) => <WeatherSVG level={score} color={color} />,
-    reactions: [
-      "Heavy days deserve space. I'm here.",
-      "Up and down is still movement.",
-      "Calm is its own kind of okay.",
-      "Something genuinely good is alive in you.",
-    ],
-  },
-  meaning: {
-    friendlyQ: "How many stars lit up today?",
-    visual: (score, color) => <StarsSVG level={score} color={color} />,
-    reactions: [
-      "Going through the motions still takes strength.",
-      "Unclear days are part of it too.",
-      "Small moments are real moments.",
-      "Something real touched you today.",
-    ],
-  },
-  connection: {
-    friendlyQ: "How close do you feel to the people you love?",
-    visual: (score, color) => <RippleSVG level={score} color={color} />,
-    reactions: [
-      "Loneliness is loud. You showed up here.",
-      "Distance is temporary.",
-      "In-between is a real place to be.",
-      "Being seen is rare. Notice it.",
-    ],
-  },
-  accomplishment: {
-    friendlyQ: "How full is today's jar?",
-    visual: (score, color) => <JarSVG level={score} color={color} />,
-    reactions: [
-      "Starting is sometimes the whole victory.",
-      "The basics are the foundation.",
-      "Forward is forward, no matter the speed.",
-      "That pride is yours. Nobody can take it.",
-    ],
-  },
-  sleep: {
-    friendlyQ: "Last night's moon?",
-    visual: (score, color) => <MoonSVG level={score} color={color} />,
-    reactions: [
-      "Your body is asking for rest. Be gentle.",
-      "Restless nights are heavy. You carried it.",
-      "Good enough sleep is genuinely good.",
-      "Deep rest is a gift.",
-    ],
-  },
-  resilience: {
-    friendlyQ: "Where are you on the mountain today?",
-    visual: (score, color) => <MountainSVG level={score} color={color} />,
-    reactions: [
-      "Too much at once is real. You're still here.",
-      "Pushing through is its own kind of strength.",
-      "Handling it is more than it sounds.",
-      "Steady and capable — that's the whole thing.",
-    ],
-  },
+  energy:         { type: "powerbar",  reactions: [
+    "Even a dim light is still a light.",
+    "Running low but still running. That counts.",
+    "Steady is more than it sounds.",
+    "This energy is real. Carry it with you.",
+  ]},
+  mood:           { type: "skyscenes", reactions: [
+    "Heavy days deserve space. I'm here.",
+    "Up and down is still movement.",
+    "Calm is its own kind of okay.",
+    "Something genuinely good is alive in you.",
+  ]},
+  meaning:        { type: "stars",     reactions: [
+    "Going through the motions still takes strength.",
+    "Unclear days are part of it too.",
+    "Small moments are real moments.",
+    "Something real touched you today.",
+  ]},
+  connection:     { type: "ripple",    reactions: [
+    "Loneliness is loud. You showed up here.",
+    "Distance is temporary.",
+    "In-between is a real place to be.",
+    "Being seen is rare. Notice it.",
+  ]},
+  accomplishment: { type: "jarfill",   reactions: [
+    "Starting is sometimes the whole victory.",
+    "The basics are the foundation.",
+    "Forward is forward, no matter the speed.",
+    "That pride is yours. Nobody can take it.",
+  ]},
+  sleep:          { type: "mooncycle", reactions: [
+    "Your body is asking for rest. Be gentle.",
+    "Restless nights are heavy. You carried it.",
+    "Good enough sleep is genuinely good.",
+    "Deep rest is a gift.",
+  ]},
+  resilience:     { type: "mountain",  reactions: [
+    "Too much at once is real. You're still here.",
+    "Pushing through is its own kind of strength.",
+    "Handling it is more than it sounds.",
+    "Steady and capable — that's the whole thing.",
+  ]},
 };
 
 // Singletons — created once per module load
@@ -902,40 +1101,23 @@ export default function WellnessView({
 
           {/* Question */}
           <div style={{ fontSize: "1.28rem", fontWeight: 900, color: "var(--text)", marginBottom: 22, lineHeight: 1.25 }}>
-            {QUIZ_META[QUIZ[quizIdx].id]?.friendlyQ ?? QUIZ[quizIdx].q}
+            {QUIZ[quizIdx].q}
           </div>
 
-          {/* 2×2 visual option cards */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 11 }}>
-            {QUIZ[quizIdx].opts.map((opt) => {
-              const meta   = QUIZ_META[QUIZ[quizIdx].id];
-              const oColor = getEmotionStyle(opt.emotion).color;
-              const isSel  = selectedOptIdx === opt.score;
-              return (
-                <button
-                  key={opt.label}
-                  className={`quiz-visual-card${isSel ? " selected" : ""}`}
-                  onClick={() => handleQuizTap(opt)}
-                  disabled={quizReacting}
-                  style={isSel ? {
-                    borderColor: oColor,
-                    background: oColor + "1a",
-                    boxShadow: `0 0 0 3px ${oColor}28`,
-                  } : {}}
-                >
-                  <div style={{ height: 56, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    {meta?.visual(opt.score, oColor)}
-                  </div>
-                  <div style={{ fontWeight: 800, fontSize: "0.88rem", color: isSel ? oColor : "var(--text)", lineHeight: 1.2 }}>
-                    {opt.label}
-                  </div>
-                  <div style={{ fontSize: "0.67rem", color: "var(--text-3)", lineHeight: 1.3 }}>
-                    {opt.desc}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
+          {/* Mini-game */}
+          {(() => {
+            const q = QUIZ[quizIdx];
+            const t = QUIZ_META[q.id]?.type;
+            const common = { opts: q.opts, disabled: quizReacting };
+            if (t === "powerbar")  return <PowerBarGame      {...common} onConfirm={handleQuizTap} />;
+            if (t === "skyscenes") return <SkyScenesGame     {...common} onPick={handleQuizTap} />;
+            if (t === "stars")     return <StarTapGame       {...common} onConfirm={handleQuizTap} />;
+            if (t === "ripple")    return <RippleZoneGame    {...common} onPick={handleQuizTap} />;
+            if (t === "jarfill")   return <JarFillGame       {...common} onConfirm={handleQuizTap} />;
+            if (t === "mooncycle") return <MoonCarouselGame  {...common} onConfirm={handleQuizTap} />;
+            if (t === "mountain")  return <MountainWaypointGame {...common} onPick={handleQuizTap} />;
+            return null;
+          })()}
         </div>
       )}
 

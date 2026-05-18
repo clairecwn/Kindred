@@ -3,24 +3,24 @@
 
 /* ── Design tokens ─────────────────────────────────────────────── */
 :root {
-  --bg:          #FBF5EC;
-  --bg-2:        #F0E5D2;
-  --panel:       rgba(255, 251, 244, 0.96);
-  --panel-solid: #FFFBF4;
+  --bg:          #EDF2EF;
+  --bg-2:        #E0EAE5;
+  --panel:       rgba(248, 252, 250, 0.97);
+  --panel-solid: #F8FCFA;
   --surface:     #FFFFFF;
   --brand:       #E8845A;
   --brand-2:     #5B9B8A;
   --gold:        #D4A853;
   --gold-light:  #F4D580;
   --gold-dark:   #A8803A;
-  --text:        #3D2B1F;
-  --text-2:      #7A6050;
-  --text-3:      #A89080;
-  --nav-bg:      #2E1B0E;
+  --text:        #192C26;
+  --text-2:      #3A5248;
+  --text-3:      #7A9490;
+  --nav-bg:      #1B3530;
   --nav-active:  #E8845A;
-  --border:      rgba(61, 43, 31, 0.10);
-  --shadow:      rgba(61, 43, 31, 0.14);
-  --shadow-lg:   rgba(61, 43, 31, 0.22);
+  --border:      rgba(25, 44, 38, 0.10);
+  --shadow:      rgba(25, 44, 38, 0.12);
+  --shadow-lg:   rgba(25, 44, 38, 0.20);
   --r-sm:        12px;
   --r-md:        20px;
   --r-lg:        28px;
@@ -77,10 +77,10 @@ a { color: inherit; }
   display: flex;
   flex-direction: column;
   background:
-    radial-gradient(ellipse at 15% 0%, rgba(232, 132, 90, 0.14) 0%, transparent 52%),
-    radial-gradient(ellipse at 85% 100%, rgba(91, 155, 138, 0.12) 0%, transparent 52%),
-    radial-gradient(ellipse at 50% 50%, rgba(212, 168, 83, 0.05) 0%, transparent 70%),
-    linear-gradient(160deg, #FDF8F0 0%, #F6EBE0 45%, #EEE4D2 100%);
+    radial-gradient(ellipse at 12% 0%,   rgba(91, 155, 138, 0.13) 0%, transparent 50%),
+    radial-gradient(ellipse at 88% 100%, rgba(74, 127, 143, 0.09) 0%, transparent 52%),
+    radial-gradient(ellipse at 50% 55%,  rgba(212, 168, 83, 0.04) 0%, transparent 65%),
+    linear-gradient(160deg, #F2F7F4 0%, #EBF2EE 45%, #E4EDE8 100%);
 }
 
 /* ── Top header ─────────────────────────────────────────────────── */
@@ -251,9 +251,9 @@ a { color: inherit; }
   display: grid;
   place-items: center;
   background:
-    radial-gradient(ellipse at 30% 20%, rgba(232, 132, 90, 0.22) 0%, transparent 60%),
-    radial-gradient(ellipse at 75% 80%, rgba(91, 155, 138, 0.18) 0%, transparent 55%),
-    linear-gradient(160deg, #FDF2E3 0%, #F5E8D5 40%, #EAE0CC 100%);
+    radial-gradient(ellipse at 28% 18%, rgba(91, 155, 138, 0.22) 0%, transparent 58%),
+    radial-gradient(ellipse at 76% 82%, rgba(232, 132, 90, 0.16) 0%, transparent 55%),
+    linear-gradient(160deg, #EEF4F1 0%, #E6EFE9 40%, #DCE9E2 100%);
   overflow: hidden;
 }
 
@@ -2048,12 +2048,12 @@ input:focus, select:focus {
 .bottom-nav {
   height: 72px;
   flex-shrink: 0;
-  background: linear-gradient(180deg, #2A1608 0%, var(--nav-bg) 100%);
+  background: linear-gradient(180deg, #163028 0%, var(--nav-bg) 100%);
   display: flex;
   align-items: stretch;
   padding: 0 4px;
   border-top: 2px solid rgba(255,255,255,0.07);
-  box-shadow: 0 -6px 30px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.06);
+  box-shadow: 0 -6px 30px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.06);
   z-index: 40;
 }
 
@@ -2265,7 +2265,116 @@ input:focus, select:focus {
   white-space: nowrap;
 }
 
-/* ── Duolingo-style gamified check-in ───────────────────────────── */
+/* ── Sky scene weather animations (mood mini-game) ──────────────── */
+@keyframes rain-fall {
+  0%   { transform: translateY(-14px); opacity: 0; }
+  15%  { opacity: 0.65; }
+  100% { transform: translateY(52px);  opacity: 0; }
+}
+
+@keyframes cloud-drift {
+  0%, 100% { transform: translateX(0px) translateY(0px); }
+  33%       { transform: translateX(5px) translateY(-2px); }
+  66%       { transform: translateX(-3px) translateY(1px); }
+}
+
+@keyframes sun-rotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes sun-pulse {
+  0%, 100% { opacity: 0.75; transform: scale(1); }
+  50%       { opacity: 1;    transform: scale(1.06); }
+}
+
+@keyframes lightning-flash {
+  0%, 90%, 100% { opacity: 0; }
+  92%            { opacity: 0.9; }
+  94%            { opacity: 0; }
+  96%            { opacity: 0.7; }
+}
+
+.sky-scene-card {
+  border-radius: var(--r-md);
+  border: 2.5px solid transparent;
+  padding: 14px 10px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  text-align: center;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  position: relative;
+  overflow: hidden;
+  min-height: 110px;
+  justify-content: flex-end;
+}
+
+.sky-scene-card:not(:disabled):hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  border-color: rgba(255,255,255,0.5);
+}
+
+.sky-scene-card.selected {
+  animation: quiz-select 0.38s cubic-bezier(0.22,1,0.36,1) forwards;
+  border-color: rgba(255,255,255,0.7);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.25);
+}
+
+/* Power bar track */
+.power-node {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 3px solid;
+  transition: all 0.22s cubic-bezier(0.22,1,0.36,1);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Star tap */
+@keyframes star-glow {
+  0%, 100% { filter: drop-shadow(0 0 2px currentColor); }
+  50%       { filter: drop-shadow(0 0 10px currentColor); }
+}
+
+.star-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  transition: transform 0.18s;
+}
+
+.star-btn:hover { transform: scale(1.15); }
+.star-btn.lit svg { animation: star-glow 1.8s ease-in-out infinite; }
+
+/* Moon carousel */
+.moon-nav-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--bg-2);
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+  font-size: 1.2rem;
+  color: var(--text-2);
+}
+.moon-nav-btn:hover:not(:disabled) { background: var(--panel); transform: scale(1.08); }
+.moon-nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+/* Duolingo-style gamified check-in ───────────────────────────── */
 @keyframes quiz-select {
   0%   { transform: scale(1); }
   30%  { transform: scale(0.91); }
