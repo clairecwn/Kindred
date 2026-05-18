@@ -9,6 +9,7 @@ import { useDatabaseState } from "./hooks/useDatabaseState.js";
 import { EMOTIONS } from "./utils/emotion.js";
 import { sfx } from "./lib/sound.js";
 import { getWorldMood, getNPCBehavior } from "./lib/journal-ai.js";
+import { ambientPlayer } from "./lib/ambient-audio.js";
 
 // Nav tab definitions with SVG icons
 const TABS = [
@@ -90,15 +91,29 @@ export default function App() {
   const [nameInput, setNameInput] = useState("");
   const [tab, setTab] = useDatabaseState("kindred.activeTab", "wellness");
   const [muted, setMuted] = useState(false);
+  const [musicOn, setMusicOn] = useState(false);
 
   // Sync mute state to sound library
   useEffect(() => {
     if (sfx && typeof sfx.setMuted === "function") sfx.setMuted(muted);
   }, [muted]);
 
+  // Ambient music start/stop
+  useEffect(() => {
+    if (musicOn) {
+      ambientPlayer.start();
+    } else {
+      ambientPlayer.stop();
+    }
+  }, [musicOn]);
+
   function toggleMute() {
     setMuted(m => !m);
     if (!muted) sfx.click?.();
+  }
+
+  function toggleMusic() {
+    setMusicOn(m => !m);
   }
   const [emotion, setEmotion] = useDatabaseState("kindred.emotion", "calm");
   const [coins, setCoins] = useDatabaseState("kindred.coins", 2450);
@@ -255,14 +270,36 @@ export default function App() {
             {coins.toLocaleString()}
           </div>
 
-          {/* Sound toggle */}
+          {/* Ambient music toggle */}
+          <button
+            type="button"
+            onClick={toggleMusic}
+            title={musicOn ? "Stop ambient music" : "Play ambient music"}
+            style={{
+              width: 36, height: 36, borderRadius: 10,
+              background: musicOn ? "rgba(91,155,138,0.22)" : "rgba(61,43,31,0.08)",
+              border: `1.5px solid ${musicOn ? "rgba(91,155,138,0.4)" : "var(--border)"}`,
+              display: "grid", placeItems: "center",
+              color: musicOn ? "var(--brand-2)" : "var(--text-3)",
+              transition: "all 0.2s",
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 13V4l8-2v9" fill="none"/>
+              <circle cx="4" cy="13" r="2" fill={musicOn ? "currentColor" : "none"} fillOpacity="0.5"/>
+              <circle cx="12" cy="11" r="2" fill={musicOn ? "currentColor" : "none"} fillOpacity="0.5"/>
+              {musicOn && <path d="M2 5.5c1.5-1 3.5-1 4 0" opacity="0.5"/>}
+            </svg>
+          </button>
+
+          {/* Sound effects toggle */}
           <button
             type="button"
             onClick={toggleMute}
             title={muted ? "Unmute sounds" : "Mute sounds"}
             style={{
               width: 36, height: 36, borderRadius: 10,
-              background: muted ? "rgba(61,43,31,0.12)" : "rgba(232,132,90,0.15)",
+              background: muted ? "rgba(61,43,31,0.08)" : "rgba(232,132,90,0.12)",
               border: "1.5px solid var(--border)",
               display: "grid", placeItems: "center",
               color: muted ? "var(--text-3)" : "var(--brand)",
