@@ -114,10 +114,27 @@ const WELLNESS_PROMPTS = {
   neutral:  "Feeling neutral can be a quiet reset. Sometimes steady is exactly what we need."
 };
 
+function getEmotionStyle(emotionStr) {
+  if (!emotionStr) return EMOTIONS.neutral;
+  if (EMOTIONS[emotionStr]) return EMOTIONS[emotionStr];
+  const lower = emotionStr.toLowerCase();
+  if (lower.includes("happy") || lower.includes("joy") || lower.includes("bright") || lower.includes("elat")) return EMOTIONS.happy;
+  if (lower.includes("excit") || lower.includes("thrill") || lower.includes("energiz") || lower.includes("buzzing")) return EMOTIONS.excited;
+  if (lower.includes("calm") || lower.includes("peace") || lower.includes("settl") || lower.includes("ground") || lower.includes("still")) return EMOTIONS.calm;
+  if (lower.includes("anxious") || lower.includes("worried") || lower.includes("overwhelm") || lower.includes("panic") || lower.includes("spiral")) return EMOTIONS.anxious;
+  if (lower.includes("sad") || lower.includes("lone") || lower.includes("depress") || lower.includes("hollow") || lower.includes("griev")) return EMOTIONS.sad;
+  if (lower.includes("tired") || lower.includes("exhaust") || lower.includes("drain") || lower.includes("foggy") || lower.includes("weary")) return EMOTIONS.tired;
+  if (lower.includes("angry") || lower.includes("frustrat") || lower.includes("irritat") || lower.includes("annoy") || lower.includes("trap")) return EMOTIONS.angry;
+  if (lower.includes("content") || lower.includes("okay") || lower.includes("fine") || lower.includes("steady") || lower.includes("stabl")) return EMOTIONS.content;
+  if (lower.includes("grateful") || lower.includes("thankful") || lower.includes("appreciat") || lower.includes("hopeful")) return EMOTIONS.grateful;
+  return EMOTIONS.neutral;
+}
+
 function EmotionBadge({ emotion, size = "normal" }) {
-  const e   = EMOTIONS[emotion] ?? EMOTIONS.neutral;
-  const pad = size === "large" ? "8px 18px" : "5px 14px";
-  const fs  = size === "large" ? "0.95rem" : "0.82rem";
+  const e     = getEmotionStyle(emotion);
+  const label = EMOTIONS[emotion] ? e.label : emotion;
+  const pad   = size === "large" ? "8px 18px" : "5px 14px";
+  const fs    = size === "large" ? "0.95rem" : "0.82rem";
   return (
     <span style={{
       display: "inline-flex", alignItems: "center", gap: 6,
@@ -125,13 +142,235 @@ function EmotionBadge({ emotion, size = "normal" }) {
       background: e.color + "22", color: e.color,
       fontSize: fs, fontWeight: 800, border: `1.5px solid ${e.color}40`,
     }}>
-      <span style={{ fontSize: size === "large" ? "1.1rem" : "0.9rem" }}>
+      <span style={{ fontSize: size === "large" ? "1.1rem" : "0.9rem", flexShrink: 0 }}>
         {EMOTION_SYMBOL[emotion] ?? "○"}
       </span>
-      {e.label}
+      {label}
     </span>
   );
 }
+
+// ── Quiz SVG visuals ─────────────────────────────────────────────────────────
+
+function BatterySVG({ level, color }) {
+  return (
+    <svg width="62" height="30" viewBox="0 0 62 30" fill="none">
+      <rect x="1" y="4" width="52" height="22" rx="5" stroke={color} strokeWidth="2.5"/>
+      <rect x="53" y="11" width="8" height="8" rx="3" fill={color} opacity="0.5"/>
+      {[0,1,2,3].map(i => (
+        <rect key={i} x={5 + i * 12} y="8" width="9" height="14" rx="3"
+          fill={i <= level ? color : "transparent"}
+          stroke={color} strokeWidth="1.5"
+          opacity={i <= level ? (level === 0 ? 0.5 : 1) : 0.18}/>
+      ))}
+    </svg>
+  );
+}
+
+function WeatherSVG({ level, color }) {
+  if (level === 3) return (
+    <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
+      <circle cx="26" cy="26" r="11" fill={color}/>
+      {[0,45,90,135,180,225,270,315].map((deg, i) => {
+        const r = deg * Math.PI / 180;
+        return <line key={i} x1={26+15*Math.cos(r)} y1={26+15*Math.sin(r)} x2={26+21*Math.cos(r)} y2={26+21*Math.sin(r)} stroke={color} strokeWidth="2.5" strokeLinecap="round"/>;
+      })}
+    </svg>
+  );
+  if (level === 2) return (
+    <svg width="54" height="48" viewBox="0 0 54 48" fill="none">
+      <circle cx="36" cy="17" r="8" fill={color} opacity="0.75"/>
+      {[0,45,90,135,180].map((deg, i) => {
+        const r = deg * Math.PI / 180;
+        return <line key={i} x1={36+11*Math.cos(r)} y1={17+11*Math.sin(r)} x2={36+15*Math.cos(r)} y2={17+15*Math.sin(r)} stroke={color} strokeWidth="2" strokeLinecap="round" opacity="0.7"/>;
+      })}
+      <ellipse cx="22" cy="34" rx="16" ry="10" fill="white" stroke={color} strokeWidth="1.5"/>
+      <circle cx="14" cy="31" r="9" fill="white" stroke={color} strokeWidth="1.5"/>
+      <circle cx="30" cy="29" r="8" fill="white" stroke={color} strokeWidth="1.5"/>
+    </svg>
+  );
+  if (level === 1) return (
+    <svg width="54" height="42" viewBox="0 0 54 42" fill="none">
+      <ellipse cx="27" cy="28" rx="20" ry="11" fill="white" stroke={color} strokeWidth="2" opacity="0.6"/>
+      <circle cx="17" cy="25" r="10" fill="white" stroke={color} strokeWidth="2" opacity="0.7"/>
+      <circle cx="36" cy="24" r="9" fill="white" stroke={color} strokeWidth="2" opacity="0.7"/>
+      <ellipse cx="27" cy="32" rx="18" ry="9" fill="white" stroke={color} strokeWidth="2"/>
+      <circle cx="17" cy="29" r="9" fill="white" stroke={color} strokeWidth="2"/>
+      <circle cx="36" cy="28" r="8" fill="white" stroke={color} strokeWidth="2"/>
+    </svg>
+  );
+  return (
+    <svg width="54" height="52" viewBox="0 0 54 52" fill="none">
+      <ellipse cx="27" cy="24" rx="21" ry="13" fill="white" stroke={color} strokeWidth="2" opacity="0.5"/>
+      <circle cx="16" cy="21" r="10" fill="white" stroke={color} strokeWidth="2" opacity="0.6"/>
+      <circle cx="37" cy="20" r="9" fill="white" stroke={color} strokeWidth="2" opacity="0.6"/>
+      <path d="M28 34 L21 45 L27 43 L20 52" stroke={color} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+}
+
+function StarsSVG({ level, color }) {
+  const pts = (cx) => `${cx},4 ${cx+3.5},12 ${cx+12},12 ${cx+5},17 ${cx+8},26 ${cx},21 ${cx-8},26 ${cx-5},17 ${cx-12},12 ${cx-3.5},12`;
+  return (
+    <svg width="76" height="30" viewBox="0 0 76 30" fill="none">
+      {[0,1,2].map(i => (
+        <polygon key={i} points={pts(13 + i * 25)}
+          fill={i < level ? color : "transparent"}
+          stroke={color} strokeWidth="1.5"
+          opacity={i < level ? 1 : 0.25}/>
+      ))}
+    </svg>
+  );
+}
+
+function RippleSVG({ level, color }) {
+  const dots = [{ x:44, y:38 },{ x:37, y:30 },{ x:30, y:24 },{ x:26, y:26 }];
+  const p = dots[level];
+  return (
+    <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
+      <circle cx="26" cy="26" r="22" stroke={color} strokeWidth="1.5" opacity="0.18"/>
+      <circle cx="26" cy="26" r="15" stroke={color} strokeWidth="1.5" opacity="0.32"/>
+      <circle cx="26" cy="26" r="8"  stroke={color} strokeWidth="1.5" opacity="0.52"/>
+      <circle cx="26" cy="26" r="3"  fill={color} opacity="0.6"/>
+      <circle cx={p.x} cy={p.y} r="5"   fill={color}/>
+      <circle cx={p.x} cy={p.y} r="8.5" stroke={color} strokeWidth="1.5" opacity="0.35"/>
+    </svg>
+  );
+}
+
+function JarSVG({ level, color }) {
+  const fillY = [48, 38, 28, 14][level];
+  return (
+    <svg width="36" height="52" viewBox="0 0 36 52" fill="none">
+      <defs>
+        <clipPath id={`jc${level}`}>
+          <path d="M4 13 Q4 9 9 9 L27 9 Q32 9 32 13 L32 46 Q32 50 27 50 L9 50 Q4 50 4 46 Z"/>
+        </clipPath>
+      </defs>
+      <rect x="9" y="2" width="18" height="8" rx="3" fill={color} opacity="0.55"/>
+      <path d="M4 13 Q4 9 9 9 L27 9 Q32 9 32 13 L32 46 Q32 50 27 50 L9 50 Q4 50 4 46 Z" fill="none" stroke={color} strokeWidth="2.2"/>
+      {level > 0 && <rect x="4" y={fillY} width="28" height={52} fill={color} opacity="0.35" clipPath={`url(#jc${level})`}/>}
+      <line x1="10" y1="15" x2="10" y2="44" stroke="white" strokeWidth="2.5" strokeLinecap="round" opacity="0.35"/>
+    </svg>
+  );
+}
+
+function MoonSVG({ level, color }) {
+  if (level === 3) return (
+    <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+      <circle cx="24" cy="24" r="17" fill={color} opacity="0.85"/>
+      <circle cx="7"  cy="11" r="2"   fill={color} opacity="0.45"/>
+      <circle cx="40" cy="9"  r="1.5" fill={color} opacity="0.4"/>
+      <circle cx="41" cy="35" r="2"   fill={color} opacity="0.45"/>
+      <circle cx="6"  cy="38" r="1.5" fill={color} opacity="0.35"/>
+    </svg>
+  );
+  const clipW = [7, 14, 22, 34][level];
+  return (
+    <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+      <defs>
+        <clipPath id={`mc${level}`}>
+          <rect x={24 - clipW/2} y="6" width={clipW} height="36"/>
+        </clipPath>
+      </defs>
+      <circle cx="24" cy="24" r="17" fill="transparent" stroke={color} strokeWidth="1.5" opacity="0.25"/>
+      <circle cx="24" cy="24" r="17" fill={color} opacity="0.82" clipPath={`url(#mc${level})`}/>
+      <circle cx="9"  cy="13" r="1.5" fill={color} opacity="0.38"/>
+      <circle cx="38" cy="11" r="2"   fill={color} opacity="0.32"/>
+    </svg>
+  );
+}
+
+function MountainSVG({ level, color }) {
+  const dots = [{ x:26, y:44 },{ x:25, y:34 },{ x:24, y:22 },{ x:24, y:11 }];
+  const p = dots[level];
+  return (
+    <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
+      <path d="M2 48 L24 4 L46 48 Z" fill={color} opacity="0.15" stroke={color} strokeWidth="2" strokeLinejoin="round"/>
+      <path d="M25 46 L24 34 L24 12" stroke={color} strokeWidth="1.5" strokeDasharray="3 3" opacity="0.4" strokeLinecap="round"/>
+      {level === 3 && <>
+        <line x1="24" y1="4" x2="24" y2="0" stroke={color} strokeWidth="1.5"/>
+        <polygon points="24,0 30,3 24,6" fill={color}/>
+      </>}
+      <circle cx={p.x} cy={p.y} r="5.5" fill={color}/>
+      <circle cx={p.x} cy={p.y} r="9"   stroke={color} strokeWidth="1.5" opacity="0.32"/>
+    </svg>
+  );
+}
+
+// ── Quiz metadata: playful questions + companion reactions + SVG visuals ───────
+const QUIZ_META = {
+  energy: {
+    friendlyQ: "What's your battery at right now?",
+    visual: (score, color) => <BatterySVG level={score} color={color} />,
+    reactions: [
+      "Even a dim light is still a light.",
+      "Running low but still running. That counts.",
+      "Steady is more than it sounds.",
+      "This energy is real. Carry it with you.",
+    ],
+  },
+  mood: {
+    friendlyQ: "Today's weather report?",
+    visual: (score, color) => <WeatherSVG level={score} color={color} />,
+    reactions: [
+      "Heavy days deserve space. I'm here.",
+      "Up and down is still movement.",
+      "Calm is its own kind of okay.",
+      "Something genuinely good is alive in you.",
+    ],
+  },
+  meaning: {
+    friendlyQ: "How many stars lit up today?",
+    visual: (score, color) => <StarsSVG level={score} color={color} />,
+    reactions: [
+      "Going through the motions still takes strength.",
+      "Unclear days are part of it too.",
+      "Small moments are real moments.",
+      "Something real touched you today.",
+    ],
+  },
+  connection: {
+    friendlyQ: "How close do you feel to the people you love?",
+    visual: (score, color) => <RippleSVG level={score} color={color} />,
+    reactions: [
+      "Loneliness is loud. You showed up here.",
+      "Distance is temporary.",
+      "In-between is a real place to be.",
+      "Being seen is rare. Notice it.",
+    ],
+  },
+  accomplishment: {
+    friendlyQ: "How full is today's jar?",
+    visual: (score, color) => <JarSVG level={score} color={color} />,
+    reactions: [
+      "Starting is sometimes the whole victory.",
+      "The basics are the foundation.",
+      "Forward is forward, no matter the speed.",
+      "That pride is yours. Nobody can take it.",
+    ],
+  },
+  sleep: {
+    friendlyQ: "Last night's moon?",
+    visual: (score, color) => <MoonSVG level={score} color={color} />,
+    reactions: [
+      "Your body is asking for rest. Be gentle.",
+      "Restless nights are heavy. You carried it.",
+      "Good enough sleep is genuinely good.",
+      "Deep rest is a gift.",
+    ],
+  },
+  resilience: {
+    friendlyQ: "Where are you on the mountain today?",
+    visual: (score, color) => <MountainSVG level={score} color={color} />,
+    reactions: [
+      "Too much at once is real. You're still here.",
+      "Pushing through is its own kind of strength.",
+      "Handling it is more than it sounds.",
+      "Steady and capable — that's the whole thing.",
+    ],
+  },
+};
 
 // Singletons — created once per module load
 const detector  = new EmotionDetector();
@@ -159,13 +398,16 @@ export default function WellnessView({
   const [quizEmot, setQuizEmot]       = useState(null);
   const [quizVotes, setQuizVotes]     = useState({});
   const [quizAnalyzing, setQuizAnalyzing] = useState(false);
+  const [quizReacting, setQuizReacting]     = useState(false);
+  const [lastReaction, setLastReaction]     = useState(null);
+  const [selectedOptIdx, setSelectedOptIdx] = useState(null);
 
   const memory   = useMemo(() => new JournalMemory(journalEntries), [journalEntries]);
   const timeline = useMemo(() => memory.getTimeline(14), [memory]);
   const summary  = useMemo(() => memory.getWeekSummary(), [memory]);
 
-  const currentEmotion  = EMOTIONS[emotion] ?? EMOTIONS.neutral;
-  const detectedEmotion = aiResult ? (EMOTIONS[aiResult.emotion] ?? EMOTIONS.neutral) : null;
+  const currentEmotion  = getEmotionStyle(emotion);
+  const detectedEmotion = aiResult ? getEmotionStyle(aiResult.emotion) : null;
 
   // ── Journal: submit and analyse ─────────────────────────────────────────────
   async function analyzeEntry(e) {
@@ -315,6 +557,23 @@ export default function WellnessView({
     setQuizVotes({});
     setQuizScore(0);
     setQuizAnalyzing(false);
+    setQuizReacting(false);
+    setLastReaction(null);
+    setSelectedOptIdx(null);
+  }
+
+  function handleQuizTap(opt) {
+    if (quizReacting) return;
+    const meta = QUIZ_META[QUIZ[quizIdx].id];
+    setSelectedOptIdx(opt.score);
+    setLastReaction({ text: meta?.reactions?.[opt.score] ?? "", score: opt.score });
+    setQuizReacting(true);
+    setTimeout(() => {
+      setQuizReacting(false);
+      setSelectedOptIdx(null);
+      setLastReaction(null);
+      answerQuiz(opt);
+    }, 1150);
   }
 
   const wellbeingBand = WELLBEING_BANDS.find(b => (quizScore || 0) <= b.max) ?? WELLBEING_BANDS[2];
@@ -408,9 +667,9 @@ export default function WellnessView({
                     }}>
                       {companionResponse.text}
                     </p>
-                    {(companionResponse.source === "gemini" || companionResponse.source === "claude") && (
+                    {(companionResponse.source === "gemini" || companionResponse.source === "groq" || companionResponse.source === "claude") && (
                       <div style={{ fontSize: "0.68rem", color: "var(--text-3)", marginTop: 6 }}>
-                        Powered by {companionResponse.source === "gemini" ? "Gemini" : "Claude"}
+                        Powered by {companionResponse.source === "gemini" ? "Gemini" : companionResponse.source === "groq" ? "Groq" : "Claude"}
                       </div>
                     )}
                   </div>
@@ -573,7 +832,7 @@ export default function WellnessView({
               </div>
               <div className="entry-list">
                 {journalEntries.slice(0, 5).map((entry) => {
-                  const em = EMOTIONS[entry.emotion] ?? EMOTIONS.neutral;
+                  const em = getEmotionStyle(entry.emotion);
                   return (
                     <article
                       key={entry.id}
@@ -608,123 +867,203 @@ export default function WellnessView({
       {/* ════════════════════════════════════════════════════════════════════════
           DAILY CHECK-IN VIEW
       ════════════════════════════════════════════════════════════════════════ */}
-      {view === "checkin" && (
-        <div className="card anim-fade-in">
-          <div className="card-header">
-            <div>
-              <div className="card-title">Daily Check-in</div>
-              <div className="card-sub">{QUIZ.length} questions · evidence-based · +10 coins</div>
+      {view === "checkin" && !quizDone && (
+        <div className="card anim-fade-in" style={{ padding: "22px 20px 24px" }}>
+          {/* Header row */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+            <span style={{ fontSize: "0.75rem", fontWeight: 800, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.07em" }}>
+              {quizIdx + 1} / {QUIZ.length}
+            </span>
+            <span style={{
+              fontSize: "0.7rem", fontWeight: 700,
+              color: currentEmotion.color,
+              background: currentEmotion.color + "18",
+              padding: "3px 12px", borderRadius: 999,
+              border: `1px solid ${currentEmotion.color}30`,
+            }}>
+              {QUIZ[quizIdx].dimension}
+            </span>
+          </div>
+
+          {/* Segmented progress bar */}
+          <div style={{ display: "flex", gap: 5, marginBottom: 24 }}>
+            {QUIZ.map((_, i) => (
+              <div key={i} style={{
+                flex: 1, height: 7, borderRadius: 999,
+                background: i < quizIdx
+                  ? currentEmotion.color
+                  : i === quizIdx
+                  ? currentEmotion.color + "50"
+                  : "var(--bg-2)",
+                transition: "background 0.4s cubic-bezier(0.22,1,0.36,1)",
+              }}/>
+            ))}
+          </div>
+
+          {/* Question */}
+          <div style={{ fontSize: "1.28rem", fontWeight: 900, color: "var(--text)", marginBottom: 22, lineHeight: 1.25 }}>
+            {QUIZ_META[QUIZ[quizIdx].id]?.friendlyQ ?? QUIZ[quizIdx].q}
+          </div>
+
+          {/* 2×2 visual option cards */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 11 }}>
+            {QUIZ[quizIdx].opts.map((opt) => {
+              const meta   = QUIZ_META[QUIZ[quizIdx].id];
+              const oColor = getEmotionStyle(opt.emotion).color;
+              const isSel  = selectedOptIdx === opt.score;
+              return (
+                <button
+                  key={opt.label}
+                  className={`quiz-visual-card${isSel ? " selected" : ""}`}
+                  onClick={() => handleQuizTap(opt)}
+                  disabled={quizReacting}
+                  style={isSel ? {
+                    borderColor: oColor,
+                    background: oColor + "1a",
+                    boxShadow: `0 0 0 3px ${oColor}28`,
+                  } : {}}
+                >
+                  <div style={{ height: 56, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    {meta?.visual(opt.score, oColor)}
+                  </div>
+                  <div style={{ fontWeight: 800, fontSize: "0.88rem", color: isSel ? oColor : "var(--text)", lineHeight: 1.2 }}>
+                    {opt.label}
+                  </div>
+                  <div style={{ fontSize: "0.67rem", color: "var(--text-3)", lineHeight: 1.3 }}>
+                    {opt.desc}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Micro-reaction panel — slides up from bottom after each answer */}
+      {view === "checkin" && !quizDone && quizReacting && lastReaction && (
+        <div
+          className="quiz-reaction-panel"
+          style={{
+            background: lastReaction.score >= 2
+              ? `linear-gradient(135deg, ${currentEmotion.color}f2, ${currentEmotion.color}cc)`
+              : lastReaction.score === 1
+              ? "linear-gradient(135deg, #6B7A8D, #4E5D6C)"
+              : "linear-gradient(135deg, #5E6470, #404550)",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 14, maxWidth: 560, margin: "0 auto" }}>
+            <div style={{ fontSize: "1.45rem", flexShrink: 0, opacity: 0.9 }}>
+              {lastReaction.score === 3 ? "✦" : lastReaction.score === 2 ? "♦" : lastReaction.score === 1 ? "〜" : "○"}
+            </div>
+            <p style={{ color: "#fff", fontWeight: 700, fontSize: "0.94rem", lineHeight: 1.5, margin: 0 }}>
+              {lastReaction.text}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* ── Check-in complete — celebration screen ────────────────────── */}
+      {view === "checkin" && quizDone && (
+        <div className="card anim-pop-in" style={{ textAlign: "center", padding: "32px 22px 28px", position: "relative", overflow: "hidden" }}>
+          {/* Background confetti dots */}
+          {[...Array(7)].map((_, i) => (
+            <div key={i} style={{
+              position: "absolute", borderRadius: "50%",
+              width: 8 + (i % 3) * 5, height: 8 + (i % 3) * 5,
+              background: EMOTIONS[quizEmot]?.color ?? "#74B3CE",
+              opacity: 0.08 + i * 0.025,
+              top: `${8 + (i * 14) % 78}%`,
+              left: `${4 + (i * 27) % 88}%`,
+              animation: `breathe ${2.5 + i * 0.35}s ease-in-out ${i * 0.18}s infinite`,
+              pointerEvents: "none",
+            }}/>
+          ))}
+
+          {/* Radiating rings + emotion symbol */}
+          <div style={{ position: "relative", width: 112, height: 112, margin: "0 auto 22px" }}>
+            {[0,1,2].map(i => (
+              <div key={i} style={{
+                position: "absolute", inset: 0, borderRadius: "50%",
+                border: `2px solid ${EMOTIONS[quizEmot]?.color ?? "#74B3CE"}`,
+                animation: `ring-expand 2s ease-out ${i * 0.5}s infinite`,
+              }}/>
+            ))}
+            <div style={{
+              width: 112, height: 112, borderRadius: "50%",
+              background: (EMOTIONS[quizEmot]?.color ?? "#74B3CE") + "20",
+              border: `3px solid ${EMOTIONS[quizEmot]?.color ?? "#74B3CE"}55`,
+              display: "grid", placeItems: "center",
+              fontSize: "3rem",
+              animation: "breathe 3s ease-in-out infinite",
+            }}>
+              {EMOTION_SYMBOL[quizEmot] ?? "♦"}
             </div>
           </div>
 
-          {!quizDone ? (
-            <>
-              {/* Progress */}
-              <div className="quiz-progress">
-                {QUIZ.map((_, i) => (
-                  <div
-                    key={i}
-                    className={`quiz-progress-dot${i <= quizIdx ? " done" : ""}`}
-                    style={i <= quizIdx ? { background: currentEmotion.color } : undefined}
-                  />
-                ))}
-              </div>
+          <div style={{ fontSize: "1.5rem", fontWeight: 900, marginBottom: 10, color: "var(--text)", animation: "celebration-bounce 0.55s cubic-bezier(0.22,1,0.36,1) forwards" }}>
+            Check-in complete
+          </div>
 
-              <div style={{ fontSize: "0.7rem", color: "var(--text-3)", marginBottom: 10, textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                {QUIZ[quizIdx].dimension}
-              </div>
-              <div className="quiz-question">{QUIZ[quizIdx].q}</div>
+          {/* Coin reward badge */}
+          <div style={{
+            display: "inline-flex", alignItems: "center", gap: 7,
+            background: "linear-gradient(135deg, #F4D580, #D4A853)",
+            color: "#5A3A08", fontWeight: 800, fontSize: "0.88rem",
+            padding: "5px 18px", borderRadius: 999, marginBottom: 18,
+            boxShadow: "0 3px 12px rgba(212,168,83,0.4)",
+          }}>
+            <span style={{ width: 13, height: 13, borderRadius: "50%", background: "#A8803A", display: "inline-block", boxShadow: "inset 0 -1px 3px rgba(0,0,0,0.2)" }}/>
+            +10 coins earned
+          </div>
 
-              <div className="quiz-options">
-                {QUIZ[quizIdx].opts.map((opt) => (
-                  <button
-                    key={opt.label}
-                    className="quiz-option"
-                    onClick={() => answerQuiz(opt)}
-                  >
-                    <div style={{ fontWeight: 800 }}>{opt.label}</div>
-                    {opt.desc && (
-                      <div style={{ fontSize: "0.72rem", opacity: 0.62, marginTop: 2 }}>
-                        {opt.desc}
-                      </div>
-                    )}
-                  </button>
-                ))}
-              </div>
-            </>
-          ) : (
-            /* Check-in complete */
-            <div style={{ textAlign: "center", padding: "28px 0" }}>
-              <div style={{
-                width: 88, height: 88, borderRadius: "50%", margin: "0 auto 18px",
-                background: (EMOTIONS[quizEmot]?.color ?? "#74B3CE") + "20",
-                display: "grid", placeItems: "center", fontSize: "2.2rem",
-                border: `3px solid ${EMOTIONS[quizEmot]?.color ?? "#74B3CE"}40`,
-              }}>
-                {EMOTION_SYMBOL[quizEmot] ?? "♦"}
-              </div>
-
-              <div style={{ fontSize: "1.3rem", fontWeight: 900, marginBottom: 8 }}>
-                Check-in complete
-              </div>
-
-              {quizAnalyzing && (
-                <div className="ai-analyzing" style={{ justifyContent: "center", marginBottom: 10 }}>
-                  <span style={{ fontSize: "0.8rem", color: "var(--text-3)" }}>Reading your answers</span>
-                  <div className="ai-dots"><span /><span /><span /></div>
-                </div>
-              )}
-
-              {/* Wellbeing band label */}
-              <div style={{
-                display: "inline-block", padding: "4px 14px", borderRadius: 999,
-                background: (EMOTIONS[wellbeingBand.emotion]?.color ?? "#888") + "20",
-                color: EMOTIONS[wellbeingBand.emotion]?.color ?? "#888",
-                fontSize: "0.78rem", fontWeight: 800, marginBottom: 12,
-              }}>
-                {wellbeingBand.label}
-              </div>
-
-              <p style={{
-                color: "var(--text-2)", marginBottom: 8,
-                maxWidth: 290, margin: "0 auto 10px", fontSize: "0.95rem",
-              }}>
-                You're feeling{" "}
-                <strong style={{ color: EMOTIONS[quizEmot]?.color ?? "var(--text-1)" }}>
-                  {EMOTIONS[quizEmot]?.label ?? quizEmot}
-                </strong>{" "}today.
-              </p>
-
-              <p style={{
-                color: "var(--text-2)", fontSize: "0.88rem",
-                maxWidth: 300, margin: "0 auto 16px", lineHeight: 1.72,
-                fontStyle: "italic",
-                padding: "14px 18px",
-                background: "rgba(0,0,0,0.03)",
-                borderRadius: 14,
-              }}>
-                "{wellbeingBand.message}"
-              </p>
-
-              <p style={{
-                fontSize: "0.77rem", color: "var(--text-3)",
-                maxWidth: 260, margin: "0 auto 20px", lineHeight: 1.55,
-              }}>
-                Score {quizScore}/{QUIZ.length * 3} across {QUIZ.length} dimensions
-              </p>
-
-              <EmotionBadge emotion={quizEmot} size="large" />
-
-              <div style={{ marginTop: 22, display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
-                <button className="btn-secondary" onClick={resetQuiz}>
-                  Check in again
-                </button>
-                <button className="btn-primary" onClick={() => setView("journey")}>
-                  See my journey
-                </button>
-              </div>
+          {quizAnalyzing && (
+            <div className="ai-analyzing" style={{ justifyContent: "center", marginBottom: 12 }}>
+              <span style={{ fontSize: "0.8rem", color: "var(--text-3)" }}>Reading the full picture</span>
+              <div className="ai-dots"><span /><span /><span /></div>
             </div>
           )}
+
+          {/* Wellbeing band pill */}
+          <div style={{ marginBottom: 14 }}>
+            <span style={{
+              display: "inline-block", padding: "5px 20px", borderRadius: 999,
+              background: (EMOTIONS[wellbeingBand.emotion]?.color ?? "#888") + "20",
+              color: EMOTIONS[wellbeingBand.emotion]?.color ?? "#888",
+              fontSize: "0.8rem", fontWeight: 900,
+              border: `1.5px solid ${EMOTIONS[wellbeingBand.emotion]?.color ?? "#888"}40`,
+            }}>
+              {wellbeingBand.label}
+            </span>
+          </div>
+
+          <p style={{ fontSize: "1rem", fontWeight: 700, color: "var(--text-2)", marginBottom: 14 }}>
+            You're feeling{" "}
+            <strong style={{ color: EMOTIONS[quizEmot]?.color ?? "var(--text-1)" }}>
+              {EMOTIONS[quizEmot]?.label ?? quizEmot}
+            </strong>{" "}today.
+          </p>
+
+          <div style={{
+            background: (EMOTIONS[quizEmot]?.color ?? "#74B3CE") + "12",
+            border: `1.5px solid ${EMOTIONS[quizEmot]?.color ?? "#74B3CE"}30`,
+            borderRadius: 16, padding: "14px 18px",
+            maxWidth: 300, margin: "0 auto 16px",
+          }}>
+            <p style={{ color: "var(--text-2)", fontSize: "0.88rem", lineHeight: 1.72, fontStyle: "italic", margin: 0 }}>
+              "{wellbeingBand.message}"
+            </p>
+          </div>
+
+          <p style={{ fontSize: "0.74rem", color: "var(--text-3)", marginBottom: 18 }}>
+            {quizScore}/{QUIZ.length * 3} across {QUIZ.length} dimensions
+          </p>
+
+          <EmotionBadge emotion={quizEmot} size="large" />
+
+          <div style={{ marginTop: 22, display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
+            <button className="btn-secondary" onClick={resetQuiz}>Check in again</button>
+            <button className="btn-primary" onClick={() => setView("journey")}>See my journey</button>
+          </div>
         </div>
       )}
 
@@ -780,7 +1119,7 @@ export default function WellnessView({
             </div>
             <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginTop: 8 }}>
               {timeline.map(({ date, weekday, entry }) => {
-                const em = entry ? (EMOTIONS[entry.emotion] ?? EMOTIONS.neutral) : null;
+                const em = entry ? getEmotionStyle(entry.emotion) : null;
                 return (
                   <div
                     key={date}
@@ -853,7 +1192,7 @@ export default function WellnessView({
               </div>
               <div className="entry-list">
                 {journalEntries.map((entry) => {
-                  const em = EMOTIONS[entry.emotion] ?? EMOTIONS.neutral;
+                  const em = getEmotionStyle(entry.emotion);
                   return (
                     <article
                       key={entry.id}
