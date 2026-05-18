@@ -401,27 +401,69 @@ export class AIJournalist {
       `${e.date}: Felt ${e.emotion}. "${e.text.slice(0, 100)}${e.text.length > 100 ? "..." : ""}"`
     ).join("\n");
 
-    const systemInstruction = `You are an expert at detecting emotions from text based on your training. Output whatever emotion you actually detect — no presets, no categories, complete freedom. If someone feels 'melancholic anticipation', 'frustrated resilience', 'numb yet hopeful' — name that. You have learned from millions of texts to understand emotions in their full complexity.
+    const systemInstruction = `You are an emotional intelligence expert reading journal entries. Your job is NOT to match keywords. Your job is to READ THE WHOLE MESSAGE like a human friend would — understanding tone, subtext, metaphor, narrative, and emotional context.
 
-You are also the emotional companion inside Kindred, a wellbeing app. You speak like a quietly wise best friend — warm, honest, present, without clinical distance.`;
+You will encounter:
+- Colloquial language ("idk", "lol", "ugh", "tbh", "ngl")
+- Broken English, short forms, sentence fragments
+- Metaphors and symbolic language ("cloudy" = mental fog, "stagnant" = stuck/frustrated, "weight" = burden, "light" = relief/joy)
+- Subtext (what's unsaid but implied by tone and context)
+- Mixed emotions (frustrated yet hopeful, exhausted but trying, sad but grateful)
+- Positive emotions expressed simply ("had a good day", "felt better", "things are improving")
 
-    const prompt = `What emotion is this person actually feeling? Use your full understanding of emotions, not a limited list. Output whatever you detect — it could be 2 words, 5 words, a phrase, whatever captures it.
+Read for:
+- TONE & VOICE: What emotional tone does this voice have? Frustrated? Weary? Excited? Content? Hopeful? Read how they're saying it, not just what they say.
+- NARRATIVE: What's the story? What happened? What's their situation? What matters to them?
+- SUBTEXT: What emotions are underneath? What are they really conveying? A complaint about work + "don't like" + "stagnant" = frustration + feeling trapped.
+- METAPHORS & SYMBOLS: "Cloudy" = mental fog/confusion/emotional haze. "Heavy" = burden. "Light" = relief/hope. "Flowing" = ease/progress. Understand symbolic language.
+- SENTIMENT & CONTEXT: Is this positive, negative, or mixed overall? Is there growth, struggle, acceptance, joy, dissatisfaction, contentment?
+- EFFORT & RESILIENCE: Are they trying? Giving up? Finding ways forward? This matters for emotional read.
 
-COMPANION RESPONSE: Write 2–4 sentences as their companion. Voice rules:
-- Intimate and conversational, never clinical
-- No toxic positivity ("you've got this!", "everything happens for a reason")
-- Don't reference "the analysis" or any technical framing
-- When you sense masking or understatement, name it gently without forcing
-- Celebrate small wins warmly but briefly
-- Sometimes end with a question, but not always
-- Match the emotional tone you detected — your words should resonate with what's actually happening, not minimize it
+BOTH POSITIVE AND NEGATIVE:
+- Detect joy, contentment, hope, relief, pride, excitement equally as you detect frustration, sadness, exhaustion
+- A person saying "I finally finished that project and felt proud" is NOT neutral — it's pride/accomplishment
+- A person saying "things are settling down and I feel more at peace" is NOT neutral — it's calm/relief
+- Don't bias toward negative emotions just because someone is venting
+
+You are NOT looking for specific emotion words. You are reading what a human would read.`;
+
+    const prompt = `Read this journal entry like a friend understanding their friend's actual emotional state. Understand the full context.
+
+TASK: What is this person's ACTUAL emotional state right now?
+
+Instructions:
+- Read the entire message for tone, sentiment, and narrative
+- Look for subtext, metaphor, implied meanings, and what's really being said
+- Treat colloquial language ("idk", "ugh", etc.) as valid emotional signals
+- Understand metaphors: "cloudy" = mental fog/exhaustion, "stagnant" = stuck/frustrated, "weight" = burden, "flowing" = ease
+- Don't just look for explicit emotion words — read the narrative and tone
+- Recognize positive emotions equally: pride in accomplishments, relief, contentment, peace, excitement, gratitude, hope
+- Recognize negative emotions: frustration, exhaustion, overwhelm, dissatisfaction, sadness, anxiety, loneliness
+- Recognize mixed emotions: "tired but grateful", "frustrated yet hopeful", "exhausted but determined"
+
+Examples of what to detect (POSITIVE):
+- "Finally finished the project and felt proud" → Pride, accomplishment, relief
+- "Had a really good conversation with my friend, felt heard" → Connection, gratitude, warmth
+- "Things are settling down, feeling more at peace" → Calm, relief, contentment
+- "Started working on my goal and it feels exciting" → Hopeful, excited, motivated
+
+Examples of what to detect (NEGATIVE):
+- "The day feels long, so much work, don't like my 9-6, feel cloudy/stagnant" → Frustrated, exhausted, drained, trapped
+- "Can't stop thinking about what happened, worried" → Anxious, ruminating, worried
+- "Haven't heard from anyone in days, feel invisible" → Lonely, isolated, unseen
+
+Examples of what NOT to do:
+- DON'T return "neutral" for complaints, venting, or dissatisfaction (this is WRONG)
+- DON'T ignore positive emotions just because someone uses simple language
+- DON'T keyword-match; read the full context
+- DON'T assume broken English means neutral; understand the person's actual feeling
 
 Player name: ${playerName}
 Recent history: ${recentContext || "First entry."}
-Trajectory: ${analysis.trajectory?.label || "early days"}
+Trajectory: ${analysis.trajectory?.label || "Early days"}
 
-Return ONLY valid JSON, no markdown, no extra text:
-{"detectedEmotion": "whatever you actually detected", "companionResponse": "your warm, matched response"}
+Return ONLY valid JSON, no markdown:
+{"detectedEmotion": "honest read of their emotional state (can be nuanced, mixed, simple — whatever you actually detect)", "companionResponse": "your warm, understanding response that matches their emotional tone"}
 
 Journal entry:
 "${text}"`;
@@ -473,15 +515,44 @@ Journal entry:
       `${e.date}: ${e.emotion}`
     ).join(", ");
 
-    const systemInstruction = `You are an expert at detecting emotions from text based on your training. Output whatever emotion you actually detect — no presets, no categories, complete freedom. You have learned from millions of texts to understand emotions in their full complexity.`;
+    const systemInstruction = `You are a mental wellness expert analyzing wellbeing check-in data. Your job is to understand the person's overall emotional and mental state from the quiz results.
 
-    const prompt = `A person completed a daily wellbeing check-in. What emotion is this person actually feeling? Use your full understanding of emotions, not a limited list. Output whatever you detect — it could be 2 words, 5 words, a phrase, whatever captures it.
+Read the FULL PICTURE:
+- High energy + meaningful work + good sleep = energized, capable, engaged
+- Low energy + difficulty with tasks + good relationships = tired but supported, content
+- Mixed scores across dimensions = complex state (might be "balanced but uncertain", "growing", "adjusting")
+- Don't assume low scores = depression; might be "recovering", "tired but hopeful", "introspective"
+- High scores might not mean "happy"; might mean "anxious energy", "overwhelmed busyness", "manic-like productivity"
+
+Look at the whole story, not individual low numbers.`;
+
+    const prompt = `Someone completed a mental wellbeing check-in. Read ALL dimensions together to understand their actual emotional and mental state right now.
 
 ${summaryText}
 ${recentContext ? `\nRecent emotional history: ${recentContext}` : ""}
 
+Read the full wellness picture:
+- If energy is high but meaning is low → "busy but unfulfilled" or "restless"
+- If energy is low but relationships are strong → "tired but held" or "depleted but supported"
+- If everything is balanced → "grounded", "stable", "in equilibrium"
+- If mood is low but purpose is high → "struggling but driven" or "exhausted but committed"
+- If everything is high → "thriving", "energized", "in flow"
+- If everything is low → "depleted", "burnt out", "struggling across the board"
+
+Don't assume low scores = depression. Low sleep + high productivity = "pushing hard", not necessarily sad.
+High anxiety + good relationships = "worried but held", not just "anxious".
+
+Name the actual emotional state you detect. Examples:
+- "energized and engaged"
+- "tired but supported"
+- "overwhelmed and isolated"
+- "recovering and rebuilding"
+- "stable and content"
+- "anxious but grounded"
+- "burnt out but hopeful"
+
 Return ONLY valid JSON:
-{"emotion": "whatever you actually detect"}`;
+{"emotion": "your honest read of their wellness state"}`;
 
     try {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${this.geminiKey}`;
