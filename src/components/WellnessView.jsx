@@ -1,108 +1,97 @@
 import { useState, useEffect, useMemo } from "react";
 import Animal3D from "./Animal3D.jsx";
-import { analyzeEmotionAI, analyzeEmotionLocal } from "../lib/emotion-api.js";
+import { analyzeEmotionAI } from "../lib/emotion-api.js";
 import { EmotionDetector, AIJournalist, JournalMemory } from "../lib/journal-ai.js";
 import { EMOTIONS } from "../utils/emotion.js";
 
-// ── Evidence-based daily quiz ─────────────────────────────────────────────────
-// Questions derived from PHQ-2, GAD-2, WHO-5 Well-Being Index, PSQI, and PANAS.
-// Adapted to feel warm and conversational rather than clinical.
+// ── Wellness quiz — 7 balanced dimensions ────────────────────────────────────
+// Equal weight to positive and negative states across energy, mood, meaning,
+// connection, accomplishment, sleep, and resilience. Not a depression screen.
 const QUIZ = [
   {
-    id: "interest",
-    q: "Over the last day or two, how often have you noticed little interest in things you'd normally enjoy?",
-    dimension: "interest & pleasure",
+    id: "energy",
+    q: "How would you describe your energy level right now?",
+    dimension: "energy & vitality",
     opts: [
-      { label: "Not really",     desc: "I've felt present and engaged",    emotion: "content",  score: 3 },
-      { label: "A little",       desc: "Some moments felt flat",           emotion: "neutral",  score: 2 },
-      { label: "Quite often",    desc: "Hard to find things that matter",  emotion: "tired",    score: 1 },
-      { label: "Almost always",  desc: "Nothing's been reaching me",       emotion: "sad",      score: 0 },
+      { label: "Drained",           desc: "Running on empty",              emotion: "tired",    score: 0 },
+      { label: "Low but going",     desc: "Getting through, not much left", emotion: "tired",   score: 1 },
+      { label: "Steady",            desc: "Present and okay",              emotion: "content",  score: 2 },
+      { label: "Energized",         desc: "Full and alive",                emotion: "excited",  score: 3 },
     ],
   },
   {
     id: "mood",
-    q: "Have you been feeling down, heavy, or without much hope?",
-    dimension: "mood & hope",
+    q: "How would you describe your overall mood today?",
+    dimension: "mood & emotional state",
     opts: [
-      { label: "Not at all",     desc: "I've felt okay",                   emotion: "content",  score: 3 },
-      { label: "A couple times", desc: "A few low moments",                emotion: "neutral",  score: 2 },
-      { label: "Quite a bit",    desc: "More often than not",              emotion: "sad",      score: 1 },
-      { label: "Most of the time",desc: "Hard to shake",                   emotion: "sad",      score: 0 },
+      { label: "Pretty low",        desc: "Heavy or hard to lift",         emotion: "sad",      score: 0 },
+      { label: "Somewhere between", desc: "Mixed — up and down",           emotion: "neutral",  score: 1 },
+      { label: "Mostly okay",       desc: "Calm or settled",               emotion: "calm",     score: 2 },
+      { label: "Genuinely good",    desc: "Hopeful or happy",              emotion: "happy",    score: 3 },
     ],
   },
   {
-    id: "worry",
-    q: "How much have anxious thoughts or worry taken up space in your mind?",
-    dimension: "anxiety & worry",
+    id: "meaning",
+    q: "Has your day felt like it matters — even in small ways?",
+    dimension: "meaning & purpose",
     opts: [
-      { label: "Very little",    desc: "Mind has felt clear",              emotion: "calm",     score: 3 },
-      { label: "A bit",          desc: "Some background noise",            emotion: "neutral",  score: 2 },
-      { label: "Quite a lot",    desc: "Hard to quiet it down",            emotion: "anxious",  score: 1 },
-      { label: "Constantly",     desc: "It's been overwhelming",           emotion: "anxious",  score: 0 },
-    ],
-  },
-  {
-    id: "energy",
-    q: "How would you describe your energy and vitality right now?",
-    dimension: "energy & vitality",
-    opts: [
-      { label: "Drained",        desc: "Running on empty",                 emotion: "tired",    score: 0 },
-      { label: "Low",            desc: "A little flat",                    emotion: "tired",    score: 1 },
-      { label: "Steady",         desc: "Getting through it okay",          emotion: "neutral",  score: 2 },
-      { label: "Alive",          desc: "Full and present",                 emotion: "excited",  score: 3 },
-    ],
-  },
-  {
-    id: "sleep",
-    q: "How did you rest last night?",
-    dimension: "sleep quality",
-    opts: [
-      { label: "Barely",         desc: "Very little sleep",                emotion: "tired",    score: 0 },
-      { label: "Restlessly",     desc: "On and off all night",             emotion: "anxious",  score: 1 },
-      { label: "Okay",           desc: "Well enough",                      emotion: "neutral",  score: 2 },
-      { label: "Deeply",         desc: "Woke up restored",                 emotion: "calm",     score: 3 },
+      { label: "Hard to care",      desc: "Going through the motions",     emotion: "sad",      score: 0 },
+      { label: "Not really",        desc: "Feels unclear",                 emotion: "neutral",  score: 1 },
+      { label: "Sort of",           desc: "Some small moments landed",     emotion: "content",  score: 2 },
+      { label: "Yes, genuinely",    desc: "Something felt real today",     emotion: "grateful", score: 3 },
     ],
   },
   {
     id: "connection",
     q: "How connected do you feel to the people in your life right now?",
-    dimension: "social connection",
+    dimension: "relationships & connection",
     opts: [
-      { label: "Very alone",     desc: "Quite cut off",                    emotion: "sad",      score: 0 },
-      { label: "Distant",        desc: "A little disconnected",            emotion: "sad",      score: 1 },
-      { label: "Okay",           desc: "Neither here nor there",           emotion: "neutral",  score: 2 },
-      { label: "Seen",           desc: "Genuinely close to someone",       emotion: "grateful", score: 3 },
+      { label: "Very alone",        desc: "Quite cut off or invisible",    emotion: "sad",      score: 0 },
+      { label: "A bit distant",     desc: "Not quite reaching anyone",     emotion: "neutral",  score: 1 },
+      { label: "Okay",              desc: "Fine, neither close nor far",   emotion: "content",  score: 2 },
+      { label: "Genuinely seen",    desc: "Close to someone today",        emotion: "grateful", score: 3 },
     ],
   },
   {
-    id: "body",
-    q: "What is your body telling you right now?",
-    dimension: "somatic awareness",
+    id: "accomplishment",
+    q: "Have you been able to do the things that matter to you today?",
+    dimension: "accomplishment & growth",
     opts: [
-      { label: "Heavy & tight",  desc: "Tension throughout",               emotion: "anxious",  score: 0 },
-      { label: "A bit stiff",    desc: "Some discomfort",                  emotion: "tired",    score: 1 },
-      { label: "Neutral",        desc: "Just here",                        emotion: "neutral",  score: 2 },
-      { label: "Light & open",   desc: "Relaxed and grounded",             emotion: "calm",     score: 3 },
+      { label: "Struggling to start", desc: "Couldn't get going",          emotion: "tired",    score: 0 },
+      { label: "Basics only",         desc: "Getting through the minimum", emotion: "neutral",  score: 1 },
+      { label: "Making progress",     desc: "Moving forward okay",         emotion: "content",  score: 2 },
+      { label: "Proud of something",  desc: "Did something that counts",   emotion: "happy",    score: 3 },
     ],
   },
   {
-    id: "meaning",
-    q: "Has today — even in small ways — felt like it matters?",
-    dimension: "meaning & purpose",
+    id: "sleep",
+    q: "How did you rest last night?",
+    dimension: "sleep & physical wellness",
     opts: [
-      { label: "Hard to care",   desc: "Going through the motions",        emotion: "sad",      score: 0 },
-      { label: "Not really",     desc: "Unclear",                          emotion: "neutral",  score: 1 },
-      { label: "Sort of",        desc: "Some small moments",               emotion: "content",  score: 2 },
-      { label: "Genuinely yes",  desc: "Something felt real today",        emotion: "grateful", score: 3 },
+      { label: "Very little",       desc: "Barely slept",                  emotion: "tired",    score: 0 },
+      { label: "Restless",          desc: "On and off, not deep",          emotion: "anxious",  score: 1 },
+      { label: "Okay",              desc: "Well enough",                   emotion: "neutral",  score: 2 },
+      { label: "Deeply",            desc: "Woke feeling restored",         emotion: "calm",     score: 3 },
+    ],
+  },
+  {
+    id: "resilience",
+    q: "When challenges came up today, how did handling them feel?",
+    dimension: "resilience & coping",
+    opts: [
+      { label: "Completely overwhelmed", desc: "Too much at once",         emotion: "anxious",  score: 0 },
+      { label: "Hard but pushed through",desc: "Got there with effort",    emotion: "tired",    score: 1 },
+      { label: "Managed okay",           desc: "Handled it well enough",   emotion: "neutral",  score: 2 },
+      { label: "Felt capable",           desc: "Steady and in control",    emotion: "calm",     score: 3 },
     ],
   },
 ];
 
-// Wellbeing score ranges (0–24 from 8 questions × 0–3 each)
+// Wellbeing score ranges (0–21 from 7 questions × 0–3 each)
 const WELLBEING_BANDS = [
-  { max: 8,  label: "Struggling",   message: "I want to sit with this for a second. It's been a hard stretch — and I don't want to skip past that. How you've been feeling matters.", emotion: "sad" },
-  { max: 16, label: "Navigating",   message: "You're navigating. Not soaring, not sinking — just moving through it. That's real and it counts.", emotion: "neutral" },
-  { max: 24, label: "Flourishing",  message: "There's something quietly good happening for you right now. I don't want to rush past it — this is a good patch.", emotion: "happy" },
+  { max: 7,  label: "Struggling",   message: "I want to sit with this for a second. It's been a hard stretch — and I don't want to skip past that. How you've been feeling matters.", emotion: "sad" },
+  { max: 14, label: "Navigating",   message: "You're navigating. Not soaring, not sinking — just moving through it. That's real and it counts.", emotion: "neutral" },
+  { max: 21, label: "Flourishing",  message: "There's something quietly good happening for you right now. I don't want to rush past it — this is a good patch.", emotion: "happy" },
 ];
 
 // ── Shared visual helpers ─────────────────────────────────────────────────────
@@ -198,8 +187,8 @@ export default function WellnessView({
       journalist.generateResponse(text, detectorResult, journalEntries, player?.name),
     ]);
 
-    // Merge: EmotionDetector has subtext context, HuggingFace has neural signal
-    let merged = mergeAnalysis(detectorResult, hfResult || analyzeEmotionLocal(text));
+    // Merge: EmotionDetector provides subtext context, Gemini provides neural signal
+    let merged = mergeAnalysis(detectorResult, hfResult ?? { emotion: "neutral", confidence: 50, source: "fallback" });
 
     // Gemini read the raw text itself — if it detected an emotion, it takes priority
     if (response?.emotion) {
@@ -434,7 +423,9 @@ export default function WellnessView({
                   <div style={{ fontWeight: 900, fontSize: "1rem", marginBottom: 6, lineHeight: 1.3 }}>
                     I'm sensing{" "}
                     <span style={{ color: detectedEmotion.color }}>
-                      {companionResponse?.nuancedEmotion || detectedEmotion.label}
+                      {aiResult?.emotion && !EMOTIONS[aiResult.emotion]
+                        ? aiResult.emotion
+                        : detectedEmotion.label}
                     </span>.
                     {" "}Does that land right?
                   </div>
@@ -699,8 +690,8 @@ export default function WellnessView({
                 maxWidth: 290, margin: "0 auto 10px", fontSize: "0.95rem",
               }}>
                 You're feeling{" "}
-                <strong style={{ color: EMOTIONS[quizEmot]?.color }}>
-                  {EMOTIONS[quizEmot]?.label}
+                <strong style={{ color: EMOTIONS[quizEmot]?.color ?? "var(--text-1)" }}>
+                  {EMOTIONS[quizEmot]?.label ?? quizEmot}
                 </strong>{" "}today.
               </p>
 
