@@ -3,7 +3,7 @@ import L from "leaflet";
 import { CalendarPlus, MapPin, Users } from "lucide-react";
 
 export default function RealWorldView({ character, activities, setActivities }) {
-  const mapRef = useRef(null);
+  const mapRef     = useRef(null);
   const mapNodeRef = useRef(null);
   const markersRef = useRef([]);
   const [selected, setSelected] = useState(null);
@@ -22,7 +22,7 @@ export default function RealWorldView({ character, activities, setActivities }) 
 
   useEffect(() => {
     if (!mapRef.current) return;
-    markersRef.current.forEach((marker) => marker.remove());
+    markersRef.current.forEach((m) => m.remove());
     markersRef.current = activities.map((activity) => {
       const marker = L.marker([activity.lat, activity.lng]).addTo(mapRef.current);
       marker.on("click", () => setSelected(activity));
@@ -35,19 +35,19 @@ export default function RealWorldView({ character, activities, setActivities }) 
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     const activity = {
-      id: crypto.randomUUID(),
-      title: String(form.get("title")),
-      host: "you",
-      date: String(form.get("date")),
-      location: String(form.get("location")),
-      lat: Number(form.get("lat") || 1.3521),
-      lng: Number(form.get("lng") || 103.8198),
-      capacity: Number(form.get("capacity") || 8),
-      joined: 1,
-      type: String(form.get("type") || "Social"),
-      description: String(form.get("description") || ""),
+      id:            crypto.randomUUID(),
+      title:         String(form.get("title")),
+      host:          "you",
+      date:          String(form.get("date")),
+      location:      String(form.get("location")),
+      lat:           Number(form.get("lat") || 1.3521),
+      lng:           Number(form.get("lng") || 103.8198),
+      capacity:      Number(form.get("capacity") || 8),
+      joined:        1,
+      type:          String(form.get("type") || "Social"),
+      description:   String(form.get("description") || ""),
       hostCharacter: character,
-      participants: ["you"]
+      participants:  ["you"],
     };
     setActivities((items) => [activity, ...items]);
     setCreating(false);
@@ -55,15 +55,17 @@ export default function RealWorldView({ character, activities, setActivities }) 
   }
 
   function joinActivity(id) {
-    setActivities((items) => items.map((activity) => (
-      activity.id === id
-        ? {
-            ...activity,
-            joined: Math.min(activity.capacity, activity.joined + 1),
-            participants: Array.from(new Set([...(activity.participants || []), "you"]))
-          }
-        : activity
-    )));
+    setActivities((items) =>
+      items.map((a) =>
+        a.id === id
+          ? {
+              ...a,
+              joined:       Math.min(a.capacity, a.joined + 1),
+              participants: Array.from(new Set([...(a.participants || []), "you"])),
+            }
+          : a
+      )
+    );
   }
 
   function focusActivity(activity) {
@@ -71,89 +73,162 @@ export default function RealWorldView({ character, activities, setActivities }) 
     mapRef.current?.flyTo([activity.lat, activity.lng], 14, { duration: 0.8 });
   }
 
+  const inputStyle = {
+    padding: "12px 16px", borderRadius: 12,
+    border: "1.5px solid var(--border)", background: "var(--surface)",
+    fontSize: "0.95rem", color: "var(--text)", outline: "none", width: "100%",
+    fontFamily: "inherit",
+  };
+
   return (
-    <div className="page-grid">
-      <section className="hero-panel map-hero">
-        <div>
-          <p className="eyebrow">Real world</p>
-        <h1>Host or join nearby activities.</h1>
-          <p>Create your own activity, drop it onto the map, and browse everything available around you.</p>
-        </div>
-        <div className="suggestion-card">
-          <MapPin size={24} />
-          <strong>{activities.length} activities</strong>
-          <span>Inspect host characters, see who joined, or create your own pin.</span>
-        </div>
-      </section>
+    <div className="page-container anim-fade-in">
 
-      <section className="map-panel">
-        <div ref={mapNodeRef} className="map-node" />
-      </section>
-
-      <section className="wide-panel">
-        <div className="section-heading">
-          <div>
-            <h2>Activities Near You</h2>
-            <p>Browse all available activities and focus their pins on the map.</p>
+      {/* ── Hero ──────────────────────────────────────────────── */}
+      <div className="page-hero page-hero-alt">
+        <div className="hero-text">
+          <div className="hero-label">Ventures</div>
+          <div className="hero-title" style={{ fontSize: "1.45rem" }}>
+            Real places,<br />real connection.
           </div>
-          <button className="primary-button small" type="button" onClick={() => setCreating(true)}>
-            <CalendarPlus size={17} /> Create
+          <p className="hero-desc" style={{ marginTop: 6 }}>
+            Host an activity, drop it on the map, and meet people nearby.
+          </p>
+          <div style={{ marginTop: 14, display: "flex", alignItems: "center", gap: 8, opacity: 0.9 }}>
+            <MapPin size={16} />
+            <span style={{ fontSize: "0.88rem", fontWeight: 700 }}>
+              {activities.length} {activities.length === 1 ? "activity" : "activities"} nearby
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Map ───────────────────────────────────────────────── */}
+      <div className="card" style={{ padding: 0, overflow: "hidden" }}>
+        <div
+          ref={mapNodeRef}
+          style={{ width: "100%", height: 340, borderRadius: "var(--r-lg)" }}
+          aria-label="Activity map"
+        />
+      </div>
+
+      {/* ── Activities list ────────────────────────────────────── */}
+      <div className="card">
+        <div className="card-header">
+          <div>
+            <div className="card-title">Nearby Activities</div>
+            <div className="card-sub">Tap to focus on the map</div>
+          </div>
+          <button className="btn-primary" type="button" onClick={() => setCreating(true)}>
+            <CalendarPlus size={16} />
+            Create
           </button>
         </div>
-        <div className="activity-list">
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {activities.map((activity) => (
-            <article className="activity-card" key={activity.id}>
-              <button className="host-avatar" type="button" onClick={() => focusActivity(activity)} aria-label={`Show ${activity.title} on map`}>
-                <span className={`mini-avatar ${activity.hostCharacter?.animal || "fox"}`} />
-              </button>
-              <div>
-                <strong>{activity.title}</strong>
-                <span>{activity.location} - {activity.type}</span>
-                <small>{activity.date} - @{activity.host} - {activity.joined}/{activity.capacity} joined</small>
+            <article
+              key={activity.id}
+              style={{
+                display: "flex", alignItems: "center", gap: 14,
+                padding: "14px 16px", borderRadius: 16,
+                border: "1.5px solid var(--border)", background: "var(--surface)",
+                cursor: "pointer", transition: "background 0.15s",
+              }}
+              onClick={() => focusActivity(activity)}
+            >
+              <div style={{
+                width: 44, height: 44, borderRadius: 12, flexShrink: 0,
+                background: "linear-gradient(135deg, var(--brand-2), #3A7868)",
+                display: "grid", placeItems: "center",
+                color: "#fff", fontSize: "1.1rem", fontWeight: 900,
+              }}>
+                {activity.type?.[0] ?? "A"}
               </div>
-              <button type="button" onClick={() => focusActivity(activity)}>View</button>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 800, fontSize: "0.95rem", color: "var(--text)" }}>
+                  {activity.title}
+                </div>
+                <div style={{ fontSize: "0.8rem", color: "var(--text-2)", marginTop: 2 }}>
+                  {activity.location} · {activity.type}
+                </div>
+                <div style={{ fontSize: "0.75rem", color: "var(--text-3)", marginTop: 1 }}>
+                  {activity.date} · {activity.joined}/{activity.capacity} joined
+                </div>
+              </div>
+              <button
+                className="btn-secondary"
+                type="button"
+                style={{ padding: "7px 14px", fontSize: "0.82rem", flexShrink: 0 }}
+                onClick={(e) => { e.stopPropagation(); focusActivity(activity); }}
+              >
+                View
+              </button>
             </article>
           ))}
         </div>
-      </section>
+      </div>
 
+      {/* ── Create activity drawer ──────────────────────────────── */}
       {creating && (
-        <div className="drawer" role="dialog" aria-modal="true">
-          <div>
-            <h2>Create Activity</h2>
-            <button type="button" onClick={() => setCreating(false)}>Close</button>
+        <div className="drawer-overlay" role="dialog" aria-modal="true" onClick={() => setCreating(false)}>
+          <div className="drawer" onClick={(e) => e.stopPropagation()}>
+            <div className="drawer-handle" />
+            <div className="drawer-title">New Activity</div>
+            <p className="drawer-sub">Drop a pin and invite others to join.</p>
+            <form style={{ display: "flex", flexDirection: "column", gap: 12 }} onSubmit={createActivity}>
+              <input name="title"    placeholder="Activity title"                 required style={inputStyle} />
+              <input name="location" placeholder="Location name"                 required style={inputStyle} />
+              <input name="date"     type="datetime-local"                        required style={inputStyle} />
+              <input name="type"     placeholder="Type e.g. Walk, Support, Games"         style={inputStyle} />
+              <input name="description" placeholder="What should people know?"           style={inputStyle} />
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                <input name="lat" type="number" step="0.0001" placeholder="Latitude"  defaultValue="1.3521"   style={inputStyle} />
+                <input name="lng" type="number" step="0.0001" placeholder="Longitude" defaultValue="103.8198" style={inputStyle} />
+              </div>
+              <input name="capacity" type="number" min="2" defaultValue="8" placeholder="Max participants" style={inputStyle} />
+              <button className="btn-primary" type="submit" style={{ width: "100%", justifyContent: "center" }}>
+                Save Activity
+              </button>
+            </form>
           </div>
-          <form className="activity-form" onSubmit={createActivity}>
-            <input name="title" placeholder="Activity title" required />
-            <input name="location" placeholder="Location name" required />
-            <input name="date" type="datetime-local" required />
-            <input name="type" placeholder="Type, e.g. Walk, Support, Games" />
-            <input name="description" placeholder="What should people know?" />
-            <div className="two-col">
-              <input name="lat" type="number" step="0.0001" placeholder="Latitude" defaultValue="1.3521" />
-              <input name="lng" type="number" step="0.0001" placeholder="Longitude" defaultValue="103.8198" />
-            </div>
-            <input name="capacity" type="number" min="2" defaultValue="8" />
-            <button className="primary-button" type="submit">Save activity</button>
-          </form>
         </div>
       )}
 
+      {/* ── Activity detail drawer ──────────────────────────────── */}
       {selected && (
-        <div className="drawer compact" role="dialog" aria-modal="true">
-          <div>
-            <h2>{selected.title}</h2>
-            <button type="button" onClick={() => setSelected(null)}>Close</button>
+        <div className="drawer-overlay" role="dialog" aria-modal="true" onClick={() => setSelected(null)}>
+          <div className="drawer" onClick={(e) => e.stopPropagation()}>
+            <div className="drawer-handle" />
+            <div className="drawer-title">{selected.title}</div>
+            <p className="drawer-sub">{selected.location} · hosted by @{selected.host}</p>
+            {selected.description && (
+              <p style={{ color: "var(--text-2)", fontSize: "0.9rem", marginBottom: 16 }}>
+                {selected.description}
+              </p>
+            )}
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
+              <Users size={16} style={{ color: "var(--text-3)", flexShrink: 0 }} />
+              {(selected.participants || ["Mia", "Kai", "Zoe"]).slice(0, 5).map((name) => (
+                <span
+                  key={name}
+                  style={{
+                    padding: "4px 12px", borderRadius: 999,
+                    background: "var(--bg-2)", fontSize: "0.82rem", fontWeight: 700,
+                  }}
+                >
+                  {name}
+                </span>
+              ))}
+            </div>
+            <button
+              className="btn-primary"
+              type="button"
+              style={{ width: "100%", justifyContent: "center" }}
+              onClick={() => joinActivity(selected.id)}
+            >
+              Join Activity
+            </button>
           </div>
-          <p>{selected.location} - hosted by @{selected.host}</p>
-          {selected.description && <p>{selected.description}</p>}
-          <div className="participant-strip">
-            <Users size={17} />
-            {(selected.participants || ["Mia", "Kai", "Zoe"]).slice(0, 5).map((name) => (
-              <span key={name}>{name}</span>
-            ))}
-          </div>
-          <button className="primary-button" type="button" onClick={() => joinActivity(selected.id)}>Join activity</button>
         </div>
       )}
     </div>

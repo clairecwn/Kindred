@@ -67,12 +67,12 @@ export const shops = [
     name: "Nest & Nook",
     category: "Home",
     x: 18,
-    y: 28,
+    y: 32,
     color: "#e97451",
     items: [
-      { id: "sofa", name: "Cloud Sofa", price: 350, description: "A soft living-room centerpiece for visits and quiet idle moments." },
-      { id: "lamp", name: "Warm Lamp", price: 140, description: "Adds a warm animated glow to your home world." },
-      { id: "rug", name: "Round Rug", price: 180, description: "A cozy floor piece for decorating social corners." }
+      { id: "sofa", type: "sofa", name: "Cloud Sofa", price: 350, description: "A soft living-room centerpiece for visits and quiet idle moments." },
+      { id: "lamp", type: "lamp", name: "Warm Lamp", price: 140, description: "Adds a warm animated glow to your home world." },
+      { id: "rug", type: "rug", name: "Round Rug", price: 180, description: "A cozy floor piece for decorating social corners." }
     ]
   },
   {
@@ -80,12 +80,12 @@ export const shops = [
     name: "Pawprint Tailor",
     category: "Avatar",
     x: 48,
-    y: 20,
+    y: 24,
     color: "#5d8edb",
     items: [
-      { id: "scarf", name: "Soft Scarf", price: 120, description: "A layered neck accessory that pairs with most outfits." },
-      { id: "cap", name: "Tiny Cap", price: 90, description: "A compact hat for a playful street look." },
-      { id: "satchel", name: "Explorer Satchel", price: 160, description: "A crossbody accessory for outings and activity hosting." }
+      { id: "scarf", type: "scarf", name: "Soft Scarf", price: 0, description: "A layered neck accessory that pairs with most outfits." },
+      { id: "cap", type: "cap", name: "Tiny Cap", price: 90, description: "A compact hat for a playful street look." },
+      { id: "satchel", type: "satchel", name: "Explorer Satchel", price: 160, description: "A crossbody accessory for outings and activity hosting." }
     ]
   },
   {
@@ -96,15 +96,42 @@ export const shops = [
     y: 34,
     color: "#4fbf7f",
     items: [
-      { id: "fern", name: "Fern Planter", price: 80, description: "A small animated plant for home paths and shop patios." },
-      { id: "tree", name: "Fruit Tree", price: 220, description: "A friendly landmark that adds height and shade." },
-      { id: "pond", name: "Tiny Pond", price: 300, description: "A rippling water decoration for garden depth." }
+      { id: "fern", type: "fern", name: "Fern Planter", price: 0, description: "A small animated plant for home paths and shop patios." },
+      { id: "tree", type: "tree", name: "Fruit Tree", price: 220, description: "A friendly landmark that adds height and shade." },
+      { id: "pond", type: "pond", name: "Tiny Pond", price: 300, description: "A rippling water decoration for garden depth." }
+    ]
+  },
+  {
+    id: "arcade",
+    name: "Soft Arena",
+    category: "Games",
+    x: 32,
+    y: 58,
+    color: "#d76ba8",
+    items: [
+      { id: "arena-token", type: "token", name: "Practice Token", price: 0, description: "Unlocks gentle bot matches for coins and low-pressure practice." },
+      { id: "team-banner", type: "banner", name: "Team Banner", price: 210, description: "A small banner for friend matches and world bridges." },
+      { id: "spark-trail", type: "trail", name: "Spark Trail", price: 260, description: "A soft movement trail when walking through social spaces." }
+    ]
+  },
+  {
+    id: "estate",
+    name: "House Registry",
+    category: "Homes",
+    x: 66,
+    y: 58,
+    color: "#8e7cc3",
+    items: [
+      { id: "loft", type: "house", name: "Canopy Loft", price: 520, description: "A taller home shell with a balcony and garden deck." },
+      { id: "lakehouse", type: "house", name: "Lakehouse", price: 680, description: "A calm waterside home that expands your decorating land." },
+      { id: "tea-garden", type: "house", name: "Tea Garden Lot", price: 0, description: "A free starting extension for visits with close friends." }
     ]
   }
 ];
 
 export const streetPlayers = [
-  { id: "p-1", name: "Mia", mood: "calm", x: 28, y: 66, status: "hosting a tea-room bridge" },
-  { id: "p-2", name: "Kai", mood: "tired", x: 55, y: 70, status: "looking for a bot match" },
-  { id: "p-3", name: "Zoe", mood: "excited", x: 82, y: 63, status: "shopping for arcade gear" }
+  { id: "p-1", name: "Mia", mood: "calm", x: 24, y: 70, status: "hosting a tea-room bridge" },
+  { id: "p-2", name: "Kai", mood: "tired", x: 52, y: 74, status: "looking for a bot match" },
+  { id: "p-3", name: "Zoe", mood: "excited", x: 82, y: 66, status: "shopping for arcade gear" },
+  { id: "p-4", name: "Noor", mood: "grateful", x: 43, y: 52, status: "decorating a lakehouse" }
 ];

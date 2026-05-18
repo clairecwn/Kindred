@@ -1,39 +1,45 @@
+import { Figma } from "lucide-react";
 import { useState } from "react";
 
 const FONT_URL = "https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap";
 
 const EM = {
-  happy:   { e:"😊", c:"#FFD166", l:"Happy",    bg:"#FFF9E6" },
-  excited: { e:"🤩", c:"#FF6B9D", l:"Excited",  bg:"#FFF0F8" },
-  calm:    { e:"😌", c:"#6BCB77", l:"Calm",      bg:"#F0FAF2" },
-  anxious: { e:"😰", c:"#FFB347", l:"Anxious",   bg:"#FFF8EC" },
-  sad:     { e:"😢", c:"#74B9FF", l:"Sad",       bg:"#EEF6FF" },
-  tired:   { e:"😴", c:"#B8A9E0", l:"Tired",     bg:"#F5F2FF" },
-  angry:   { e:"😤", c:"#FF6B6B", l:"Angry",     bg:"#FFF0F0" },
-  content: { e:"🙂", c:"#55EFC4", l:"Content",   bg:"#EDFAF5" },
-  grateful:{ e:"🥰", c:"#FD79A8", l:"Grateful",  bg:"#FFF0F8" },
-  neutral: { e:"😐", c:"#B2BEC3", l:"Neutral",   bg:"#F5F5F5" },
+  happy:   { e:"😊", c:"#FFD166", l:"Happy",     bg:"#FFF9E6", desc:"Joyful and bright", warmth:9 },
+  excited: { e:"🤩", c:"#FF6B9D", l:"Excited",   bg:"#FFF0F8", desc:"Energized and eager", warmth:8 },
+  calm:    { e:"😌", c:"#6BCB77", l:"Calm",      bg:"#F0FAF2", desc:"Peaceful and grounded", warmth:7 },
+  anxious: { e:"😰", c:"#FFB347", l:"Anxious",   bg:"#FFF8EC", desc:"Worried or restless", warmth:3 },
+  sad:     { e:"😢", c:"#74B9FF", l:"Sad",       bg:"#EEF6FF", desc:"Tender and reflective", warmth:2 },
+  tired:   { e:"😴", c:"#B8A9E0", l:"Tired",     bg:"#F5F2FF", desc:"Weary and slow", warmth:4 },
+  angry:   { e:"😤", c:"#FF6B6B", l:"Frustrated", bg:"#FFF0F0", desc:"Frustrated or upset", warmth:2 },
+  content: { e:"🙂", c:"#55EFC4", l:"Content",   bg:"#EDFAF5", desc:"Satisfied and warm", warmth:7 },
+  grateful:{ e:"🥰", c:"#FD79A8", l:"Grateful",  bg:"#FFF0F8", desc:"Appreciative and open", warmth:8 },
+  hopeful: { e:"✨", c:"#A7D8DE", l:"Hopeful",   bg:"#F0FAFB", desc:"Optimistic and forward", warmth:7 },
+  neutral: { e:"😐", c:"#B2BEC3", l:"Neutral",   bg:"#F5F5F5", desc:"Balanced and present", warmth:5 },
+  overwhelmed: { e:"😵", c:"#E88A95", l:"Overwhelmed", bg:"#FDF7F8", desc:"Overstimulated", warmth:2 },
 };
 
 const QS = [
-  { id:"mood",   q:"How's your mood right now?",   icon:"💭", opts:["😞 Very Low","😔 Low","😐 Neutral","🙂 Good","😄 Great"] },
-  { id:"sleep",  q:"How did you sleep?",            icon:"🌙", opts:["😫 Terrible","😕 Poor","😶 OK","🙂 Good","🤩 Amazing"] },
-  { id:"energy", q:"Energy level today?",           icon:"⚡", opts:["💀 Drained","😩 Low","😐 Moderate","😊 Energised","🚀 Pumped!"] },
-  { id:"social", q:"Ready to socialise?",           icon:"👥", opts:["🔇 Need space","😶 Prefer solo","🤷 Open","😊 Social","🎉 Very social"] },
+  { id:"mood",   q:"How are you feeling right now?",   icon:"💭", opts:["Really struggling","Down","Okay","Good","Really good"] },
+  { id:"sleep",  q:"How did you sleep last night?",    icon:"🌙", opts:["Barely slept","Restless","Okay","Well","Deeply rested"] },
+  { id:"body",   q:"How's your body feeling?",          icon:"💪", opts:["Exhausted","Sluggish","Normal","Energized","Alive"] },
+  { id:"social", q:"Do you feel like connecting?",      icon:"👥", opts:["Need space","Solo time","Either way","Want company","Very social"] },
+  { id:"stress", q:"What's your stress level?",         icon:"🌊", opts:["Overwhelmed","High","Moderate","Low","Calm"] },
 ];
 
-const FRIENDS = [
-  { name:"Alex",  av:"🧑",     em:"happy",   land:"Sunset Valley",  online:true  },
-  { name:"Mia",   av:"👩",     em:"calm",    land:"Crystal Cove",   online:true  },
-  { name:"Kai",   av:"🧑‍🦱",  em:"tired",   land:"Misty Hills",    online:false },
-  { name:"Zoe",   av:"👩‍🦰",  em:"excited", land:"Starlight Isle", online:true  },
+const WORLD_SHOPS = [
+  { id:1, name:"Bloom Café",       emoji:"☕", type:"Social Wellness", desc:"Cozy spot for quiet reflection & warm conversations", visitors:12, vibe:"calm", x:"18%", y:"22%" },
+  { id:2, name:"Pixel Arcade",     emoji:"🎮", type:"Games & Play", desc:"Retro games, trivia challenges, friend leaderboards", visitors:8, vibe:"excited", x:"55%", y:"40%" },
+  { id:3, name:"Mindful Gardens",  emoji:"🌿", type:"Reflection Zone", desc:"Guided journaling spaces, meditation circles, nature walks", visitors:6, vibe:"calm", x:"74%", y:"18%" },
+  { id:4, name:"Commons Gather",   emoji:"🎪", type:"Social Hub", desc:"Group activities, word games, share your day with friends", visitors:15, vibe:"happy", x:"38%", y:"60%" },
+  { id:5, name:"Cozy Library",     emoji:"📚", type:"Stories & Art", desc:"Share creative work, read others' reflections, exhibitions", visitors:4, vibe:"content", x:"25%", y:"50%" },
+  { id:6, name:"Wellness Studio",  emoji:"🧘", type:"Movement & Calm", desc:"Yoga, breathing exercises, movement classes together", visitors:7, vibe:"calm", x:"68%", y:"35%" },
 ];
 
-const ACTS = [
-  { id:1, t:"Morning Dog Walk",    host:"wanderer_99",  date:"Sun 11 May • 7:00 AM",   loc:"East Coast Park",  joined:4,  max:8,  icon:"🐕" },
-  { id:2, t:"Mental Health Circle",host:"mindful_jo",   date:"Sat 10 May • 6:00 PM",   loc:"Online Meeting",   joined:12, max:20, icon:"🧠" },
-  { id:3, t:"Sunset Yoga",          host:"yogini_sun",  date:"Sun 11 May • 6:30 PM",   loc:"Marina Barrage",   joined:6,  max:10, icon:"🧘" },
-  { id:4, t:"Board Game Café",      host:"gamemaster_k",date:"Sat 17 May • 2:00 PM",   loc:"Meeples Café",     joined:3,  max:6,  icon:"🎲" },
+const FRIEND_WORLDS = [
+  { name:"Alex", world:"Sunset Meadow", feeling:"happy", lastActive:"2 hours ago", online:true, island:true },
+  { name:"Mia", world:"Crystalline Bay", feeling:"calm", lastActive:"10 min ago", online:true, island:true },
+  { name:"Kai", world:"Starlit Forest", feeling:"tired", lastActive:"yesterday", online:false, island:true },
+  { name:"Zoe", world:"Aurora Peak", feeling:"excited", lastActive:"1 hour ago", online:true, island:true },
 ];
 
 function AvatarFace({ emotion="neutral", size=80 }) {
@@ -93,6 +99,27 @@ function AvatarFace({ emotion="neutral", size=80 }) {
         </>
       )}
       <rect x="31" y="75" width="28" height="13" rx="7" fill={ec} opacity="0.75"/>
+    </svg>
+  );
+}
+
+function AvatarToken({ mood="neutral", size=42 }) {
+  const e = EM[mood]||EM.neutral;
+  return (
+    <svg width={size} height={size} viewBox="0 0 60 60" style={{borderRadius:"50%",overflow:"visible"}}>
+      <defs>
+        <radialGradient id="avatarGlow" cx="50%" cy="50%" r="70%">
+          <stop offset="0%" stopColor="rgba(255,255,255,0.9)" />
+          <stop offset="100%" stopColor="rgba(255,255,255,0)" />
+        </radialGradient>
+      </defs>
+      <circle cx="30" cy="30" r="28" fill={e.c} opacity="0.95" />
+      <circle cx="30" cy="20" r="11" fill="#FFFBEC" />
+      <path d="M18 36 C18 28 26 28 30 34 C34 28 42 28 42 36 L42 44 C42 48 38 52 30 52 C22 52 18 48 18 44 Z" fill="#F8F0E3" />
+      <circle cx="24" cy="19" r="2.8" fill="#3B2D2F" />
+      <circle cx="36" cy="19" r="2.8" fill="#3B2D2F" />
+      <path d="M24 25 Q30 30 36 25" stroke="#3B2D2F" strokeWidth="2" fill="none" strokeLinecap="round" />
+      <circle cx="30" cy="30" r="18" fill="url(#avatarGlow)" />
     </svg>
   );
 }
@@ -158,6 +185,75 @@ function Island({ buildings=3, currency=2000 }) {
   );
 }
 
+function WorldScene({ emotion }) {
+  const e = EM[emotion]||EM.neutral;
+  return (
+    <div style={{ margin:"0 -16px 16px", borderRadius:28, overflow:"hidden",
+      background:"linear-gradient(180deg,#E7F2FF 0%,#F8F3EB 100%)",
+      boxShadow:"0 20px 42px rgba(15,23,42,0.16)", border:"1px solid rgba(255,255,255,0.5)", padding:"16px" }}>
+      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:12 }}>
+        <div>
+          <div style={{ ...h2, fontSize:17 }}>Kindred Commons</div>
+          <div style={{ fontSize:11, color:"#64748B", marginTop:4, maxWidth:220, lineHeight:1.4 }}>
+            A warm plaza of shops, arcades, and friend worlds where your story unfolds.
+          </div>
+        </div>
+        <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+          <div style={{ width:42, height:42, borderRadius:"50%", background:`linear-gradient(135deg,${e.c},#ffffff)`,
+            display:"grid", placeItems:"center", boxShadow:"0 10px 18px rgba(15,23,42,0.12)" }}>
+            <span style={{ fontSize:20 }}>{e.e}</span>
+          </div>
+          <div style={{ fontSize:11, fontWeight:700, color:"#334155", textAlign:"right" }}>
+            {e.l} mood<br/>guides your journey
+          </div>
+        </div>
+      </div>
+      <div style={{ position:"relative", borderRadius:24, overflow:"hidden", height:160, background:"#EFF6FF" }}>
+        <svg viewBox="0 0 380 160" style={{ width:"100%", height:"100%" }}>
+          <defs>
+            <linearGradient id="worldSky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#C8EAFB" />
+              <stop offset="100%" stopColor="#F7F1E8" />
+            </linearGradient>
+            <linearGradient id="shopRoof" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="#FDE68A" />
+              <stop offset="100%" stopColor="#F59E0B" />
+            </linearGradient>
+          </defs>
+          <rect width="380" height="160" fill="url(#worldSky)" />
+          <ellipse cx="190" cy="148" rx="220" ry="24" fill="#FFF4E8" />
+          <path d="M0 112 Q75 92 150 112 T300 112 L380 160 L0 160 Z" fill="#DCEFFF" />
+          <path d="M42 110 L86 68 L118 76 L104 118 Z" fill="#FBF5D7" />
+          <path d="M42 110 L96 110 L94 68 L86 68 Z" fill="#FACC15" />
+          <rect x="54" y="90" width="10" height="18" rx="3" fill="#A16207" />
+          <rect x="75" y="98" width="12" height="8" rx="2" fill="#FFF7CD" />
+          <rect x="146" y="82" width="54" height="66" rx="18" fill="#D8B4FE" />
+          <path d="M146 82 L173 52 L200 82 Z" fill="#C084FC" />
+          <rect x="165" y="104" width="14" height="20" rx="5" fill="#5B21B6" />
+          <rect x="182" y="104" width="14" height="20" rx="5" fill="#5B21B6" />
+          <rect x="104" y="90" width="50" height="46" rx="14" fill="#93C5FD" />
+          <path d="M104 90 L129 66 L154 90 Z" fill="#60A5FA" />
+          <circle cx="273" cy="96" r="30" fill="#A7F3D0" />
+          <rect x="248" y="106" width="50" height="26" rx="9" fill="#22C55E" />
+          <path d="M248 106 L273 82 L298 106 Z" fill="#16A34A" />
+          <path d="M122 148 C144 138 168 142 186 148" stroke="#64748B" strokeWidth="2" fill="none" />
+          <path d="M218 148 C238 140 260 144 282 148" stroke="#64748B" strokeWidth="2" fill="none" />
+          <circle cx="178" cy="118" r="12" fill="#F8FAFC" stroke="#475569" strokeWidth="2" />
+          <circle cx="178" cy="118" r="6" fill="#334155" />
+          <circle cx="210" cy="104" r="10" fill="#F8FAFC" stroke="#475569" strokeWidth="2" />
+          <circle cx="210" cy="104" r="4" fill="#334155" />
+          <rect x="164" y="123" width="12" height="18" rx="6" fill="#CBD5E1" />
+          <rect x="200" y="121" width="12" height="18" rx="6" fill="#CBD5E1" />
+          <path d="M196 55 Q205 38 214 55" stroke="#0F172A" strokeWidth="3" fill="none" strokeLinecap="round" />
+          <path d="M16 88 Q26 76 36 86 Q46 96 56 84" fill="#D9F99D" />
+          <path d="M330 90 Q340 80 350 90 Q360 100 370 88" fill="#D9F99D" />
+          <path d="M250 54 C260 48 270 50 280 58 C290 66 300 78 314 75" stroke="#344E41" strokeWidth="3" fill="none" />
+        </svg>
+      </div>
+    </div>
+  );
+}
+
 function WellnessTab({ emotion, setEmotion, currency, setCurrency, streak, setStreak }) {
   const [step, setStep] = useState("idle");
   const [qIdx, setQIdx] = useState(0);
@@ -180,16 +276,20 @@ function WellnessTab({ emotion, setEmotion, currency, setCurrency, streak, setSt
       const r = await fetch("https://api.anthropic.com/v1/messages", {
         method:"POST", headers:{"Content-Type":"application/json"},
         body: JSON.stringify({
-          model:"claude-sonnet-4-20250514", max_tokens:150,
-          messages:[{ role:"user", content:`Detect the primary emotion in this wellness check-in. Reply ONLY with a compact JSON object, no markdown or backticks. Fields: "emotion" (one word from: happy excited calm anxious sad tired angry content grateful neutral), "reason" (4 words max describing why). Text: "${freeText}"` }]
+          model:"claude-sonnet-4-20250514", max_tokens:250,
+          messages:[{ role:"user", content:`Analyze this wellness reflection deeply. Respond ONLY with JSON object, no markdown. Fields: "emotion" (one from: happy excited calm anxious sad tired angry content grateful hopeful overwhelmed neutral), "certainty" (0-100), "clarificationQ" (optional gentle question max 15 words), "insight" (1-2 word theme). Text: "${freeText}"` }]
         })
       });
       const d = await r.json();
       const p = JSON.parse(d.content[0].text.trim());
-      setDetected(p); setEmotion(p.emotion);
-      setCurrency(c => c + 50); setDone(true); setStep("result");
+      if (p.clarificationQ && p.certainty < 85) {
+        setDetected({...p, stage:"clarify"}); setStep("clarify");
+      } else {
+        setDetected({...p, stage:"result"}); setEmotion(p.emotion);
+        setCurrency(c => c + 50); setDone(true); setStep("result");
+      }
     } catch {
-      setDetected({ emotion:"neutral", reason:"Noted with care" });
+      setDetected({ emotion:"neutral", reason:"Noted with care", stage:"result" });
       setStep("result"); setDone(true);
     }
   }
@@ -293,6 +393,43 @@ function WellnessTab({ emotion, setEmotion, currency, setCurrency, streak, setSt
       </div>
     </div>
   );
+
+  if (step === "clarify" && detected) {
+    const de = EM[detected.emotion]||EM.neutral;
+    return (
+      <div style={anim}>
+        <div style={row("flex-start")}>
+          <span style={{cursor:"pointer",fontSize:"20px",marginRight:8}} onClick={() => setStep("text")}>←</span>
+          <span style={h2}>Let me understand better</span>
+        </div>
+        <div style={{...card, marginTop:16, marginBottom:12, background:`linear-gradient(145deg,${de.c}18,white)`}}>
+          <div style={{fontSize:20,marginBottom:8}}>{de.e}</div>
+          <div style={{...h3, marginBottom:12}}>I think you may be feeling <span style={{color:de.c, fontWeight:900}}>{de.l}</span>. Is that right?</div>
+          <div style={{color:"#718096",fontSize:13,marginBottom:14}}>{detected.insight && "Theme: " + detected.insight}</div>
+          <div style={{...h3, fontSize:14, marginBottom:12, color:"#475569"}}>{detected.clarificationQ}</div>
+        </div>
+        <div style={{display:"flex",gap:8,marginBottom:12}}>
+          <button style={{...btn, flex:1}} onClick={() => { setEmotion(detected.emotion); setCurrency(c=>c+50); setDone(true); setStep("result"); }}>
+            Yes, that's it
+          </button>
+          <button style={{...btnOutline, flex:1}} onClick={() => setStep("text")}>
+            Not quite
+          </button>
+        </div>
+        <div style={{color:"#A0AEC0",fontSize:12,textAlign:"center"}}>or choose an emotion below:</div>
+        <div style={{display:"flex",flexWrap:"wrap",gap:4,marginTop:8}}>
+          {Object.entries(EM).map(([k,v]) => (
+            <button key={k} onClick={() => { setEmotion(k); setDetected({...detected,emotion:k}); setCurrency(c=>c+50); setDone(true); setStep("result"); }}
+              style={{ background: detected.emotion===k ? `${v.c}33` : "white", border:`2px solid ${detected.emotion===k?v.c:"#EDF2F7"}`,
+                borderRadius:50, padding:"4px 10px", fontSize:11, fontWeight:700, cursor:"pointer",
+                fontFamily:"'Nunito',sans-serif", color:"#2D3748", transition:"all .15s" }}>
+              {v.e}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   if (step === "result" && detected) {
     const de = EM[detected.emotion]||EM.neutral;
@@ -499,8 +636,8 @@ function SocialTab() {
       {view === "friends" && (
         <div style={anim}>
           <div style={{...h3, marginBottom:10}}>Your Connections</div>
-          {FRIENDS.map((f,i) => {
-            const fe = EM[f.em]||EM.neutral;
+          {FRIEND_WORLDS.map((f,i) => {
+            const fe = EM[f.feeling]||EM.neutral;
             return (
               <div key={i} style={{...card, marginBottom:8, display:"flex", alignItems:"center", gap:12}}>
                 <div style={{ width:44,height:44,borderRadius:"50%",background:`linear-gradient(135deg,${fe.c}44,${fe.c}22)`,
@@ -511,7 +648,7 @@ function SocialTab() {
                 </div>
                 <div style={{flex:1}}>
                   <div style={{fontWeight:800,fontSize:14,color:"#2D3748"}}>{f.name}</div>
-                  <div style={{fontSize:11,color:"#A0AEC0"}}>🏝️ {f.land}</div>
+                  <div style={{fontSize:11,color:"#A0AEC0"}}>🏝️ {f.world}</div>
                   <span style={{ background:`${fe.c}22`,borderRadius:20,padding:"2px 8px",
                     fontSize:10,fontWeight:700,color:"#2D3748" }}>{fe.e} {fe.l}</span>
                 </div>
