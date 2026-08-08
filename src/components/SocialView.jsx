@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { shops } from "../data/seed.js";
 import { sfx } from "../lib/sound.js";
+import SpriteCharacter from "./SpriteCharacter.jsx";
 
 // ── Color helpers ────────────────────────────────────────────────
 const SKIN_COLORS = {
@@ -1087,14 +1088,12 @@ export default function SocialView({ character, inventory, setInventory, friends
         </g>
       ))}
 
-      {/* Layer 16 — Player */}
+      {/* Layer 16 — Player shadow + indicator (SpriteCharacter is overlaid via CSS) */}
       <g transform={`translate(${playerPos.x} ${playerPos.y})`}>
-        <ellipse cx={0} cy={13} rx="10.5" ry="3.8" fill="rgba(0,0,0,0.18)"/>
-        <CharSprite
-          animal={character?.animal || "fox"}
-          color={character?.color || character?.skin || "honey"}
-          x={0} y={0} size={32} isPlayer name="You"
-        />
+        <ellipse cx={0} cy={13} rx="12" ry="4.5" fill="rgba(0,0,0,0.26)"/>
+        {/* Player arrow indicator */}
+        <polygon fill="#E8845A" stroke="white" strokeWidth="1"
+          points="0,-38 -7,-54 7,-54" />
       </g>
     </svg>
   );
@@ -1130,17 +1129,18 @@ export default function SocialView({ character, inventory, setInventory, friends
                 >Messages</button>
               </div>
             </div>
-            <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:8,paddingBottom:16,paddingRight:4}}>
-              {navigating ? (
-                <div style={{background:"rgba(255,255,255,0.18)",borderRadius:12,padding:"10px 16px",color:"white",fontSize:"0.82rem",fontWeight:800,textAlign:"center"}}>
-                  Walking…
+            <div className="hero-character" style={{position:"relative"}}>
+              <SpriteCharacter
+                emotion={emotion}
+                character={character}
+                interactive={false}
+                size={{ width: 160, height: 190 }}
+              />
+              {arrivedZone && ZONES[arrivedZone] && (
+                <div style={{position:"absolute",bottom:0,left:"50%",transform:"translateX(-50%)",background:"rgba(255,255,255,0.22)",borderRadius:999,padding:"3px 12px",color:"white",fontSize:"0.62rem",fontWeight:800,whiteSpace:"nowrap"}}>
+                  {ZONES[arrivedZone].label}
                 </div>
-              ) : arrivedZone && ZONES[arrivedZone] ? (
-                <div style={{background:"rgba(255,255,255,0.18)",borderRadius:12,padding:"10px 14px",color:"white",textAlign:"center"}}>
-                  <div style={{fontSize:"0.62rem",opacity:0.72,fontWeight:700,marginBottom:3,textTransform:"uppercase",letterSpacing:"0.8px"}}>You are at</div>
-                  <div style={{fontWeight:900,fontSize:"0.88rem"}}>{ZONES[arrivedZone].label}</div>
-                </div>
-              ) : null}
+              )}
             </div>
           </div>
 
@@ -1175,9 +1175,28 @@ export default function SocialView({ character, inventory, setInventory, friends
             </div>
           )}
 
-          {/* World SVG */}
+          {/* World SVG — SpriteCharacter overlaid at player position */}
           <div className="card" style={{padding:12}}>
-            {worldSVG}
+            <div style={{ position: "relative" }}>
+              {worldSVG}
+              <div style={{
+                position: "absolute",
+                left: `${(playerPos.x / 400) * 100}%`,
+                top: `${(playerPos.y / 270) * 100}%`,
+                transform: "translate(-50%, -100%)",
+                pointerEvents: "none",
+                zIndex: 10,
+                transition: "left 0.08s linear, top 0.08s linear",
+                marginTop: -8,
+              }}>
+                <SpriteCharacter
+                  emotion={emotion}
+                  character={character}
+                  interactive={false}
+                  size={{ width: 56, height: 70 }}
+                />
+              </div>
+            </div>
           </div>
 
           {/* Zone arrival panel */}

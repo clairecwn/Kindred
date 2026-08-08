@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { sfx } from "../lib/sound.js";
+import SpriteCharacter from "./SpriteCharacter.jsx";
 
 // ── Island SVG paths (viewBox 360×300) ────────────────────────────
 const BEACH = "M190,22 C242,10 298,32 330,72 C362,112 364,162 344,202 C324,242 288,272 244,284 C200,296 150,294 112,276 C74,258 44,228 28,192 C12,156 14,110 38,76 C62,42 138,34 190,22 Z";
@@ -248,11 +249,19 @@ export default function LandView({ emotion, character, land, setLand, coins, set
       {/* ── Hero ──────────────────────────────────────────────── */}
       <div className="page-hero page-hero-alt">
         <div className="hero-text">
-          <div className="hero-label">Burrow</div>
+          <div className="hero-label">Kingdom</div>
           <div className="hero-title" style={{ fontSize: "1.45rem" }}>Your island,<br />your world.</div>
           <p className="hero-desc" style={{ marginTop: 6 }}>
             Place items from your inventory and bridge to friends' islands.
           </p>
+        </div>
+        <div className="hero-character">
+          <SpriteCharacter
+            emotion={emotion}
+            character={character}
+            interactive={false}
+            size={{ width: 160, height: 190 }}
+          />
         </div>
       </div>
 
@@ -295,6 +304,23 @@ export default function LandView({ emotion, character, land, setLand, coins, set
             </div>
           )}
 
+          <div style={{ position: "relative" }}>
+          <div style={{
+            position: "absolute",
+            left: `${(charPos.x / 360) * 100}%`,
+            top: `${(charPos.y / 300) * 100}%`,
+            transform: "translate(-50%, -100%)",
+            pointerEvents: "none",
+            zIndex: 5,
+            marginTop: -4,
+          }}>
+            <SpriteCharacter
+              emotion={emotion}
+              character={character}
+              interactive={false}
+              size={{ width: 56, height: 70 }}
+            />
+          </div>
           <svg
             ref={svgRef}
             viewBox="0 0 360 300"
@@ -378,8 +404,8 @@ export default function LandView({ emotion, character, land, setLand, coins, set
               </g>
             ))}
 
-            {/* Player character */}
-            <CharTopDown animal={character?.animal ?? "fox"} color={character?.color ?? "honey"} x={charPos.x} y={charPos.y} />
+            {/* Player shadow + indicator (SpriteCharacter rendered via CSS overlay below) */}
+            <ellipse cx={charPos.x} cy={charPos.y + 8} rx={12} ry={4} fill="rgba(0,0,0,0.24)"/>
             <polygon points={`${charPos.x},${charPos.y-30} ${charPos.x-5},${charPos.y-22} ${charPos.x+5},${charPos.y-22}`} fill="#E8845A" />
 
             {/* D-pad */}
@@ -397,6 +423,7 @@ export default function LandView({ emotion, character, land, setLand, coins, set
               ))}
             </g>
           </svg>
+          </div>{/* end relative SVG wrapper */}
 
           {/* Build mode toggle button */}
           <button

@@ -382,6 +382,61 @@ export class AIJournalist {
     return this._templateResponse(text, analysis, pastEntries);
   }
 
+  async generateQuizReaction(question, answer, playerName = "friend") {
+    const FALLBACKS = [
+      "Every step counts.",
+      "That's real. I hear you.",
+      "Moving through it matters.",
+      "Something good is alive in you.",
+    ];
+    if (!this.groqKey) return FALLBACKS[1];
+    try {
+      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${this.groqKey}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "llama-3.3-70b-versatile",
+          messages: [
+            { role: "system", content: `You are a warm, empathetic companion responding to ${playerName}'s wellness check-in. Give ONE short, natural, human reaction (max 10 words). No quotes. No emojis. Respond directly to their answer with warmth.` },
+            { role: "user", content: `Question: "${question}". They answered: "${answer}".` }
+          ],
+          temperature: 0.9,
+          max_tokens: 40
+        })
+      });
+      if (!response.ok) throw new Error(`Groq ${response.status}`);
+      const data = await response.json();
+      const text = data.choices?.[0]?.message?.content?.trim();
+      return text || FALLBACKS[1];
+    } catch (err) {
+      console.warn("[Kindred] Quiz reaction fallback:", err.message);
+      return FALLBACKS[Math.floor(Math.random() * FALLBACKS.length)];
+    }
+  }
+
+  async generateChatReply(userMessage, chatHistory = [], originalEntry = "", detectedEmotion = "", playerName = "friend") {
+    if (!this.groqKey) return "I'm here with you. Tell me more.";
+    try {
+      const messages = [
+        { role: "system", content: `You are Kindred, a warm and emotionally intelligent companion. The user just wrote a journal entry and you detected their emotion as "${detectedEmotion}". Have a genuine, natural back-and-forth conversation with them. Be concise (2-3 sentences max), empathetic, and curious. Ask follow-up questions naturally. Never be clinical or list bullet points. Address them as ${playerName}.` },
+        { role: "assistant", content: `I just read your journal entry: "${originalEntry.slice(0, 200)}${originalEntry.length > 200 ? "..." : ""}"` },
+        ...chatHistory.map(m => ({ role: m.role === "ai" ? "assistant" : "user", content: m.text })),
+        { role: "user", content: userMessage }
+      ];
+      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${this.groqKey}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages, temperature: 0.85, max_tokens: 120 })
+      });
+      if (!response.ok) throw new Error(`Groq ${response.status}`);
+      const data = await response.json();
+      return data.choices?.[0]?.message?.content?.trim() || "I'm here with you. Tell me more.";
+    } catch (err) {
+      console.warn("[Kindred] Chat reply fallback:", err.message);
+      return "I'm here with you. Tell me more.";
+    }
+  }
+
   async _groqResponse(text, analysis, pastEntries, playerName) {
     const recentContext = pastEntries.slice(0, 4).map(e =>
       `${e.date}: Felt ${e.emotion}. "${e.text.slice(0, 100)}${e.text.length > 100 ? "..." : ""}"`

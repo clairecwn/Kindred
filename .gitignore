@@ -1,5 +1,42 @@
+# Dependencies
 node_modules
+
+# Build output
 dist
+
+# Environment secrets
 .env
 .env.local
+
+# Logs
 npm-debug.log*
+*.log
+
+# Python virtual env (used by design/tooling scripts, not the app itself)
+.venv
+
+# Temp / scratch output
+tmp/
+
+# AI coding tool configs & skills (local to each contributor, not app source)
+.agent/
+.agents/
+.claude/
+.codebuddy/
+.codex/
+.continue/
+.cursor/
+.gemini/
+.kiro/
+.opencode/
+.qoder/
+.roo/
+.trae/
+.windsurf/
+.github/prompts/
+
+# Stray AI memory notes (not app source)
+memory/
+
+# Nested tool repo (has its own git history — not part of this repo)
+claude-blender/

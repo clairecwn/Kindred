@@ -1,14 +1,14 @@
 export const EMOTIONS = {
-  happy: { label: "Happy", color: "#f6c65b", tone: "bright and open", behavior: "smiling idle", speed: 1.08 },
-  excited: { label: "Excited", color: "#ee6f8f", tone: "high energy", behavior: "energetic bounce", speed: 1.38 },
-  calm: { label: "Calm", color: "#5dbb9d", tone: "settled and steady", behavior: "slow breathing", speed: 0.86 },
-  anxious: { label: "Anxious", color: "#f49f58", tone: "uneasy or worried", behavior: "small nervous sway", speed: 1.12 },
-  sad: { label: "Sad", color: "#5d8edb", tone: "heavy or low", behavior: "slower lowered idle", speed: 0.68 },
-  tired: { label: "Tired", color: "#8e7cc3", tone: "drained or foggy", behavior: "soft sleepy sway", speed: 0.62 },
-  angry: { label: "Angry", color: "#e85d5d", tone: "frustrated or tense", behavior: "tight stance", speed: 1 },
-  content: { label: "Content", color: "#4fbf7f", tone: "quietly okay", behavior: "relaxed smile", speed: 0.92 },
-  grateful: { label: "Grateful", color: "#d76ba8", tone: "appreciative", behavior: "warm nod", speed: 0.95 },
-  neutral: { label: "Neutral", color: "#8b99a7", tone: "even or unclear", behavior: "neutral idle", speed: 0.9 }
+  happy:    { label: "Happy",    color: "#d8a011", tone: "bright and open",     behavior: "smiling idle",        speed: 1.08 },
+  excited:  { label: "Excited",  color: "#bc22db", tone: "high energy",         behavior: "energetic bounce",    speed: 1.38 },
+  calm:     { label: "Calm",     color: "#4a7d99", tone: "settled and steady",  behavior: "slow breathing",      speed: 0.86 },
+  anxious:  { label: "Anxious",  color: "#fc6005", tone: "uneasy or worried",   behavior: "small nervous sway",  speed: 1.12 },
+  sad:      { label: "Sad",      color: "#0062ff", tone: "heavy or low",        behavior: "slower lowered idle", speed: 0.68 },
+  tired:    { label: "Tired",    color: "#546483", tone: "drained or foggy",    behavior: "soft sleepy sway",    speed: 0.62 },
+  angry:    { label: "Angry",    color: "#f51414", tone: "frustrated or tense", behavior: "tight stance",        speed: 1    },
+  content:  { label: "Content",  color: "#127938", tone: "quietly okay",        behavior: "relaxed smile",       speed: 0.92 },
+  grateful: { label: "Grateful", color: "#da027c", tone: "appreciative",        behavior: "warm nod",            speed: 0.95 },
+  neutral:  { label: "Neutral",  color: "#535253", tone: "even or unclear",     behavior: "neutral idle",        speed: 0.9  }
 };
 
 const LEXICON = {
