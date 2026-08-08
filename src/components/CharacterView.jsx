@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Animal3D from "./Animal3D.jsx";
+import SpriteCharacter from "./SpriteCharacter.jsx";
 
 // ── Roster — each animal has a lore name, role and rarity ────────
 const ROSTER = [
@@ -113,10 +113,9 @@ export default function CharacterView({ emotion, character, setCharacter }) {
       {/* ── Top preview section (large 3D character + info) ──── */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, alignItems: "start" }}>
 
-        {/* 3D Character stage */}
+        {/* Character stage */}
         <div className="character-stage-wrap" style={{ height: 320 }}>
-          <Animal3D emotion={emotion} {...character} interactive />
-          <div className="stage-hint">Drag to rotate</div>
+          <SpriteCharacter emotion={emotion} character={character} interactive size={{ width: 200, height: 260 }} />
         </div>
 
         {/* Character info panel */}

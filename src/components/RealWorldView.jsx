@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import { CalendarPlus, MapPin, Users } from "lucide-react";
+import SpriteCharacter from "./SpriteCharacter.jsx";
 
-export default function RealWorldView({ character, activities, setActivities }) {
+export default function RealWorldView({ emotion, character, activities, setActivities }) {
   const mapRef     = useRef(null);
   const mapNodeRef = useRef(null);
   const markersRef = useRef([]);
@@ -99,6 +100,14 @@ export default function RealWorldView({ character, activities, setActivities }) 
               {activities.length} {activities.length === 1 ? "activity" : "activities"} nearby
             </span>
           </div>
+        </div>
+        <div className="hero-character">
+          <SpriteCharacter
+            emotion={emotion}
+            character={character}
+            interactive={false}
+            size={{ width: 160, height: 190 }}
+          />
         </div>
       </div>
 
