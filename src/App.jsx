@@ -7,8 +7,11 @@ import SocialView from "./components/SocialView.jsx";
 import WellnessView from "./components/WellnessView.jsx";
 import HomeView from "./components/HomeView.jsx";
 import SettingsPanel from "./components/SettingsPanel.jsx";
+import AuthScreen from "./components/AuthScreen.jsx";
 import { initialActivities, initialJournalEntries } from "./data/seed.js";
 import { useDatabaseState } from "./hooks/useDatabaseState.js";
+import { isSupabaseConfigured, supabase } from "./lib/supabase.js";
+import { useSession } from "./lib/SessionProvider.jsx";
 import { sfx } from "./lib/sound.js";
 import { getWorldMood, getNPCBehavior } from "./lib/journal-ai.js";
 import { ambientPlayer } from "./lib/ambient-audio.js";
@@ -51,6 +54,7 @@ const initialLand = {
 };
 
 export default function App() {
+  const { session, loading: sessionLoading } = useSession();
   const [player, setPlayer]   = useDatabaseState("kindred.player", null);
   const [nameInput, setNameInput] = useState("");
   const [goalInput, setGoalInput] = useState("");
@@ -62,6 +66,14 @@ export default function App() {
 
   useEffect(() => { if (sfx?.setMuted) sfx.setMuted(muted); }, [muted]);
   useEffect(() => { if (musicOn) ambientPlayer.start(); else ambientPlayer.stop(); }, [musicOn]);
+
+  // Ends the Supabase session where there is one; locally it just clears the
+  // profile and drops back to onboarding, as it always did.
+  async function signOut() {
+    setShowUserDetails(false);
+    if (isSupabaseConfigured) await supabase.auth.signOut();
+    else setPlayer(null);
+  }
 
   const toggleMute  = () => { setMuted(m => !m); if (!muted) sfx.click?.(); };
   const toggleMusic = () => setMusicOn(m => !m);
@@ -79,6 +91,13 @@ export default function App() {
   const [activities, setActivities] = useDatabaseState("kindred.activities", initialActivities);
 
   const worldMood       = useMemo(() => getWorldMood(emotion), [emotion]);
+
+  // Publish the mood wash to the full-bleed backdrop (.viewport-fit::before) so
+  // it covers the whole screen instead of stopping at the scaled stage's edge.
+  useEffect(() => {
+    document.documentElement.style.setProperty("--world-ambient", worldMood.ambient);
+  }, [worldMood]);
+
   const todayStr        = new Date().toISOString().slice(0, 10);
   const journalledToday = journalEntries.some(e => e.date === todayStr);
   const npcBehavior     = useMemo(() => getNPCBehavior(emotion, journalledToday), [emotion, journalledToday]);
@@ -87,10 +106,26 @@ export default function App() {
     e.preventDefault();
     const name = nameInput.trim() || "Wanderer";
     const goal = goalInput.trim();
-    setPlayer({ id:crypto.randomUUID(), name, goal:goal||null, goalAchieved:false, goalAchievedAt:null, joinedAt:new Date().toISOString(), lastSeenAt:new Date().toISOString() });
+    setPlayer({ id:session?.user?.id ?? crypto.randomUUID(), name, goal:goal||null, goalAchieved:false, goalAchievedAt:null, joinedAt:new Date().toISOString(), lastSeenAt:new Date().toISOString() });
   }
 
-  // ── Login ────────────────────────────────────────────────────────────────
+  // ── Auth gate ────────────────────────────────────────────────────────────
+  // Only applies when Supabase is configured; local-only setups skip straight
+  // to the name/goal onboarding exactly as before.
+  if (sessionLoading) {
+    return (
+      <main className="login-world">
+        <section className="login-panel">
+          <h1 className="login-kindred-title">Kindred</h1>
+          <p className="login-kindred-sub">Waking up your world…</p>
+        </section>
+      </main>
+    );
+  }
+
+  if (isSupabaseConfigured && !session) return <AuthScreen />;
+
+  // ── Onboarding ───────────────────────────────────────────────────────────
   if (!player) {
     return (
       <main className="login-world">
@@ -150,7 +185,7 @@ export default function App() {
               )}
               <div style={{display:"flex",gap:10,marginTop:16}}>
                 <button className="scroll-btn-secondary" style={{flex:1}} onClick={()=>setShowUserDetails(false)}>Close</button>
-                <button className="scroll-btn-secondary" style={{flex:1,color:"#C04040",borderColor:"rgba(192,64,64,0.3)"}} onClick={()=>{setPlayer(null);setShowUserDetails(false);}}>Sign out</button>
+                <button className="scroll-btn-secondary" style={{flex:1,color:"#C04040",borderColor:"rgba(192,64,64,0.3)"}} onClick={signOut}>Sign out</button>
               </div>
             </motion.div>
           </motion.div>
@@ -158,7 +193,7 @@ export default function App() {
       </AnimatePresence>
 
       {/* Main content */}
-      <main className="main-content" style={{ background:worldMood.ambient!=="transparent"?worldMood.ambient:undefined, filter:worldMood.filter!=="none"?worldMood.filter:undefined, transition:"background 2s ease, filter 2s ease" }}>
+      <main className="main-content" style={{ filter:worldMood.filter!=="none"?worldMood.filter:undefined, transition:"filter 2s ease" }}>
         {tab==="home"     && <HomeView player={player} character={character} emotion={emotion} coins={coins} setTab={setTab} muted={muted} toggleMute={toggleMute} onOpenSettings={()=>setShowSettings(true)} onOpenUser={()=>setShowUserDetails(true)}/>}
         {tab==="journal"  && <WellnessView emotion={emotion} setEmotion={setEmotion} journalEntries={journalEntries} setJournalEntries={setJournalEntries} character={character} coins={coins} setCoins={setCoins} player={player} setPlayer={setPlayer} muted={muted} toggleMute={toggleMute} onOpenSettings={()=>setShowSettings(true)} onOpenUser={()=>setShowUserDetails(true)}/>}
         {tab==="grove"    && <SocialView character={character} inventory={inventory} setInventory={setInventory} friends={friends} setFriends={setFriends} coins={coins} setCoins={setCoins} emotion={emotion} npcBehavior={npcBehavior} journalledToday={journalledToday}/>}

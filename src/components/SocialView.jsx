@@ -1663,7 +1663,7 @@ export default function SocialView({ character, inventory, setInventory, friends
         const thread = chatThreads[activeThread] || [];
         const isFriend = friends?.includes(d.name);
         return (
-          <div style={{display:"flex",flexDirection:"column",height:"calc(100dvh - 132px)"}}>
+          <div style={{display:"flex",flexDirection:"column",height:"calc(100% - 132px)"}}>
             {/* Thread header */}
             <div style={{
               display:"flex",alignItems:"center",gap:14,

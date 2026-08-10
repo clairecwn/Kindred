@@ -1,38 +1,33 @@
+import { groqChat, hasGroqKey, warnIfNoKey } from "./groq.js";
+
+/**
+ * Reads a free-text entry and names the emotion behind it.
+ * Returns null when unavailable so callers can fall back to local heuristics.
+ */
 export async function analyzeEmotionAI(text) {
-  const apiKey = import.meta.env.VITE_GROQ_API_KEY;
-  if (!apiKey) return null;
+  if (!hasGroqKey()) {
+    warnIfNoKey("emotion detection");
+    return null;
+  }
 
   try {
-    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${apiKey}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
-        messages: [
-          {
-            role: "system",
-            content: "You are reading text and detecting the person's emotional state. Be honest and specific about what emotion they're feeling."
-          },
-          {
-            role: "user",
-            content: `What emotion is this person feeling? Be specific and honest.\n\n"${text}"`
-          }
-        ],
-        temperature: 0.85,
-        max_tokens: 150
-      })
+    const raw = await groqChat({
+      messages: [
+        {
+          role: "system",
+          content: "You are reading text and detecting the person's emotional state. Be honest and specific about what emotion they're feeling. Reply with the emotion only — a word or short phrase, no punctuation or explanation.",
+        },
+        {
+          role: "user",
+          content: `What emotion is this person feeling? Be specific and honest.\n\n"${text}"`,
+        },
+      ],
+      temperature: 0.85,
+      maxTokens: 150,
     });
 
-    if (!response.ok) return null;
-
-    const data = await response.json();
-    const raw = data.choices?.[0]?.message?.content;
-    if (!raw) return null;
-
-    const emotion = raw.toLowerCase().split('\n')[0];
+    const emotion = raw.toLowerCase().split("\n")[0].trim();
+    if (!emotion) return null;
 
     return {
       emotion,
@@ -40,7 +35,8 @@ export async function analyzeEmotionAI(text) {
       confidence: 75,
       source: "groq",
     };
-  } catch {
+  } catch (err) {
+    console.warn("[Kindred] Emotion detection failed:", err.message);
     return null;
   }
 }

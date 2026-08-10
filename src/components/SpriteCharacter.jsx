@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { getStageScale } from "../hooks/useStageScale.js";
 
 const SPRITE_URL = "/models/sprite.glb";
 
@@ -404,7 +405,14 @@ export default function SpriteCharacter({
 
     const { width, height } = size;
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    // The canvas is laid out in design-canvas px but painted at stage scale, so
+    // fold that scale into the pixel ratio or the sprite renders soft when the
+    // stage is scaled up.
+    const applyPixelRatio = () =>
+      renderer.setPixelRatio(
+        Math.min((window.devicePixelRatio || 1) * getStageScale(), 3)
+      );
+    applyPixelRatio();
     renderer.setSize(width, height);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.domElement.style.display = "block";
@@ -646,8 +654,11 @@ export default function SpriteCharacter({
     }
     animate();
 
+    window.addEventListener("resize", applyPixelRatio);
+
     return () => {
       cancelAnimationFrame(rafId);
+      window.removeEventListener("resize", applyPixelRatio);
       if (interactive) {
         renderer.domElement.removeEventListener("pointerdown", onDown);
         window.removeEventListener("pointermove", onMove);
