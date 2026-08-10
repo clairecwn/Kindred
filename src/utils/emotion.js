@@ -75,48 +75,6 @@ export function inferEmotion(text) {
   };
 }
 
-function parseEmotionPayload(payload) {
-  const text = typeof payload === "string" ? payload : payload?.emotion ? JSON.stringify(payload) : "";
-  const parsed = typeof payload === "object" && payload?.emotion ? payload : JSON.parse(text);
-  const emotion = EMOTIONS[parsed.emotion] ? parsed.emotion : "neutral";
-  return {
-    emotion,
-    confidence: Number(parsed.confidence || 82),
-    language: String(parsed.language || "Detected"),
-    behavior: EMOTIONS[emotion].behavior,
-    reason: String(parsed.reason || "Language model reflection")
-  };
-}
-
-export async function reflectEmotionWithLLM(text) {
-  const fallback = inferEmotion(text);
-  const endpoint = import.meta.env.VITE_EMOTION_LLM_ENDPOINT;
-
-  if (!endpoint) {
-    return {
-      ...fallback,
-      source: "local-reflection"
-    };
-  }
-
-  try {
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        text,
-        instruction:
-          "Detect language and primary reflected emotion. Return JSON only with emotion, confidence, language, and reason. Emotion must be one of: happy, excited, calm, anxious, sad, tired, angry, content, grateful, neutral. Keep the reflection subtle and non-clinical."
-      })
-    });
-
-    if (!response.ok) throw new Error("Emotion model unavailable");
-    const data = await response.json();
-    return { ...parseEmotionPayload(data), source: "llm" };
-  } catch {
-    return {
-      ...fallback,
-      source: "local-reflection"
-    };
-  }
-}
+// Emotion detection now runs through lib/groq.js (see lib/emotion-api.js). The
+// old VITE_EMOTION_LLM_ENDPOINT path that used to live here pointed at a
+// self-hosted endpoint that was never configured, and has been removed.

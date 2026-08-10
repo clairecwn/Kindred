@@ -1,12 +1,13 @@
 /**
- * journal-ai.js — The emotional heart of Kindred (FIXED)
+ * journal-ai.js — The emotional heart of Kindred
  *
- * CHANGES:
- * - Removed the forced "INTERNAL CATEGORY" mapping to preset emotions
- * - Now allows Gemini to freely detect whatever emotions it finds
- * - Gemini output is now the actual nuanced emotion, not compressed to a category
- * - Increased temperature to 0.85 for more creative/honest emotion naming
+ * The model is free to name whatever emotion it actually reads, rather than
+ * being forced into a preset category. Every AI call goes through lib/groq.js;
+ * when no API key is configured each entry point degrades to varied canned
+ * text and logs a one-time warning explaining how to enable the real thing.
  */
+
+import { groqChat, hasGroqKey, warnIfNoKey, parseJsonFromCompletion } from "./groq.js";
 
 // ── Subtext Detection Patterns ────────────────────────────────────────────────
 
@@ -367,17 +368,15 @@ const WIN_CELEBRATIONS = [
 // ── AIJournalist ──────────────────────────────────────────────────────────────
 
 export class AIJournalist {
-  constructor() {
-    this.groqKey = import.meta.env.VITE_GROQ_API_KEY;
-  }
-
   async generateResponse(text, analysis, pastEntries = [], playerName = "friend") {
-    if (this.groqKey) {
+    if (hasGroqKey()) {
       try {
         return await this._groqResponse(text, analysis, pastEntries, playerName);
       } catch (err) {
         console.warn("[Kindred] Groq fallback activated:", err.message);
       }
+    } else {
+      warnIfNoKey("journal responses");
     }
     return this._templateResponse(text, analysis, pastEntries);
   }
@@ -389,51 +388,54 @@ export class AIJournalist {
       "Moving through it matters.",
       "Something good is alive in you.",
     ];
-    if (!this.groqKey) return FALLBACKS[1];
+    const pickFallback = () => FALLBACKS[Math.floor(Math.random() * FALLBACKS.length)];
+
+    if (!hasGroqKey()) {
+      warnIfNoKey("check-in reactions");
+      return pickFallback();
+    }
     try {
-      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: { "Authorization": `Bearer ${this.groqKey}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "llama-3.3-70b-versatile",
-          messages: [
-            { role: "system", content: `You are a warm, empathetic companion responding to ${playerName}'s wellness check-in. Give ONE short, natural, human reaction (max 10 words). No quotes. No emojis. Respond directly to their answer with warmth.` },
-            { role: "user", content: `Question: "${question}". They answered: "${answer}".` }
-          ],
-          temperature: 0.9,
-          max_tokens: 40
-        })
+      return await groqChat({
+        messages: [
+          { role: "system", content: `You are a warm, empathetic companion responding to ${playerName}'s wellness check-in. Give ONE short, natural, human reaction (max 10 words). No quotes. No emojis. Respond directly to their answer with warmth.` },
+          { role: "user", content: `Question: "${question}". They answered: "${answer}".` }
+        ],
+        temperature: 0.9,
+        maxTokens: 40,
       });
-      if (!response.ok) throw new Error(`Groq ${response.status}`);
-      const data = await response.json();
-      const text = data.choices?.[0]?.message?.content?.trim();
-      return text || FALLBACKS[1];
     } catch (err) {
       console.warn("[Kindred] Quiz reaction fallback:", err.message);
-      return FALLBACKS[Math.floor(Math.random() * FALLBACKS.length)];
+      return pickFallback();
     }
   }
 
   async generateChatReply(userMessage, chatHistory = [], originalEntry = "", detectedEmotion = "", playerName = "friend") {
-    if (!this.groqKey) return "I'm here with you. Tell me more.";
+    const FALLBACKS = [
+      "I'm here with you. Tell me more.",
+      "I'm listening. What else is on your mind?",
+      "Say more about that — I want to understand.",
+      "That stays with me. Where does it go from here?",
+    ];
+    const pickFallback = () => FALLBACKS[Math.floor(Math.random() * FALLBACKS.length)];
+
+    if (!hasGroqKey()) {
+      warnIfNoKey("journal chat");
+      return pickFallback();
+    }
     try {
-      const messages = [
-        { role: "system", content: `You are Kindred, a warm and emotionally intelligent companion. The user just wrote a journal entry and you detected their emotion as "${detectedEmotion}". Have a genuine, natural back-and-forth conversation with them. Be concise (2-3 sentences max), empathetic, and curious. Ask follow-up questions naturally. Never be clinical or list bullet points. Address them as ${playerName}.` },
-        { role: "assistant", content: `I just read your journal entry: "${originalEntry.slice(0, 200)}${originalEntry.length > 200 ? "..." : ""}"` },
-        ...chatHistory.map(m => ({ role: m.role === "ai" ? "assistant" : "user", content: m.text })),
-        { role: "user", content: userMessage }
-      ];
-      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: { "Authorization": `Bearer ${this.groqKey}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages, temperature: 0.85, max_tokens: 120 })
+      return await groqChat({
+        messages: [
+          { role: "system", content: `You are Kindred, a warm and emotionally intelligent companion. The user just wrote a journal entry and you detected their emotion as "${detectedEmotion}". Have a genuine, natural back-and-forth conversation with them. Be concise (2-3 sentences max), empathetic, and curious. Ask follow-up questions naturally. Never be clinical or list bullet points. Address them as ${playerName}.` },
+          { role: "assistant", content: `I just read your journal entry: "${originalEntry.slice(0, 200)}${originalEntry.length > 200 ? "..." : ""}"` },
+          ...chatHistory.map(m => ({ role: m.role === "ai" ? "assistant" : "user", content: m.text })),
+          { role: "user", content: userMessage }
+        ],
+        temperature: 0.85,
+        maxTokens: 120,
       });
-      if (!response.ok) throw new Error(`Groq ${response.status}`);
-      const data = await response.json();
-      return data.choices?.[0]?.message?.content?.trim() || "I'm here with you. Tell me more.";
     } catch (err) {
       console.warn("[Kindred] Chat reply fallback:", err.message);
-      return "I'm here with you. Tell me more.";
+      return pickFallback();
     }
   }
 
@@ -491,41 +493,17 @@ Return ONLY valid JSON:
 Journal entry:
 "${text}"`;
 
-    const apiKey = import.meta.env.VITE_GROQ_API_KEY;
-    if (!apiKey) throw new Error("VITE_GROQ_API_KEY not set");
-
     try {
-      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${apiKey}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          model: "llama-3.3-70b-versatile",
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: userPrompt }
-          ],
-          temperature: 0.9,
-          max_tokens: 500
-        })
+      const raw = await groqChat({
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt }
+        ],
+        temperature: 0.9,
+        maxTokens: 500,
       });
 
-      if (!response.ok) {
-        const error = await response.json().catch(() => ({}));
-        throw new Error(`Groq API ${response.status}: ${error.error?.message || "unknown error"}`);
-      }
-
-      const data = await response.json();
-      const raw = data.choices?.[0]?.message?.content;
-
-      if (!raw) throw new Error("Empty Groq response");
-
-      const jsonMatch = raw.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) throw new Error("No JSON in Groq response");
-
-      const parsed = JSON.parse(jsonMatch[0]);
+      const parsed = parseJsonFromCompletion(raw);
       const detectedEmotion = parsed.detectedEmotion?.trim();
       const companionResponse = parsed.companionResponse?.trim();
 
@@ -542,8 +520,10 @@ Journal entry:
   }
 
   async detectEmotion(summaryText, pastEntries = []) {
-    const apiKey = import.meta.env.VITE_GROQ_API_KEY;
-    if (!apiKey) return null;
+    if (!hasGroqKey()) {
+      warnIfNoKey("check-in emotion detection");
+      return null;
+    }
 
     const recentContext = pastEntries.slice(0, 3).map(e =>
       `${e.date}: ${e.emotion}`
@@ -584,37 +564,18 @@ Return ONLY valid JSON:
 {"emotion": "your honest read of their wellness state"}`;
 
     try {
-      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${apiKey}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          model: "llama-3.3-70b-versatile",
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: userPrompt }
-          ],
-          temperature: 0.75,
-          max_tokens: 200
-        })
+      const raw = await groqChat({
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt }
+        ],
+        temperature: 0.75,
+        maxTokens: 200,
       });
 
-      if (!response.ok) throw new Error(`Groq API ${response.status}`);
-
-      const data = await response.json();
-      const raw = data.choices?.[0]?.message?.content;
-      if (!raw) return null;
-
-      const jsonMatch = raw.match(/\{[^}]+\}/);
-      if (!jsonMatch) return null;
-
-      const parsed = JSON.parse(jsonMatch[0]);
-      const emotion = parsed.emotion?.trim();
-
+      const emotion = parseJsonFromCompletion(raw).emotion?.trim();
       console.info("[Kindred] Quiz Groq detected:", emotion);
-      return emotion;
+      return emotion || null;
     } catch (err) {
       console.warn("[Kindred] Quiz emotion detection failed:", err.message);
       return null;

@@ -6,15 +6,8 @@ export default function HomeView({
 }) {
   return (
     <div className="home-world">
-      {/* ── Forest background — CSS fallback behind, image on top ── */}
-      <div className="home-forest-css-fallback" aria-hidden="true"/>
-      <img
-        src="/assets/forest-bg.png"
-        alt=""
-        aria-hidden="true"
-        className="home-forest-img"
-        onError={e => { e.currentTarget.style.display = "none"; }}
-      />
+      {/* Forest backdrop is painted full-bleed by .viewport-fit so it fills the
+          screen rather than the letterboxed stage — see styles.css */}
 
       {/* ── HUD top-left: streak + coins ── */}
       <div className="home-hud-left">

@@ -179,14 +179,98 @@ button, input, textarea, select { font: inherit; }
 button { cursor: pointer; border: none; background: none; }
 a { color: inherit; }
 
+/* ── Fixed design canvas ────────────────────────────────────────────
+   The UI is authored against one fixed CSS-pixel canvas (see
+   hooks/useStageScale.js) and uniformly scaled to fit the viewport, so
+   every element keeps the position and relative size it had on the
+   original layout no matter what screen it lands on.
+
+   .viewport-fit is the only element that tracks the real viewport — it
+   carries the full-bleed background so the letterbox margins created by
+   the aspect-ratio difference read as background, not as bars.
+   .design-stage is a fixed-size box, so descendants can keep using px
+   and % freely; because it is transformed, it also becomes the
+   containing block for `position: fixed` descendants, which keeps
+   overlays pinned to the canvas rather than the screen.
+──────────────────────────────────────────────────────────────────── */
+.viewport-fit {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  /* The one and only backdrop — it spans the real viewport so it fills any
+     screen edge to edge. Nothing inside .design-stage may paint its own
+     full-area background, or a second copy of this gradient would land its
+     colour stops in different places and show up as a seam. */
+  background: linear-gradient(160deg, #C8945A 0%, #B87840 45%, #A86828 100%);
+}
+
+/* Login uses a sky backdrop instead — also full-bleed, for the same reason. */
+.viewport-fit:has(.login-world) {
+  background-color: #5BBCE8;
+  background-image: url('/assets/sky-bg.png');
+  background-size: cover;
+  background-position: center top;
+}
+
+/* HOME — forest scene. The gradient layers double as the fallback if the PNG
+   fails to load, replacing the old onError handler on the <img>. */
+.viewport-fit:has([data-tab="home"]) {
+  background-color: #6DC8F8;
+  background-image:
+    url('/assets/forest-bg.png'),
+    radial-gradient(ellipse at 50% 85%, rgba(100,200,80,0.3) 0%, transparent 55%),
+    linear-gradient(180deg, #6DC8F8 0%, #A8DFFB 38%, #5DBB5F 38%, #3A8830 100%);
+  background-size: cover, auto, auto;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+/* REFLECT — warm amber wash. */
+.viewport-fit:has([data-tab="journal"]) {
+  background: linear-gradient(135deg, #e1973f, #723a02, #ffb163);
+}
+
+/* Per-emotion mood wash, lifted out of .main-content so it tints the whole
+   screen rather than stopping at the letterbox edge. Fed by App.jsx. */
+.viewport-fit::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--world-ambient, transparent);
+  transition: background 2s ease;
+  pointer-events: none;
+}
+
+/* The wash only ever showed on tabs with no backdrop of their own — on HOME and
+   REFLECT the opaque scene used to cover it, and login predates the mood
+   system. Keep those three untinted so the layering matches the original. */
+.viewport-fit:has(.login-world)::before,
+.viewport-fit:has([data-tab="home"])::before,
+.viewport-fit:has([data-tab="journal"])::before {
+  background: transparent;
+}
+
+/* Sized and scaled inline by ViewportStage. Anchored at the viewport centre and
+   pulled back by half its own size, so it stays centred at any scale factor —
+   flex centring would misplace it whenever the canvas is larger than the
+   viewport (i.e. when the scale factor drops below 1). */
+.design-stage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;          /* above the mood wash */
+  overflow: hidden;
+  transform-origin: center center;
+}
+
 /* ── App shell ──────────────────────────────────────────────────── */
 .app-shell {
-  position: fixed;
+  position: absolute;
   inset: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(160deg, #C8945A 0%, #B87840 45%, #A86828 100%);
+  background: transparent;   /* backdrop lives on .viewport-fit */
 }
 
 /* ── Global nav pills (all pages) ───────────────────────────────── */
@@ -309,7 +393,7 @@ a { color: inherit; }
 .settings-overlay-panel {
   width: 100%;
   max-width: 540px;
-  max-height: 90dvh;
+  max-height: 90%;
   overflow-y: auto;
   border-radius: var(--r-xl);
   box-shadow: 0 24px 80px rgba(0,0,0,0.5);
@@ -430,7 +514,7 @@ a { color: inherit; }
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(135deg, #e1973f,#723a02, #ffb163);
+  background: transparent;   /* painted full-bleed by .viewport-fit */
   position: relative;
 }
 
@@ -571,28 +655,7 @@ a { color: inherit; }
   position: absolute;
   inset: 0;
   overflow: hidden;
-  background: linear-gradient(180deg, #6DC8F8 0%, #A8DFFB 55%, #5DBB5F 70%, #3A8830 100%);
-}
-
-/* CSS fallback forest (z-index 0, behind the PNG) */
-.home-forest-css-fallback {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background:
-    radial-gradient(ellipse at 50% 85%, rgba(100,200,80,0.3) 0%, transparent 55%),
-    linear-gradient(180deg, #6DC8F8 0%, #A8DFFB 38%, #5DBB5F 38%, #3A8830 100%);
-}
-
-/* Forest background image*/
-.home-forest-img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center center;
-  z-index: 1;
+  background: transparent;   /* forest scene painted full-bleed by .viewport-fit */
 }
 
 .home-hud-left {
@@ -769,14 +832,13 @@ a { color: inherit; }
 
 /* ── Login screen ───────────────────────────────────────────────── */
 .login-world {
-  position: fixed;
+  position: absolute;
   inset: 0;
   display: grid;
   place-items: center;
-  background:
-    radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.35) 0%, transparent 40%),
-    radial-gradient(ellipse at 70% 15%, rgba(200,230,255,0.40) 0%, transparent 45%),
-    linear-gradient(180deg, #4A90D9 0%, #72B5EE 30%, #A8D8F5 65%, #C8EBFF 100%);
+  /* Sky backdrop lives on .viewport-fit:has(.login-world) so it fills the
+     screen; this element only positions the login content. */
+  background: transparent;
   overflow: hidden;
 }
 
@@ -794,24 +856,24 @@ a { color: inherit; }
 }
 
 .login-hill-1 {
-  width: 120vw;
-  height: 55vh;
-  bottom: -20vh;
-  left: -10vw;
+  width: 120%;
+  height: 55%;
+  bottom: -20%;
+  left: -10%;
 }
 
 .login-hill-2 {
-  width: 80vw;
-  height: 40vh;
-  bottom: -10vh;
-  right: -15vw;
+  width: 80%;
+  height: 40%;
+  bottom: -10%;
+  right: -15%;
   background: linear-gradient(180deg, #6EC86E, #4A9C4A);
 }
 
 /* Tree silhouettes on login */
 .login-tree {
   position: absolute;
-  bottom: 18vh;
+  bottom: 18%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -2102,7 +2164,7 @@ a { color: inherit; }
   padding: 8px 24px 32px;
   width: 100%;
   max-width: 520px;
-  max-height: 85dvh;
+  max-height: 85%;
   overflow-y: auto;
   box-shadow: 0 -8px 40px rgba(0,0,0,0.25);
   animation: slideUp 0.3s cubic-bezier(0.22,1,0.36,1);
@@ -2384,31 +2446,22 @@ a { color: inherit; }
   border: 1.5px solid var(--border);
 }
 
-/* ── Responsive ─────────────────────────────────────────────────── */
-@media (max-width: 580px) {
-  .topbar { padding: 0 14px; }
-  .page-container { padding: 14px 14px 24px; gap: 14px; }
-  .roster-grid { grid-template-columns: repeat(3, 1fr); }
-  .item-grid { grid-template-columns: repeat(3, 1fr); }
-  .page-hero { min-height: 150px; padding: 20px 20px 0; }
-  .hero-title { font-size: 1.35rem; }
-  .hero-character { width: 120px; height: 150px; }
-  .coin-display { font-size: 0.8rem; padding: 5px 10px; }
-  .brand-sub { display: none; }
-}
+/* ── Design-canvas layout ───────────────────────────────────────────
+   These were media queries. The canvas is now always 1280px wide, so
+   they are frozen at the values that applied on the original layout:
+   the old `max-width: 580px` block never matched and has been dropped,
+   while the `min-width: 768px` / `1024px` blocks always matched and are
+   now unconditional. Media queries here would test the real viewport,
+   not the canvas, and would reintroduce screen-dependent layout.
+──────────────────────────────────────────────────────────────────── */
+.page-container { padding: 24px 28px 40px; }
+.roster-grid { grid-template-columns: repeat(6, 1fr); }
+.quiz-options { grid-template-columns: repeat(4, 1fr); }
+.item-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
 
-@media (min-width: 768px) {
-  .page-container { padding: 24px 28px 40px; }
-  .roster-grid { grid-template-columns: repeat(6, 1fr); }
-  .quiz-options { grid-template-columns: repeat(4, 1fr); }
-  .item-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
-}
-
-@media (min-width: 1024px) {
-  .page-container { max-width: 1100px; }
-  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  .three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-}
+.page-container { max-width: 1100px; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 
 /* ── Leaflet overrides ──────────────────────────────────────────── */
 .leaflet-container {
@@ -2700,7 +2753,7 @@ input:focus, select:focus {
   padding: 8px 24px 32px;
   width: 100%;
   max-width: 520px;
-  max-height: 85dvh;
+  max-height: 85%;
   overflow-y: auto;
   box-shadow: 0 -12px 50px rgba(0,0,0,0.22);
   animation: slideUp 0.3s cubic-bezier(0.22,1,0.36,1);
@@ -3334,19 +3387,12 @@ input:focus, select:focus {
    LOGIN — Sky scene
 ════════════════════════════════════════════════════════════════ */
 .login-world {
-  height: 100vh;
-  height: 100dvh;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  /* Uses sky-bg.png if you add it to public/assets/, falls back to CSS gradient */
-  background-image: url('/assets/sky-bg.png');
-  background-size: cover;
-  background-position: center top;
-  background-attachment: fixed;
-  background-color: #5BBCE8;
-  /* CSS gradient fallback (shows through if image not loaded) */
-  background-blend-mode: normal;
+  /* sky-bg.png is painted full-bleed by .viewport-fit:has(.login-world) */
+  background: transparent;
   overflow: hidden;
   position: relative;
 }
@@ -3434,12 +3480,13 @@ input:focus, select:focus {
   backdrop-filter: none;
   text-align: center;
   padding: 0 25px;
-  width: min(95vw, 660px);
+  width: min(95%, 660px);
 }
 
 .login-kindred-title {
   font-family: var(--font-game);
-  font-size: clamp(7.5rem, 12vw, 5.5rem);
+  /* was clamp(7.5rem, 12vw, 5.5rem) — min > max, so it always resolved to 7.5rem */
+  font-size: 7.5rem;
   color: #ffb761;
   letter-spacing: 2px;
   line-height: 1.1;
@@ -3454,7 +3501,8 @@ input:focus, select:focus {
 
 .login-kindred-sub {
   font-family: var(--font-game);
-  font-size: clamp(2.3rem, 3.5vw, 1.4rem);
+  /* was clamp(2.3rem, 3.5vw, 1.4rem) — min > max, so it always resolved to 2.3rem */
+  font-size: 2.3rem;
   color: #5c2905;
   text-shadow:
     0 2px 0 rgba(255, 246, 220, 0.90),
@@ -3512,6 +3560,35 @@ input:focus, select:focus {
 }
 .login-btn:hover  { transform: translateY(-3px); box-shadow: 0 9px 0 rgba(80,40,8,0.45), 0 14px 28px rgba(80,40,8,0.32); }
 .login-btn:active { transform: translateY(3px);  box-shadow: 0 2px 0 rgba(80,40,8,0.50), 0 4px 10px rgba(80,40,8,0.20); }
+.login-btn:disabled { opacity: 0.6; cursor: default; transform: none; }
+
+/* ── Auth screen (email + password) ─────────────────────────────── */
+.auth-message {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: center;
+  padding: 10px 14px;
+  border-radius: 14px;
+  /* Legible against the sky backdrop, which the panel leaves transparent. */
+  background: rgba(255, 250, 235, 0.92);
+  box-shadow: 0 3px 10px rgba(80, 40, 8, 0.18);
+}
+.auth-message-error  { color: #A02020; }
+.auth-message-notice { color: #2A6A3A; }
+
+.auth-switch {
+  margin-top: 14px;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #5c2905;
+  text-shadow: 0 2px 0 rgba(255, 246, 220, 0.85);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.auth-switch:hover { color: #A86018; }
 
 /* ════════════════════════════════════════════════════════════════
    JOURNAL LAYOUT — sidebar + main area (no topbar)
