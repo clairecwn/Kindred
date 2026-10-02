@@ -1,0 +1,284 @@
+/* src/ventures/ventures.css
+ *
+ * Ventures' own HUD art direction: the Leaflet map fills the view edge to
+ * edge (same "canvas fills, everything else floats over it" pattern as
+ * src/grove/grove.css), with chunky rounded pill buttons carrying a solid
+ * bottom-edge shadow. Scoped under .ventures-root so it never leaks.
+ */
+
+.ventures-root {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #cfe8dd;
+}
+
+.ventures-map {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.ventures-map.is-blurred {
+  filter: blur(3px) brightness(0.9);
+  transition: filter 0.25s ease;
+}
+.ventures-map { transition: filter 0.25s ease; }
+
+.ventures-hud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 400; /* above Leaflet's own panes */
+  font-family: var(--font-body, 'Nunito', sans-serif);
+}
+.ventures-hud > * { pointer-events: auto; }
+
+/* ── Pill buttons ─────────────────────────────────────────────────── */
+.venture-btn {
+  appearance: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 800;
+  color: #fff;
+  border-radius: 999px;
+  border: 2.5px solid rgba(255,255,255,0.5);
+  background: var(--venture-btn-bg, #3A9B7A);
+  box-shadow: 0 3px 0 var(--venture-btn-shadow, #1F6B50), 0 6px 12px rgba(20,30,25,0.3);
+  transform: translateY(0);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 18px;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+.venture-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--venture-btn-shadow, #1F6B50), 0 3px 6px rgba(20,30,25,0.25); }
+.venture-btn:disabled { filter: grayscale(0.4) brightness(0.9); cursor: default; }
+.venture-btn--gold  { --venture-btn-bg: #E8A840; --venture-btn-shadow: #A06018; }
+.venture-btn--dark  { --venture-btn-bg: rgba(24,30,26,0.78); --venture-btn-shadow: rgba(0,0,0,0.55); }
+.venture-btn--red   { --venture-btn-bg: #E85A5A; --venture-btn-shadow: #A02020; }
+.venture-btn--sm    { padding: 7px 14px; font-size: 0.76rem; }
+.venture-btn--icon  { width: 38px; height: 38px; padding: 0; border-radius: 50%; }
+
+/* ── Top status chip ────────────────────────────────────────────── */
+.venture-chip {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border-radius: 999px;
+  background: rgba(24,30,26,0.72);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.85rem;
+  border: 2px solid rgba(255,255,255,0.3);
+  box-shadow: 0 3px 0 rgba(0,0,0,0.35), 0 6px 12px rgba(0,0,0,0.25);
+  max-width: 260px;
+}
+
+.venture-create-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+}
+
+/* ── Recommendation rail (top-left, under the status chip) ──────────── */
+.venture-reco-rail {
+  position: absolute;
+  top: 60px;
+  left: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 300px;
+  max-height: 320px;
+}
+
+.venture-reco-card {
+  cursor: pointer;
+  padding: 10px 14px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.92);
+  border: 2px solid rgba(255,255,255,0.6);
+  box-shadow: 0 3px 0 rgba(20,30,25,0.18), 0 6px 14px rgba(0,0,0,0.18);
+  transition: transform 0.12s ease;
+}
+.venture-reco-card:hover { transform: translateY(-2px); }
+.venture-reco-title { font-size: 0.82rem; font-weight: 800; color: #1c2420; margin-bottom: 4px; }
+.venture-reco-chips { display: flex; gap: 5px; flex-wrap: wrap; }
+.venture-reco-chip {
+  padding: 2px 9px; border-radius: 999px; font-size: 0.66rem; font-weight: 800;
+  background: #eef3ef; color: #405048;
+}
+
+/* ── Glowing orb pins ─────────────────────────────────────────────── */
+.venture-orb-wrap {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: venture-bob 3.2s ease-in-out infinite;
+}
+.venture-orb-halo {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--orb-color, #3A9B7A);
+  opacity: 0.45;
+  filter: blur(2px);
+  animation: venture-pulse 2.4s ease-in-out infinite;
+}
+.venture-orb-core {
+  position: relative;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff, var(--orb-color, #3A9B7A) 70%);
+  border: 2px solid rgba(255,255,255,0.85);
+  box-shadow: 0 0 10px 2px var(--orb-color, #3A9B7A);
+}
+
+/* Recommended pins glow noticeably stronger + a slightly larger halo */
+.venture-orb-wrap.is-reco .venture-orb-halo {
+  opacity: 0.75;
+  filter: blur(3px);
+  animation-duration: 1.6s;
+}
+.venture-orb-wrap.is-reco .venture-orb-core {
+  box-shadow: 0 0 18px 6px var(--orb-color, #3A9B7A);
+}
+.venture-orb-wrap.is-reco { width: 42px; height: 42px; }
+.venture-orb-wrap.is-reco .venture-orb-core { width: 20px; height: 20px; }
+
+.venture-orb-wrap.is-picking .venture-orb-core { background: radial-gradient(circle at 35% 30%, #fff, #E8A840 70%); }
+.venture-orb-wrap.is-picking .venture-orb-halo { background: #E8A840; }
+
+@keyframes venture-pulse {
+  0%, 100% { transform: scale(0.85); opacity: 0.4; }
+  50%      { transform: scale(1.25); opacity: 0.75; }
+}
+@keyframes venture-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-4px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .venture-orb-wrap, .venture-orb-halo { animation: none !important; }
+}
+
+/* ── Right-side detail / create panel ────────────────────────────── */
+.venture-panel-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 500;
+  background: rgba(10, 16, 12, 0.18);
+  animation: venture-fade-in 0.2s ease;
+}
+@keyframes venture-fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+.venture-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(380px, 92%);
+  background: var(--surface, #fff);
+  box-shadow: -8px 0 24px rgba(0,0,0,0.22);
+  padding: 20px 20px 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: venture-slide-in 0.22s ease;
+}
+@keyframes venture-slide-in { from { transform: translateX(24px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+.venture-panel-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+}
+
+.venture-panel-title { font-size: 1.15rem; font-weight: 900; color: var(--text, #1c2420); padding-right: 34px; }
+.venture-panel-sub { font-size: 0.82rem; color: var(--text-2, #667069); }
+.venture-panel-desc { font-size: 0.88rem; color: var(--text-2, #667069); line-height: 1.45; }
+
+.venture-panel-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  font-size: 0.82rem;
+  color: var(--text, #1c2420);
+}
+.venture-panel-row svg { flex-shrink: 0; margin-top: 2px; color: var(--text-3, #94a099); }
+
+.venture-flag-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.venture-flag {
+  padding: 3px 10px; border-radius: 999px; font-size: 0.7rem; font-weight: 800;
+  background: var(--bg-2, #eef3ef); color: var(--text-2, #405048);
+}
+
+.venture-safety-box {
+  display: flex; flex-direction: column; gap: 6px;
+  padding: 10px 12px; border-radius: 12px;
+  background: var(--bg-2, #eef3ef);
+  font-size: 0.8rem; color: var(--text-2, #405048);
+}
+.venture-safety-box.is-warning { background: #fdecec; color: #A02020; }
+
+.venture-roster { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.venture-roster-pill {
+  padding: 4px 12px; border-radius: 999px;
+  background: var(--bg-2, #eef3ef); font-size: 0.8rem; font-weight: 700;
+}
+
+/* ── Create-activity form ────────────────────────────────────────── */
+.venture-form { display: flex; flex-direction: column; gap: 11px; }
+.venture-input, .venture-select, .venture-textarea {
+  padding: 11px 14px; border-radius: 12px;
+  border: 1.5px solid var(--border, #dde5e0);
+  background: var(--surface, #fff);
+  font-size: 0.9rem; color: var(--text, #1c2420);
+  outline: none; width: 100%; font-family: inherit;
+}
+.venture-form-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.venture-form-label { font-size: 0.74rem; font-weight: 800; color: var(--text-3, #94a099); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: -4px; }
+.venture-checkbox-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.venture-checkbox-pill {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border-radius: 999px;
+  border: 1.5px solid var(--border, #dde5e0);
+  font-size: 0.78rem; font-weight: 700; cursor: pointer;
+}
+.venture-checkbox-pill input { accent-color: #3A9B7A; }
+
+.venture-pick-location-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 12px 14px; border-radius: 12px; border: 1.5px dashed var(--border, #c7d3cc);
+  background: var(--bg-2, #eef3ef); color: var(--text-2, #405048);
+  font-weight: 800; font-size: 0.85rem; cursor: pointer;
+}
+.venture-pick-location-btn.is-picking { border-color: #E8A840; color: #A06018; background: #fdf3e0; }
+.venture-pick-location-btn.has-pin { border-style: solid; border-color: #3A9B7A; color: #1F6B50; }
+
+.venture-error { font-size: 0.8rem; color: #A02020; font-weight: 700; }
+
+.venture-hint-banner {
+  display: flex; gap: 8px; align-items: flex-start;
+  padding: 10px 12px; border-radius: 12px; background: var(--bg-2, #eef3ef);
+  font-size: 0.78rem; color: var(--text-2, #405048);
+}
+.venture-hint-banner svg { flex-shrink: 0; margin-top: 1px; }
+
+/* Leaflet's own attribution/zoom controls sit under the HUD z-index */
+.leaflet-top, .leaflet-bottom { z-index: 350; }

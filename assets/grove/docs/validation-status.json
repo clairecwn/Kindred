@@ -1,0 +1,31 @@
+{
+  "schema": "kindred.grove-validation-status.v1",
+  "roomId": "grove-mall",
+  "checkedAt": "2026-10-02",
+  "formalRuntimeGate": "blocked",
+  "localChecks": {
+    "productionBuild": "passed",
+    "projectTestSuite": "passed-261-of-261",
+    "glbStructure": "passed-13-of-13",
+    "threeJsLoading": "passed-13-of-13",
+    "browserLoad": "passed",
+    "floorSwitching": "passed-levels-1-through-3",
+    "fixtureColliderCounts": [16, 10, 11],
+    "visibleShopModulesPerFloor": 4,
+    "measuredPreview": { "drawCalls": 238, "triangles": 58788, "baselineDrawCalls": 403, "baselineTriangles": 97892 },
+    "catalogs": 16,
+    "uniquePurchasableItems": 85
+  },
+  "formalValidator": {
+    "command": "validate_room.py assets/grove/docs --gate runtime",
+    "result": "failed",
+    "reasons": [
+      "room-brief.json uses the existing Grove schema rather than game-room.room-brief.v1",
+      "plan-metadata.json is absent",
+      "props.json is absent because the assets were procedurally authored rather than generated through Meshy",
+      "room-layout.json uses the existing Grove schema rather than game-room.layout.v1",
+      "required Runtime evidence such as UV/lightmap checks, performance capture, and explicit human approval is incomplete"
+    ]
+  },
+  "policy": "Do not fabricate provider receipts, source approvals, Meshy task IDs, hashes, review renders, or gate approvals. Deployment remains blocked until the missing evidence is genuinely produced and reviewed."
+}

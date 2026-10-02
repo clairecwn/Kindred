@@ -1,0 +1,271 @@
+{
+  "avatarHeight": 1.6,
+  "boneList": [
+    "Hips",
+    "Spine_01",
+    "Spine_02",
+    "Neck",
+    "Head",
+    "Shoulder_L",
+    "UpperArm_L",
+    "LowerArm_L",
+    "Hand_L",
+    "Shoulder_R",
+    "UpperArm_R",
+    "LowerArm_R",
+    "Hand_R",
+    "Back",
+    "Thigh_L",
+    "Shin_L",
+    "Foot_L",
+    "Thigh_R",
+    "Shin_R",
+    "Foot_R",
+    "Tail_01",
+    "Tail_02"
+  ],
+  "bones": {
+    "Hips": {
+      "parent": null,
+      "offset": [
+        0.0,
+        0.48,
+        0.0
+      ]
+    },
+    "Spine_01": {
+      "parent": "Hips",
+      "offset": [
+        0.0,
+        0.12,
+        0.0
+      ]
+    },
+    "Spine_02": {
+      "parent": "Spine_01",
+      "offset": [
+        0.0,
+        0.14,
+        0.0
+      ]
+    },
+    "Neck": {
+      "parent": "Spine_02",
+      "offset": [
+        0.0,
+        0.12,
+        0.0
+      ]
+    },
+    "Head": {
+      "parent": "Neck",
+      "offset": [
+        0.0,
+        0.04,
+        0.0
+      ]
+    },
+    "Shoulder_L": {
+      "parent": "Spine_02",
+      "offset": [
+        0.2,
+        0.06,
+        0.0
+      ]
+    },
+    "UpperArm_L": {
+      "parent": "Shoulder_L",
+      "offset": [
+        0.06,
+        -0.02,
+        0.0
+      ]
+    },
+    "LowerArm_L": {
+      "parent": "UpperArm_L",
+      "offset": [
+        0.05,
+        -0.16,
+        0.0
+      ]
+    },
+    "Hand_L": {
+      "parent": "LowerArm_L",
+      "offset": [
+        0.02,
+        -0.14,
+        0.0
+      ]
+    },
+    "Shoulder_R": {
+      "parent": "Spine_02",
+      "offset": [
+        -0.2,
+        0.06,
+        0.0
+      ]
+    },
+    "UpperArm_R": {
+      "parent": "Shoulder_R",
+      "offset": [
+        -0.06,
+        -0.02,
+        0.0
+      ]
+    },
+    "LowerArm_R": {
+      "parent": "UpperArm_R",
+      "offset": [
+        -0.05,
+        -0.16,
+        0.0
+      ]
+    },
+    "Hand_R": {
+      "parent": "LowerArm_R",
+      "offset": [
+        -0.02,
+        -0.14,
+        0.0
+      ]
+    },
+    "Back": {
+      "parent": "Spine_02",
+      "offset": [
+        0.0,
+        0.06,
+        -0.13
+      ]
+    },
+    "Thigh_L": {
+      "parent": "Hips",
+      "offset": [
+        0.115,
+        -0.02,
+        0.0
+      ]
+    },
+    "Shin_L": {
+      "parent": "Thigh_L",
+      "offset": [
+        0.005,
+        -0.225,
+        0.0
+      ]
+    },
+    "Foot_L": {
+      "parent": "Shin_L",
+      "offset": [
+        0.0,
+        -0.16,
+        0.02
+      ]
+    },
+    "Thigh_R": {
+      "parent": "Hips",
+      "offset": [
+        -0.115,
+        -0.02,
+        0.0
+      ]
+    },
+    "Shin_R": {
+      "parent": "Thigh_R",
+      "offset": [
+        -0.005,
+        -0.225,
+        0.0
+      ]
+    },
+    "Foot_R": {
+      "parent": "Shin_R",
+      "offset": [
+        0.0,
+        -0.16,
+        0.02
+      ]
+    },
+    "Tail_01": {
+      "parent": "Hips",
+      "offset": [
+        0.0,
+        0.02,
+        -0.15
+      ]
+    },
+    "Tail_02": {
+      "parent": "Tail_01",
+      "offset": [
+        0.0,
+        0.0,
+        -0.12
+      ]
+    }
+  },
+  "sockets": {
+    "SOCKET_head": {
+      "bone": "Head",
+      "offset": [
+        0.0,
+        0.5,
+        0.0
+      ]
+    },
+    "SOCKET_face": {
+      "bone": "Head",
+      "offset": [
+        0.0,
+        0.31,
+        0.23
+      ]
+    },
+    "SOCKET_back": {
+      "bone": "Back",
+      "offset": [
+        0.0,
+        0.0,
+        -0.02
+      ]
+    },
+    "SOCKET_hand_L": {
+      "bone": "Hand_L",
+      "offset": [
+        0.0,
+        -0.05,
+        0.0
+      ]
+    },
+    "SOCKET_hand_R": {
+      "bone": "Hand_R",
+      "offset": [
+        0.0,
+        -0.05,
+        0.0
+      ]
+    },
+    "SOCKET_foot_L": {
+      "bone": "Foot_L",
+      "offset": [
+        0.0,
+        -0.04,
+        0.03
+      ]
+    },
+    "SOCKET_foot_R": {
+      "bone": "Foot_R",
+      "offset": [
+        0.0,
+        -0.04,
+        0.03
+      ]
+    },
+    "SOCKET_aura": {
+      "bone": "Root",
+      "offset": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  }
+}

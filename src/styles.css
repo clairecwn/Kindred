@@ -546,17 +546,20 @@ a { color: inherit; }
 /* Left sidebar: Journal / Daily Check-In / My Journey */
 .journal-view-tabs {
   flex-shrink: 0;
-  width: 110px;
+  width: 128px;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 48px 8px 16px;  /* 48px top clears the absolute topbar */
+  padding: 52px 10px 16px;  /* 52px top clears the 46px topbar with a 6px gap */
   background: transparent;
+  position: relative;
+  z-index: 30;
 }
 .journal-view-tab {
-  padding: 10px 1px;
+  padding: 9px 6px;
   font-family: var(--font-game);
-  font-size: 0.8rem;
+  font-size: 0.76rem;
+  white-space: nowrap;
   color: #fff;
   letter-spacing: 0.4px;
   text-align: center;
@@ -601,35 +604,59 @@ a { color: inherit; }
 }
 
 /* Wellness content area — holds bg image + scroll/book overlay */
+/* Every position inside this box — the artwork's inset/width/height and the
+   overlay percentages that put text on the painted pages — was hand-tuned
+   against the 1280x605 reference canvas, and those two sets of numbers only
+   agree at that one shape. So rather than re-deriving them, the box is pinned
+   to that exact ratio and centred in whatever space the canvas gives it.
+   Everything inside then resolves precisely as it was authored.
+   (Ratio matches DESIGN_W/DESIGN_H in hooks/useStageScale.js.) */
 .wellness-content {
-  flex: 1;
+  flex: none;
+  width: 100%;
+  aspect-ratio: 1280 / 605;
+  max-height: 100%;
+  margin: auto 0;
+  /* nudge the scroll/book art up off the bottom edge of the frame */
+  /* The bottom navigation occupies the last row of the shell. Lift the
+     artwork slightly so the visible book has the same breathing room above
+     it as below it, without changing the navigation's position. */
+  transform: translateY(-38px);
   position: relative;
   overflow: hidden;
   display: flex;
   align-items: stretch;
 }
+
+/* .wellness-main begins after the left journey tabs. Move only the book
+   artwork back by half that sidebar so the visible book is centered against
+   the full screen: left screen gap = right screen gap. */
+.wellness-book-content-area {
+  transform: translate(-64px, -38px);
+}
 .wellness-bg-img {
   position: absolute;
-  object-fit: contain;
+  object-fit: cover;
   z-index: 0;
   opacity: 0.9;
   pointer-events: none;
 }
 
 .wellness-scroll-bg {
-  inset:-13%;
-  width: 125%;
-  height: 101%;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   object-position: center 20%;
-  transform: translateY(8%);
 }
 
 .wellness-book-bg {
-  inset:-28.4%;
-  width: 146%;
-  height: 125%;
-  object-position: center 30%;
-  transform: translateY(8%);
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* book-bg.png is cropped to the book's own bounding box, so `contain` fits the
+     whole book to the frame's height with no cropping and no wasted margin. */
+  object-fit: contain;
+  object-position: center center;
 }
 .wellness-scroll-content {
   position: relative;
@@ -3772,24 +3799,27 @@ input:focus, select:focus {
 .scroll-title {
   font-family: var(--font-game);
   font-size: 2.7rem;
+  line-height: 1.05;
   color: #503111;
   letter-spacing: 2px;
   text-shadow: 0 0 14px rgba(139,80,30,0.45);
-  margin-bottom: -8px;
+  margin: 0 0 4px;
 }
 
 .scroll-subtitle-blue {
   font-family: var(--font-game);
   font-size: 1.29rem;
+  line-height: 1.2;
   color: #15028f;
-  margin-bottom: -2px;
+  margin-bottom: 2px;
 }
 
 .scroll-subtitle-brown {
   font-family: var(--font-game);
   font-size: 1.0rem;
+  line-height: 1.2;
   color: #503111;
-  margin-bottom: 13px;
+  margin-bottom: 10px;
 }
 
 /* Scroll action buttons */
@@ -3798,7 +3828,8 @@ input:focus, select:focus {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 10px 22px;
+  padding: 9px 20px;
+  border: 1.5px solid transparent;
   border-radius: 14px;
   background: linear-gradient(135deg, #D4882A, #A86018);
   color: #fff;
@@ -3816,7 +3847,8 @@ input:focus, select:focus {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 9px 18px;
+  gap: 6px;
+  padding: 9px 20px;
   border-radius: 14px;
   background: rgba(255,255,255,0.55);
   border: 1.5px solid rgba(139,80,30,0.30);
@@ -3899,14 +3931,15 @@ input:focus, select:focus {
 
 .checkin-quiz-label {
   font-family: var(--font-game);
-  font-size: 2.2rem;
+  font-size: 1.5rem;
   color: #110175;
   display: block;
-  margin-bottom: -3px;
+  line-height: 1.1;
+  margin-bottom: 0;
 }
 
 .checkin-progress-bar-outer {
-  height: 13px;
+  height: 9px;
   border-radius: 999px;
   background: rgba(131, 82, 39, 0.8);
   overflow: hidden;
@@ -3923,7 +3956,7 @@ input:focus, select:focus {
 
 .checkin-dimension-label {
   font-family: var(--font-game);
-  font-size: 0.85rem;
+  font-size: 0.76rem;
   color: #503111;
   letter-spacing: 0.5px;
 }
@@ -4042,14 +4075,15 @@ input:focus, select:focus {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 6px;
+  margin-top: 7px;
+  flex-shrink: 0;
 }
 
 .checkin-back-btn {
   font-family: var(--font-game);
-  font-size: 0.80rem;
+  font-size: 0.74rem;
   color: #503111;
-  padding: 7px 14px;
+  padding: 5px 13px;
   border-radius: 999px;
   background: rgba(255,255,255,0.55);
   border: 1.5px solid rgba(139,80,30,0.28);
@@ -4060,8 +4094,10 @@ input:focus, select:focus {
 
 .checkin-counter {
   font-family: var(--font-game);
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   color: #8B5A20;
+  flex-shrink: 0;
+  padding-right: 4px;
 }
 
 /* ════════════════════════════════════════════════════════════════
@@ -4165,23 +4201,23 @@ input:focus, select:focus {
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  background: rgba(250,900,200,1);
+  background: rgba(250,255,200,1);
   border: 1px solid rgba(139,80,30,0.50);
   border-radius: 11px;
-  padding: 16px 4px;
+  padding: 14px 8px;
   text-align: center;
 }
 
 .journey-stat-num {
   font-family: var(--font-game);
-  font-size: 1.6rem;
+  font-size: 1.2rem;
   color: #14037d;
   line-height: 1.1;
 }
 
 .journey-stat-label {
   font-family: var(--font-game);
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   color: #8B3A20;
   line-height: 1.2;
 }
@@ -4190,7 +4226,7 @@ input:focus, select:focus {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   align-items: end;
-  gap: 2px;
+  gap: 3px;
 }
 
 .journey-mood-day {
@@ -4203,8 +4239,9 @@ input:focus, select:focus {
 }
 
 .journey-mood-chip {
-  width: 28px;
-  height: 38px;
+  width: 100%;
+  max-width: 32px;
+  height: 42px;
   border-radius: 999px;
   border: 2px solid transparent;
   flex-shrink: 0;
@@ -4217,7 +4254,7 @@ input:focus, select:focus {
 
 .journey-mood-hologram {
   position: absolute;
-  top: calc(38px + 4px); /* just below the oval */
+  top: calc(42px + 4px); /* just below the oval */
   left: 50%;
   transform: translateX(-50%);
   font-family: var(--font-game);
@@ -4243,7 +4280,7 @@ input:focus, select:focus {
 
 .journey-mood-day-label {
   font-family: var(--font-game);
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   color: #a03d30;
   line-height: 1;
   transition: transform 0.22s ease;
@@ -4303,10 +4340,10 @@ input:focus, select:focus {
    Torn top edge ~9%, torn bottom edge ~11%.                          */
 .wellness-scroll-overlay {
   position: absolute;
-  top: 10.5%;
-  bottom: 22.5%;
-  left: 22.5%;
-  right: 30.05%;
+  top: 17.5%;
+  bottom: 12.5%;
+  left: 24%;
+  right: 31%;
   z-index: 2;
   display: flex;
   flex-direction: column;
@@ -4325,7 +4362,7 @@ input:focus, select:focus {
   border-radius: 10px;
   border: 1.5px solid rgba(139, 80, 30, 0.20);
   box-shadow: 0 2px 12px rgba(80, 40, 10, 0.9);
-  padding: 6px 9px 6px;
+  padding: 10px 12px;
   overflow: auto;
 }
 
@@ -4333,87 +4370,99 @@ input:focus, select:focus {
    DAILY CHECK-IN — QUIZ (active questions) — all isolated here
 ════════════════════════════════════════════════════════════════ */
 
-/* The white box during the quiz — size, colour, shape */
+/* The white box during the quiz — size, colour, shape.
+   Layout contract (do not reintroduce negative margins here): the box is a
+   3-part vertical stack — question bubble, then a stage row that pairs the
+   character with the mini-game, and nothing overlaps anything else. Every
+   mini-game is authored to fit the stage's measured budget, which is published
+   as the two custom properties below so JS and CSS agree on one number. */
 .checkin-quiz-box {
+  --checkin-stage-h: 210px;
   flex: 1;
-  min-height: 242px;
+  min-height: 300px;
   display: flex;
   flex-direction: column;
   position: relative;
   background: rgba(255, 255, 255, 0.82);  /* box colour */
-  border-radius: 10px;                     /* corner roundness */
+  border-radius: 14px;                     /* corner roundness */
   border: 1.5px solid rgba(139, 80, 30, 0.20);
   box-shadow: 0 2px 12px rgba(80, 40, 10, 0.9);
-  padding: 1px 8px 12px;                 /* inner spacing */
-  overflow: visible;
+  padding: 12px 14px 14px;                 /* inner spacing */
+  box-sizing: border-box;
+  overflow: hidden;                        /* nothing may escape the box */
 }
 
-/* Row containing the sprite + speech bubble */
-.checkin-quiz-sprite-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 1px;                /* space between sprite and bubble */
-  margin-bottom: -82px;
-  flex-shrink: 0;
-  z-index: 5;               /* keep character + speech bubble above the mini-game below,
-                                which visually overlaps this row because of the negative margin */
-  pointer-events: none;     /* the sprite/bubble overlap the game area below (negative margin);
-                                without this, the canvas + bubble silently swallow clicks meant
-                                for any option buttons that sit underneath them */
-}
-
-/* Sprite wrapper */
-.checkin-quiz-sprite {
-  flex-shrink: 0;
-}
-
-/* Question speech bubble*/
+/* Question speech bubble — spans the full width above the stage, so long
+   questions get two comfortable lines instead of a tall narrow column. */
 .checkin-quiz-bubble {
-  flex: none;
-  width:fit-content;
+  width: 100%;
   background: rgba(160, 180, 250, 0.78);        /* bubble background */
-  border: 1.5px solid rgba(160, 190, 300, 1);  /* border */
-  border-radius: 16px 16px 16px 4px;           /* pointed bottom-left corner */
-  padding: 10px 10px;                           /* inner spacing */
-  font-family:var(--font-game);                /* font */
-  font-size: 0.86rem;                           /* text size */
-  color: #504111;                               /* text colour */
-  line-height: 0.8;
-  margin-top: 7px;
+  border: 1.5px solid rgba(150, 175, 240, 1);   /* border */
+  border-radius: 14px 14px 14px 4px;            /* pointed bottom-left corner */
+  padding: 7px 12px;                            /* inner spacing */
+  font-family: var(--font-game);                /* font */
+  font-size: 0.82rem;                           /* text size */
+  color: #3c3208;                               /* text colour */
+  line-height: 1.25;
+  flex-shrink: 0;
+  margin-bottom: 8px;
+  box-sizing: border-box;
+  text-align: center;
 }
 
-/* Night-sky variant of the box/bubble — question 6 (sleep) only, so the star/bed
-   scene fills the whole box as its own background instead of sitting in a small dark
-   panel inside an otherwise white box. Only background/border/text-colour change here;
-   every other question keeps the base classes untouched. */
-.checkin-quiz-box--night {
-  background: linear-gradient(180deg, #232C42 0%, #333F58 100%);  /* toned down from the more saturated #1B2A4A/#2E3F63 */
-  border-color: rgba(255, 252, 230, 0.22);
+/* Stage row: character column on the left, mini-game filling the rest. */
+.checkin-quiz-stage {
+  flex: 1;
+  min-height: var(--checkin-stage-h);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
 }
 
-/* Sleep question only: the shared -82px overlap trick (character standing "in front of"
-   the game panel) leaves almost no clearance for the bed scene below it, so the dream
-   clouds/labels end up hidden behind the character and speech bubble. Pull the overlap
-   back so the bed scene sits clearly below the bubble instead of tucked underneath it. */
-.checkin-quiz-sprite-row--night {
-  margin-bottom: -36px;
-}
-
-.checkin-quiz-bubble--night {
-  background: rgba(255, 252, 240, 0.96);   /* stays light regardless of the dark box behind it */
-  border-color: rgba(139, 80, 30, 0.35);
-  color: #3a2a10;
+/* Kept only for backwards compatibility with older check-in markup. The
+   active quiz no longer shows the legacy sprite, leaving the full stage for
+   each mini-game. */
+.checkin-quiz-sprite {
+  display: none;
 }
 
 /* Area holding the mini-game (PowerBar, SkyScenes, etc.) */
 .checkin-quiz-game-area {
-  flex: 1;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  padding-top: 6px;
-  min-height: 0;
+  justify-content: center;
+}
+
+.checkin-quiz-game-area > * {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.checkin-quiz-game-area .scroll-btn-primary,
+.checkin-quiz-game-area .scroll-btn-secondary {
+  max-width: 100%;
+  white-space: normal;
+  text-align: center;
+}
+
+/* Night-sky variant of the box/bubble — the sleep question only, so the
+   star/bed scene fills the whole box as its own background instead of sitting
+   in a small dark panel inside an otherwise white box. Only background/border/
+   text-colour change here; the layout above is shared by every question. */
+.checkin-quiz-box--night {
+  background: linear-gradient(180deg, #232C42 0%, #333F58 100%);
+  border-color: rgba(255, 252, 230, 0.22);
+}
+
+.checkin-quiz-bubble--night {
+  background: rgba(255, 252, 240, 0.96);   /* stays light against the dark box */
+  border-color: rgba(139, 80, 30, 0.35);
+  color: #3a2a10;
 }
 
 /* Book overlay — the two open pages of the book.
@@ -4421,31 +4470,73 @@ input:focus, select:focus {
    Page starts at ~15% and ends at ~85%.  Spine at center ~50%.    */
 .wellness-book-overlay {
   position: absolute;
+  /* The overlay is intentionally inset to the painted page interiors, not
+     the image's outer cover. Keeping these values symmetric prevents the
+     controls from drifting toward the spine or falling onto the page stack
+     as the viewport changes size. */
+  /* book-bg.png is rendered with `contain`, so its transparent side gutters
+     are part of this canvas. These are the measured painted page bounds:
+     left page starts at ~24%, the spine is the centre, and the right page
+     ends at ~75%. Keeping the overlay inside those bounds stops controls
+     from sitting on the cover/page stack. */
   top: 3%;
-  bottom: 20%;
-  left: 24%;
-  right: 32.1%;
+  bottom: 4.5%;
+  left: 24.8%;
+  right: 26%;
   z-index: 2;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* Split lands on the painted spine, not the box centre; the right page is
+     narrower than the left because the art shows the page stack on that side. */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   overflow: hidden;
 }
 
 /* Left and right page areas */
 .wellness-book-overlay > .book-page-left {
   background: transparent;
-  overflow: hidden;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  padding: 14px 7px 4px 12px;
+  /* spread the blocks so the page is used top to bottom instead of
+     stacking tight at the top with a dead band underneath */
+  justify-content: space-between;
+  min-width: 0;
+  padding: 35px 12px 9px 9px;
 }
 
 .wellness-book-overlay > .book-page-right {
   background: transparent;
-  overflow: hidden;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  padding: 14px 7px 8px 9px;
+  min-width: 0;
+  padding: 35px 7px 9px 16px;
+}
+
+/* Journey is a showcase page: let the book typography carry the same
+   friendly, illustrated feel as the reference while keeping long entries
+   inside their page. */
+.wellness-book-overlay > .book-page-left > div:first-child,
+.wellness-book-overlay > .book-page-right > div:first-child {
+  text-shadow: 0 2px 0 rgba(255, 246, 220, 0.45), 0 0 10px rgba(139,80,30,0.22);
+}
+
+.wellness-book-overlay .journey-stat-box {
+  min-width: 0;
+  min-height: 82px;
+  padding: 12px 7px;
+  box-shadow: 0 3px 0 rgba(80,40,8,0.18), inset 0 1px 0 rgba(255,255,255,0.6);
+}
+
+.wellness-book-overlay .journey-stat-label {
+  font-size: clamp(0.68rem, 1.1vw, 0.92rem);
+  overflow-wrap: anywhere;
+}
+
+.wellness-book-overlay .journey-stat-num {
+  font-size: clamp(0.9rem, 1.45vw, 1.25rem);
+  line-height: 1.05;
+  overflow-wrap: anywhere;
 }
 
 /* Spine between pages */

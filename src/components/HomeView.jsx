@@ -1,13 +1,49 @@
-import SpriteCharacter from "./SpriteCharacter.jsx";
+import LanternfallScene from "../home/LanternfallScene.jsx";
+import { deriveHomeState } from "../home/deriveHomeState.js";
+import { getAvatarSpot } from "../home/avatarSpot.js";
+import AvatarStage from "../avatar/AvatarStage.jsx";
 
 export default function HomeView({
-  player, character, emotion, coins,
+  player, character, emotion, coins, journalEntries,
   setTab, muted, toggleMute, onOpenSettings, onOpenUser,
 }) {
+  const { sky, lanternsLit, streak } = deriveHomeState(journalEntries ?? [], player);
+  const spot = getAvatarSpot(sky);
+  // Base render box for the avatar overlay, scaled by the mood's spot.scale
+  // and expressed in the SAME 1280x605 design-canvas percentage space the
+  // rest of Home is laid out in (see hooks/useStageScale.js), so it never
+  // drifts from the SVG scene it sits on top of.
+  const avatarW = 220 * spot.scale;
+  const avatarH = 300 * spot.scale;
+
   return (
     <div className="home-world">
-      {/* Forest backdrop is painted full-bleed by .viewport-fit so it fills the
-          screen rather than the letterboxed stage — see styles.css */}
+      {/* ── Lanternfall — one illustrated scene, no page scroll, fills the
+          fixed 1280x605 design canvas edge to edge. ── */}
+      <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
+        <LanternfallScene sky={sky} lanternsLit={lanternsLit} />
+      </div>
+
+      {/* ── The real 3D Grove avatar, composited over the SVG scene at the
+          doorstep / window / path spot for this mood. ── */}
+      <div
+        style={{
+          position: "absolute",
+          left: `${(spot.x / 1280) * 100}%`,
+          top: `${(spot.y / 605) * 100}%`,
+          transform: "translate(-50%, -100%)",
+          zIndex: 1,
+          pointerEvents: "none",
+          filter: spot.silhouette ? "brightness(0) opacity(0.82)" : undefined,
+        }}
+      >
+        <AvatarStage
+          character={character}
+          clip={spot.emotion}
+          angle={sky === "flourishing" ? -0.5 : 0.3}
+          size={{ width: avatarW, height: avatarH }}
+        />
+      </div>
 
       {/* ── HUD top-left: streak + coins ── */}
       <div className="home-hud-left">
@@ -16,7 +52,7 @@ export default function HomeView({
             <path d="M12 2c0 6-8 8-8 14a8 8 0 0016 0c0-6-8-8-8-14z" fill="#FF5820"/>
             <path d="M12 8c0 4-4 5.5-4 8a4 4 0 008 0c0-2.5-4-4-4-8z" fill="#FFAA20"/>
           </svg>
-          <span>11</span>
+          <span>{streak}</span>
         </div>
         <div className="home-badge home-badge-coin">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
@@ -60,7 +96,7 @@ export default function HomeView({
         </button>
       </div>
 
-      {/* ── Wardrobe + Characters (right of sprite) ── */}
+      {/* ── Wardrobe + Characters ── */}
       <div className="home-char-side-btns">
         <button type="button" className="home-char-side-btn" onClick={() => setTab("wardrobe")} aria-label="Wardrobe">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -77,16 +113,6 @@ export default function HomeView({
           </svg>
           <span>CHARACTERS</span>
         </button>
-      </div>
-
-      {/* ── Character stage — interactive for 360° rotation ── */}
-      <div className="home-char-stage">
-        <SpriteCharacter
-          emotion={emotion}
-          character={character}
-          interactive={true}
-          size={{ width: 360, height: 450 }}
-        />
       </div>
     </div>
   );

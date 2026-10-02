@@ -1,0 +1,14 @@
+{
+  "schema": "game-room.opening-schedule.v1",
+  "roomId": "grove-mall",
+  "primaryArrival": { "openingId": "main-arrival", "exception": "" },
+  "openings": [
+    { "id": "main-arrival", "type": "door", "wall": "south", "width": 8.0, "height": 4.5, "destination": "central-atrium", "threshold": 0.0, "depth": 0.6 },
+    { "id": "ground-northwest-shop", "type": "door", "wall": "ground-northwest-front", "width": 3.2, "height": 3.2, "destination": "grove-grocer", "threshold": 0.0, "depth": 0.35 },
+    { "id": "ground-northeast-shop", "type": "door", "wall": "ground-northeast-front", "width": 3.2, "height": 3.2, "destination": "thread-and-thimble", "threshold": 0.0, "depth": 0.35 },
+    { "id": "ground-southwest-shop", "type": "door", "wall": "ground-southwest-front", "width": 3.2, "height": 3.2, "destination": "cafe-canopy", "threshold": 0.0, "depth": 0.35 },
+    { "id": "ground-southeast-shop", "type": "door", "wall": "ground-southeast-front", "width": 3.2, "height": 3.2, "destination": "home-nook", "threshold": 0.0, "depth": 0.35 },
+    { "id": "level2-shop-fronts", "type": "door", "wall": "level2-atrium-ring", "width": 3.2, "height": 3.2, "destination": "level2-shops", "threshold": 0.0, "depth": 0.35 },
+    { "id": "level3-shop-fronts", "type": "door", "wall": "level3-atrium-ring", "width": 3.2, "height": 3.2, "destination": "level3-shops", "threshold": 0.0, "depth": 0.35 }
+  ]
+}

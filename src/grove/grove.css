@@ -1,0 +1,536 @@
+/* src/grove/grove.css
+ *
+ * Grove's own HUD art direction: chunky rounded "candy" buttons with a
+ * solid bottom-edge shadow (the Brawl Stars / Mario Party read), thick
+ * borders, saturated fills, and a slight scale-down on press. Everything
+ * here is scoped under .grove-root so it can never leak into the rest of
+ * the app, which keeps its own flatter material-design chrome.
+ *
+ * The 3D canvas fills the entire view edge to edge; every element below is
+ * a floating HUD layer on top of it, never a page card sitting beside it.
+ */
+
+.grove-root {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #7fbf5a; /* matches the ground colour so there is never a
+                           flash of blank colour before the canvas paints */
+}
+
+.grove-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: none;
+}
+
+/* Overlay layer: fills the view, ignores pointer events itself so the
+   canvas underneath stays draggable/tappable for camera-free movement;
+   individual HUD children opt back in with pointer-events:auto. */
+.grove-hud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  font-family: var(--font-body, 'Nunito', sans-serif);
+}
+
+.grove-hud > * {
+  pointer-events: auto;
+}
+
+/* ── Candy button base ─────────────────────────────────────────────── */
+.grove-btn {
+  appearance: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-game, 'Lilita One', cursive);
+  font-weight: 400;
+  letter-spacing: 0.3px;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.35);
+  border-radius: 999px;
+  border: 3px solid rgba(255,255,255,0.55);
+  background: var(--grove-btn-bg, #E8A840);
+  box-shadow:
+    0 4px 0 var(--grove-btn-shadow, #A06018),
+    0 8px 14px rgba(20,10,5,0.35);
+  transform: translateY(0);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.grove-btn:active {
+  transform: translateY(3px) scale(0.96);
+  box-shadow:
+    0 1px 0 var(--grove-btn-shadow, #A06018),
+    0 3px 8px rgba(20,10,5,0.3);
+}
+
+.grove-btn:disabled {
+  filter: grayscale(0.4) brightness(0.9);
+  cursor: default;
+}
+
+.grove-btn--sm { padding: 8px 16px; font-size: 0.78rem; }
+.grove-btn--md { padding: 10px 20px; font-size: 0.88rem; }
+
+.grove-btn--gold    { --grove-btn-bg: #E8A840; --grove-btn-shadow: #A06018; }
+.grove-btn--green   { --grove-btn-bg: #6BAE82; --grove-btn-shadow: #2E5A10; }
+.grove-btn--red     { --grove-btn-bg: #E85A5A; --grove-btn-shadow: #A02020; }
+.grove-btn--violet  { --grove-btn-bg: #9B72CF; --grove-btn-shadow: #5A3A90; }
+.grove-btn--dark    { --grove-btn-bg: rgba(30,20,12,0.72); --grove-btn-shadow: rgba(0,0,0,0.6); border-color: rgba(255,255,255,0.3); }
+
+/* Circular icon-only variant, for the joystick-adjacent action cluster */
+.grove-btn--circle {
+  border-radius: 50%;
+  width: 54px;
+  height: 54px;
+  padding: 0;
+  font-size: 1.3rem;
+}
+
+/* ── Top-left status chip ─────────────────────────────────────────── */
+.grove-chip {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 16px;
+  border-radius: 18px;
+  background: rgba(30, 20, 12, 0.68);
+  backdrop-filter: blur(6px);
+  border: 2.5px solid rgba(255,255,255,0.35);
+  box-shadow: 0 4px 0 rgba(0,0,0,0.35), 0 6px 14px rgba(0,0,0,0.3);
+  max-width: 220px;
+}
+
+.grove-chip-district {
+  font-family: var(--font-game, 'Lilita One', cursive);
+  font-size: 0.95rem;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  line-height: 1.1;
+}
+
+.grove-chip-meta {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: rgba(255,255,255,0.82);
+  letter-spacing: 0.2px;
+}
+
+/* ── Top-right controls cluster ───────────────────────────────────── */
+.grove-top-right {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 8px;
+}
+
+/* ── Bottom-left action cluster ───────────────────────────────────── */
+.grove-actions {
+  position: absolute;
+  bottom: 158px;
+  left: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+/* ── Joystick ──────────────────────────────────────────────────────── */
+.grove-joystick-base {
+  position: absolute;
+  bottom: 158px;
+  right: 20px;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: rgba(30, 20, 12, 0.45);
+  border: 3px solid rgba(255,255,255,0.55);
+  box-shadow: 0 4px 0 rgba(0,0,0,0.3), 0 6px 16px rgba(0,0,0,0.35);
+  touch-action: none;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.grove-joystick-knob {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffe9b8, #E8A840 65%, #A06018 100%);
+  border: 2.5px solid rgba(255,255,255,0.7);
+  box-shadow: 0 3px 0 rgba(160,96,24,0.6), 0 4px 10px rgba(0,0,0,0.4);
+}
+
+.grove-joystick-knob--active {
+  background: radial-gradient(circle at 35% 30%, #fff3d6, #D4882A 65%, #7A4A10 100%);
+}
+
+/* ── Slide-in drawer (districts / mode UI) ────────────────────────── */
+.grove-drawer-toggle {
+  position: absolute;
+  bottom: 158px;
+  left: 78px;
+}
+
+.grove-drawer-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(20,10,5,0.28);
+  z-index: 9;
+}
+
+.grove-drawer {
+  position: absolute;
+  /* clear the global nav pill row so its buttons do not cover the drawer */
+  bottom: 74px;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  max-height: calc(62% - 74px);
+  background: rgba(250, 240, 210, 0.97);
+  border-top: 4px solid rgba(255,255,255,0.6);
+  border-radius: 22px 22px 0 0;
+  box-shadow: 0 -8px 24px rgba(20,10,5,0.35);
+  padding: 14px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transform: translateY(0);
+  animation: grove-drawer-in 0.22s cubic-bezier(0.22,1,0.36,1);
+}
+
+@keyframes grove-drawer-in {
+  from { transform: translateY(30px); opacity: 0.4; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+.grove-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.grove-drawer-title {
+  font-family: var(--font-game, 'Lilita One', cursive);
+  font-size: 1.02rem;
+  color: var(--text, #3D2010);
+}
+
+.grove-drawer-sub {
+  font-size: 0.76rem;
+  color: var(--text-2, #5A3A18);
+  font-weight: 700;
+  margin-top: 1px;
+}
+
+.grove-drawer-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2.5px solid rgba(61,32,16,0.2);
+  background: rgba(61,32,16,0.08);
+  color: var(--text, #3D2010);
+  font-weight: 900;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.grove-district-pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  cursor: pointer;
+  border: 2px solid rgba(0,0,0,0.10);
+  font-family: var(--font-game);
+}
+
+.grove-district-pill {
+  padding: 7px 14px;
+  border-radius: 14px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  border: 2px solid rgba(0,0,0,0.08);
+}
+
+.grove-plot-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+}
+
+.grove-plot-cell {
+  aspect-ratio: 1 / 1;
+  border-radius: 12px;
+  cursor: pointer;
+  border: 2px solid rgba(0,0,0,0.14);
+  font-size: 0.66rem;
+  font-weight: 900;
+}
+
+.grove-breath-dot {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #6BAE82;
+  border: 2px solid rgba(0,0,0,0.15);
+}
+
+/* ── Chat drawer ───────────────────────────────────────────────────── */
+.grove-chat-panel {
+  position: absolute;
+  bottom: 158px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(84%, 420px);
+  padding: 10px 16px;
+  border-radius: 18px;
+  background: rgba(30, 20, 12, 0.72);
+  border: 2.5px solid rgba(255,255,255,0.35);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-align: center;
+  z-index: 6;
+}
+
+.grove-district-pill:hover { filter: brightness(1.06); }
+.grove-district-pill:active { transform: translateY(2px); }
+
+/* ── The mall: fade transition, coin chip, interaction prompt, interact
+   button ──────────────────────────────────────────────────────────────
+   Appended for the four enterable buildings (economy/, interaction/,
+   interiors/). Kept as its own block so the existing HUD rules above are
+   never reflowed/renumbered by this change. */
+
+.grove-fade {
+  position: absolute;
+  inset: 0;
+  background: #1a0f08;
+  z-index: 20;
+  transition: opacity 190ms ease;
+}
+
+.grove-coin-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(30, 20, 12, 0.72);
+  border: 2.5px solid rgba(255,255,255,0.35);
+  color: #fff;
+  font-family: var(--font-game, 'Lilita One', cursive);
+  font-size: 0.92rem;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+
+.grove-coin-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff3d6, #E8A840 65%, #A06018 100%);
+  border: 1.5px solid rgba(255,255,255,0.7);
+  flex-shrink: 0;
+}
+
+.grove-coin-demo {
+  font-family: var(--font-body, 'Nunito', sans-serif);
+  font-size: 0.58rem;
+  font-weight: 800;
+  color: rgba(255,255,255,0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+/* World-anchored interaction prompt: positioned via inline left/top
+   (percent of the canvas) computed every frame from the interactable's
+   projected screen position — see GroveView.jsx / GroveScene.projectToScreen.
+   Appears/fades fast (150ms) per the brief's "1-2 frames" rule. */
+.grove-interact-prompt {
+  position: absolute;
+  transform: translate(-50%, -120%);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(30, 20, 12, 0.82);
+  border: 2px solid rgba(255,255,255,0.4);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  white-space: nowrap;
+  z-index: 7;
+  opacity: 0;
+  transition: opacity 150ms ease;
+  pointer-events: none;
+}
+
+.grove-interact-prompt--visible {
+  opacity: 1;
+}
+
+.grove-interact-key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  background: rgba(255,255,255,0.92);
+  color: #3D2010;
+  font-family: var(--font-game, 'Lilita One', cursive);
+  font-size: 0.68rem;
+  flex-shrink: 0;
+}
+
+/* Touch "Interact" button — sits just left of the joystick so both thumbs
+   stay put. The dot fills solid the instant something is in range,
+   matching the same fast show/hide as the prompt above. */
+.grove-interact-btn {
+  position: absolute;
+  bottom: 158px;
+  right: 128px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 3px solid rgba(255,255,255,0.55);
+  background: rgba(30, 20, 12, 0.55);
+  color: #ffe28a;
+  font-size: 1.4rem;
+  line-height: 1;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.3), 0 6px 14px rgba(0,0,0,0.35);
+  cursor: pointer;
+}
+
+.grove-interact-btn:active {
+  transform: translateY(3px) scale(0.96);
+}
+
+/* ── Story overlay: soft-glow streak chip, the daily task panel, and the
+   dismissible story-beat toast. All parchment-styled to match the rest
+   of the HUD. The glow chip's warmth (--glow, 0..1) is a dimming light,
+   never a number that can hit a hard zero — see story/storyState.js. */
+.grove-glow-chip {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 2px solid rgba(255,255,255,0.35);
+  background: rgba(30, 20, 12, 0.6);
+  color: #FAF4DC;
+  font-family: var(--font-game, 'Lilita One', cursive);
+  font-size: 0.72rem;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.grove-glow-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ffe28a;
+  box-shadow: 0 0 calc(4px + 10px * var(--glow, 0.5)) rgba(255, 210, 120, var(--glow, 0.5));
+  opacity: calc(0.35 + 0.65 * var(--glow, 0.5));
+}
+
+.grove-story-panel {
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(420px, 86vw);
+  background: var(--panel-solid, #F5E8C0);
+  border: 2px solid rgba(0,0,0,0.12);
+  border-radius: 16px;
+  padding: 14px 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.28);
+  pointer-events: auto;
+}
+
+.grove-story-header { margin-bottom: 10px; }
+.grove-story-title { font-family: var(--font-game, 'Lilita One', cursive); font-size: 0.9rem; color: #3D2010; }
+.grove-story-sub { font-size: 0.72rem; color: var(--text-2, #7a6248); margin-top: 2px; }
+
+.grove-story-tasks { display: flex; flex-direction: column; gap: 8px; }
+.grove-story-task {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: rgba(255,255,255,0.5);
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+.grove-story-task-text { font-size: 0.78rem; color: #3D2010; flex: 1; }
+.grove-story-task-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+.grove-story-footnote {
+  margin-top: 10px;
+  font-size: 0.68rem;
+  color: var(--text-2, #7a6248);
+  font-style: italic;
+}
+
+.grove-story-beat {
+  position: absolute;
+  /* Sits top-centre, not bottom-centre: the player character is framed in
+     the middle of the lower half, and a centred toast down there covers the
+     one thing the scene exists to show. */
+  top: 74px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(420px, 86vw);
+  background: var(--panel-solid, #F5E8C0);
+  border: 2px solid rgba(0,0,0,0.12);
+  border-radius: 16px;
+  padding: 12px 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.28);
+  pointer-events: auto;
+  text-align: center;
+}
+.grove-story-beat-title { font-family: var(--font-game, 'Lilita One', cursive); font-size: 0.82rem; color: #3D2010; margin-bottom: 6px; }
+.grove-story-beat-line { font-size: 0.76rem; color: #4a3520; margin-bottom: 4px; }
+
+/* NPC dialogue bubble: a short greeting/shop line, triggered by proximity
+   + Interact (see GroveView's onNpcInteract). Sits above the interact
+   prompt/button so it never gets covered by the HUD's bottom cluster. */
+.grove-npc-bubble {
+  position: absolute;
+  bottom: 150px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(360px, 84vw);
+  background: var(--panel-solid, #F5E8C0);
+  border: 2px solid rgba(0,0,0,0.12);
+  border-radius: 16px;
+  padding: 10px 14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.28);
+  pointer-events: none;
+  text-align: center;
+}
+.grove-npc-bubble-name { font-family: var(--font-game, 'Lilita One', cursive); font-size: 0.76rem; color: #3D2010; margin-bottom: 4px; }
+.grove-npc-bubble-line { font-size: 0.76rem; color: #4a3520; font-style: italic; }

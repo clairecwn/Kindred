@@ -1,0 +1,19 @@
+{
+  "schema": "kindred.grove-outdoor-park-layout.v1",
+  "areaId": "canopy-park",
+  "units": "meters",
+  "center": [-18, 27],
+  "radius": 7.2,
+  "zones": [
+    { "id": "mall-threshold", "type": "open-garden-portal", "position": [-12.45, 27], "clearWidth": 3.3 },
+    { "id": "loop", "type": "ring-path", "innerRadius": 4.65, "outerRadius": 5.75 },
+    { "id": "hero", "type": "bloom-chimes", "position": [-18, 27], "keepOutRadius": 1.45 },
+    { "id": "sun-petal", "type": "optional-discovery", "position": [-22.6, 24.7] },
+    { "id": "mint-petal", "type": "optional-discovery", "position": [-14.2, 23.5] },
+    { "id": "rose-petal", "type": "optional-discovery", "position": [-17.0, 32.7] },
+    { "id": "loop-seat", "type": "social-seat", "position": [-24.2, 28.8] },
+    { "id": "quiet-seat", "type": "solo-vista", "position": [-17.2, 20.9] }
+  ],
+  "surpriseBeat": "Activating all three petals wakes the Bloom Chimes.",
+  "accessibility": { "colourOnlyMeaning": false, "timedInput": false, "precisionPlatforming": false, "mandatoryAudioCue": false }
+}

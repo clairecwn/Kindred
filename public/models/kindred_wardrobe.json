@@ -1,0 +1,40 @@
+{
+  "base": "/models/kindred_char01.glb",
+  "wardrobe": "/models/kindred_wardrobe.glb",
+  "note": "Wardrobe meshes are skinned to the same 20-bone rig as every cast member. Bind each to the target skeleton by bone name, then toggle visibility. 'presents' gates which items a character can wear: an item is offered when its presents list contains the character's presents value, or when it is 'any'.",
+  "slots": {
+    "skin":   { "exclusive": true, "kind": "material" },
+    "hair":   { "exclusive": true, "kind": "mesh", "builtIn": true },
+    "top":    { "exclusive": true, "kind": "mesh" },
+    "bottom": { "exclusive": true, "kind": "mesh" },
+    "head":   { "exclusive": true, "kind": "attach" },
+    "face":   { "exclusive": true, "kind": "attach" },
+    "neck":   { "exclusive": true, "kind": "attach" },
+    "back":   { "exclusive": true, "kind": "attach" }
+  },
+  "items": [
+    { "id": "top_tee",      "slot": "top",    "presents": "any",  "mesh": "Top_Tee",      "label": "Cotton tee",      "tintMaterial": "w_tee" },
+    { "id": "top_hoodie",   "slot": "top",    "presents": "any",  "mesh": "Top_Hoodie",   "label": "Hoodie",          "tintMaterial": "w_hoodie" },
+    { "id": "top_button",   "slot": "top",    "presents": "masc", "mesh": "Top_Button",   "label": "Button-up shirt", "tintMaterial": "w_oxford" },
+    { "id": "top_bomber",   "slot": "top",    "presents": "masc", "mesh": ["Top_Bomber","Top_BomberTrim"], "label": "Bomber jacket", "tintMaterial": "w_bomber" },
+    { "id": "top_cardigan", "slot": "top",    "presents": "femme","mesh": "Top_Cardigan", "label": "Knit cardigan",   "tintMaterial": "w_cardi" },
+    { "id": "dress",        "slot": "top",    "presents": "femme","mesh": "Dress",        "label": "Pinafore dress",  "tintMaterial": "w_rose", "covers": ["bottom"] },
+
+    { "id": "bottom_joggers",  "slot": "bottom", "presents": "any",   "mesh": "Bottom_Joggers",  "label": "Joggers",      "tintMaterial": "w_jogger" },
+    { "id": "bottom_overalls", "slot": "bottom", "presents": "any",   "mesh": "Bottom_Overalls", "label": "Overalls",     "tintMaterial": "w_denim" },
+    { "id": "bottom_cargo",    "slot": "bottom", "presents": "masc",  "mesh": "Bottom_Cargo",    "label": "Cargo shorts", "tintMaterial": "w_cargo" },
+    { "id": "bottom_skirt",    "slot": "bottom", "presents": "femme", "mesh": "Bottom_Skirt",    "label": "A-line skirt", "tintMaterial": "w_mustard" },
+
+    { "id": "head_cap",     "slot": "head", "presents": "any",   "mesh": ["Acc_Cap","Acc_CapTrim"], "bone": "head", "label": "Ball cap" },
+    { "id": "head_beanie",  "slot": "head", "presents": "any",   "mesh": "Acc_Beanie",     "bone": "head",  "label": "Knit beanie", "tintMaterial": "a_sage" },
+    { "id": "head_flower",  "slot": "head", "presents": "femme", "mesh": "Acc_FlowerClip", "bone": "head",  "label": "Flower clip" },
+    { "id": "face_glasses", "slot": "face", "presents": "any",   "mesh": "Acc_Glasses",    "bone": "head",  "label": "Round glasses" },
+    { "id": "neck_scarf",   "slot": "neck", "presents": "any",   "mesh": "Acc_Scarf",      "bone": "chest", "label": "Wool scarf",  "tintMaterial": "a_terracotta" },
+    { "id": "back_pack",    "slot": "back", "presents": "any",   "mesh": "Acc_Backpack",   "bone": "chest", "label": "Day pack",    "tintMaterial": "a_clay" }
+  ],
+  "palettes": {
+    "skin":  ["#F2D8C2","#E8C4A6","#D9A87E","#B9805A","#8C5A3C","#5E3B28"],
+    "hair":  ["#4A3428","#6B4A33","#8C6440","#C9A15C","#2E2A2E","#7E5A6B","#9AA7B0"],
+    "cloth": ["#8B78B0","#EED8B4","#49668C","#D9827E","#E1A540","#A3987E","#73A36F","#D16D4D"]
+  }
+}

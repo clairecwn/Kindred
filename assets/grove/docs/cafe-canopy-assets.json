@@ -1,0 +1,16 @@
+{
+  "schema": "kindred.grove-cafe-canopy-assets.v1",
+  "shopId": "cafe-canopy",
+  "status": "prototype",
+  "items": [
+    { "id": "coffee-cup", "category": "drinkware", "function": "served beverage prop", "reuseClass": "food-item" },
+    { "id": "croissant", "category": "pastry", "function": "bakery display prop", "reuseClass": "food-item" },
+    { "id": "cake-slice", "category": "pastry", "function": "dessert display prop", "reuseClass": "food-item" },
+    { "id": "sandwich", "category": "prepared-food", "function": "food display prop", "reuseClass": "food-item" },
+    { "id": "plate", "category": "tableware", "function": "serving prop", "reuseClass": "tableware" },
+    { "id": "menu-board", "category": "signage", "function": "shop menu landmark", "reuseClass": "shop-signage" },
+    { "id": "counter-display", "category": "fixture", "function": "pastry presentation fixture", "reuseClass": "shop-fixture" },
+    { "id": "cafe-stool", "category": "furniture", "function": "customer seating", "reuseClass": "seating" }
+  ],
+  "generationPolicy": "prototype items are procedural Blender meshes; no paid external generation submitted"
+}

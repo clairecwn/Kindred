@@ -14,6 +14,7 @@ export const DEFAULT_KINDRED_SETTINGS = {
   presenceShare: true,
   emotionVisible: false,
   analytics: true,
+  groveJoystick: false, // on-screen joystick in Grove; off by default, keyboard always works
 };
 
 export function readKindredSettings() {

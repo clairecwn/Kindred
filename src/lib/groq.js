@@ -30,7 +30,7 @@ export function warnIfNoKey(feature) {
  * Throws on a missing key, a non-2xx response, or an empty completion, so
  * callers can decide between retrying, falling back, or surfacing the error.
  */
-export async function groqChat({ messages, temperature = 0.85, maxTokens = 200 }) {
+export async function groqChat({ messages, temperature = 0.85, maxTokens = 200, responseFormat }) {
   const apiKey = getGroqKey();
   if (!apiKey) throw new Error("VITE_GROQ_API_KEY not set");
 
@@ -40,7 +40,13 @@ export async function groqChat({ messages, temperature = 0.85, maxTokens = 200 }
       "Authorization": `Bearer ${apiKey}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ model: MODEL, messages, temperature, max_tokens: maxTokens }),
+    body: JSON.stringify({
+      model: MODEL,
+      messages,
+      temperature,
+      max_tokens: maxTokens,
+      ...(responseFormat ? { response_format: responseFormat } : {}),
+    }),
   });
 
   if (!response.ok) {

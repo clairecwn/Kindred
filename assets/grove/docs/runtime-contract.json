@@ -1,0 +1,51 @@
+{
+  "schema": "kindred.grove-runtime-contract.v1",
+  "roomId": "grove-mall",
+  "runtimeSurface": "Kindred Grove Three.js canvas",
+  "entry": {
+    "doors": ["commons-pantry", "commons-homeworks", "commons-threadbare"],
+    "spawn": { "x": 0, "z": -19, "headingRadians": 0 },
+    "exit": { "x": 0, "z": -20.6, "radius": 1.4 }
+  },
+  "playerEnvelope": { "radius": 0.4, "movementPlane": "active mall floor" },
+  "circulation": {
+    "floors": 3,
+    "floorHeightMeters": 5,
+    "verticalNavigation": ["east lift interaction", "north stair interaction"],
+    "upperFloorConnectors": ["north atrium deck with atrium-edge rail", "south atrium deck with atrium-edge rail"],
+    "atrium": "non-walkable on upper floors"
+  },
+  "collision": {
+    "groundFloor": "bounded mall rectangle plus fountain exclusion",
+    "upperFloors": "east/west wings plus north/south connector decks",
+    "fixtureCollision": "37 measured AABB fixture blockers across Levels 1–3",
+    "fixtureColliderCounts": [16, 10, 11]
+  },
+  "productionCamera": {
+    "type": "third-person follow",
+    "distance": 10.5,
+    "height": 3.8,
+    "lookTargetY": 1.1,
+    "fovDegrees": 50,
+    "constraint": "kept below the next five-metre floor slab to preserve upper-level sightlines"
+  },
+  "input": {
+    "movement": ["WASD", "arrow keys", "optional touch joystick"],
+    "interaction": ["E", "touch interaction button"]
+  },
+  "readiness": {
+    "glbModulesLoaded": 13,
+    "shopZones": 12,
+    "catalogs": 16,
+    "uniquePurchasableItems": 85,
+    "fixtureColliderCounts": [16, 10, 11],
+    "visibleShopModulesPerFloor": 4,
+    "offFloorShopRendering": "culled",
+    "measuredPreview": { "drawCalls": 238, "triangles": 58788, "baselineDrawCalls": 403, "baselineTriangles": 97892 },
+    "productionBuild": "passed",
+    "projectTestSuite": "passed-261-of-261",
+    "browserLoad": "passed",
+    "floorSwitching": "passed",
+    "deployment": "blocked-pending-runtime-approval"
+  }
+}

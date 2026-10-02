@@ -1,0 +1,23 @@
+{
+  "schema": "kindred.grove-outdoor-park-brief.v1",
+  "areaId": "canopy-park",
+  "title": "Canopy Park",
+  "status": "form-in-review",
+  "purpose": "A playful decompression loop beside the mall where curiosity produces a brief, harmless transformation.",
+  "inspirationPolicy": "Apply general Nintendo design principles through original Kindred forms and interactions; do not copy Mario assets, characters, layouts, collectibles, branding, or audio.",
+  "runtimeSurface": "Kindred Grove Three.js outdoor world",
+  "bounds": { "center": [-18, 27], "radiusMeters": 7.2 },
+  "hero": { "id": "bloom-chimes", "function": "orientation landmark and optional three-petal activation finale" },
+  "circulation": { "type": "single compact loop with open mall threshold", "mainPathWidthMeters": 1.1, "arrivalClearWidthMeters": 3.3, "mandatoryDeadEnds": 0 },
+  "productionCamera": { "type": "existing Grove third-person follow", "constraint": "hero and at least one discovery cue should be readable without manual camera rotation" },
+  "playerEnvelope": { "radiusMeters": 0.4, "jumpRequired": false, "failureState": false },
+  "interaction": {
+    "discoveries": 3,
+    "completionRequired": false,
+    "reward": "visual, particle and sound transformation only",
+    "competitiveMechanics": false
+  },
+  "performanceBudget": { "newDrawCallsTarget": 18, "newTrianglesTarget": 8000 },
+  "functionGate": "approved-by-user-ok-go-on",
+  "formGate": "reopened-after-user-coherence-feedback-no-export-authorized"
+}

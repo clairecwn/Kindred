@@ -1,0 +1,17 @@
+{
+  "model": "/models/kindred_char01.glb",
+  "fps": 24,
+  "clips": {
+    "idle":      { "loop": true,  "frames": [1, 73] },
+    "walk":      { "loop": true,  "frames": [1, 33] },
+    "run":       { "loop": true,  "frames": [1, 21] },
+    "sit_chair": { "loop": true,  "frames": [1, 73] },
+    "sit_floor": { "loop": true,  "frames": [1, 73] },
+    "jump":      { "loop": false, "frames": [1, 49] },
+    "wave":      { "loop": false, "frames": [1, 61] },
+    "cheer":     { "loop": false, "frames": [1, 54] },
+    "clap":      { "loop": false, "frames": [1, 44] },
+    "nod_yes":   { "loop": false, "frames": [1, 34] },
+    "shake_no":  { "loop": false, "frames": [1, 38] }
+  }
+}

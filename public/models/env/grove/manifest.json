@@ -1,0 +1,41 @@
+{
+  "schema": "kindred.grove-export-manifest.v1",
+  "generatedAt": "2026-10-01",
+  "source": "../blender/grove_master_refined.blend",
+  "generator": "Blender 5.2.0 LTS",
+  "format": "glTF 2.0 binary",
+  "validation": {
+    "status": "passed-structural-and-threejs-load-checks",
+    "checks": [
+      "GLB magic header",
+      "GLB version 2",
+      "declared file length",
+      "JSON chunk parse",
+      "scene presence",
+      "mesh presence",
+      "material presence",
+      "SHA-256 digest",
+      "Three.js GLTFLoader parse",
+      "Three.js runtime mesh traversal"
+    ],
+    "limitations": [
+      "Runtime loading, collision, walkability, UV, lightmap, and performance checks are pending.",
+      "Exports have not been copied into public/models/."
+    ]
+  },
+  "modules": [
+    { "file": "grove_architecture.glb", "bytes": 1430120, "nodes": 105, "meshes": 105, "materials": 9, "sha256": "25ec9e2716774b25a9ecf3d60caace4fc4a335e8d64421c77ddc2cbff1e37df3" },
+    { "file": "grove_grocer.glb", "bytes": 466932, "nodes": 55, "meshes": 55, "materials": 10, "sha256": "6e7e3a0c45d2b7107696b83b1185dfcbda6edcc2ee2f80b920eed0c0ecc3f1a0" },
+    { "file": "thread_and_thimble.glb", "bytes": 782344, "nodes": 63, "meshes": 63, "materials": 9, "sha256": "b5c1418fd7a4f8803a114019512495444b86983dcb4a7e2d04f5abedc0d2c1ae" },
+    { "file": "home_nook.glb", "bytes": 613112, "nodes": 39, "meshes": 39, "materials": 8, "sha256": "6ffa634fbb76cfd3cb3f7d15e1e11a3a6b37dc550e211e47e8985d8bf619b8b1" },
+    { "file": "cafe_canopy.glb", "bytes": 941020, "nodes": 53, "meshes": 53, "materials": 10, "sha256": "c0bd3809658414d5df816d28b905120a5be8aa9226269f40c93a159012c34cec" },
+    { "file": "sole_search.glb", "bytes": 1251372, "nodes": 61, "meshes": 61, "materials": 9, "sha256": "a9760f8579decbedcfdf251c4bb987a5d739b2b4af7fcb228b8a8b447ac5014d" },
+    { "file": "pixel_pantry.glb", "bytes": 551632, "nodes": 31, "meshes": 31, "materials": 9, "sha256": "38bfe4e36f379dcb65d07e6a25a4faf0def917a18728400f07c2c16ec23624d7" },
+    { "file": "maker_meadow.glb", "bytes": 379924, "nodes": 22, "meshes": 22, "materials": 9, "sha256": "af1b44773248048f01a947bb14fa50d7cd1476033e330ec9e9b60a70611170f8" },
+    { "file": "seasonal_pop_up.glb", "bytes": 327448, "nodes": 25, "meshes": 25, "materials": 9, "sha256": "552968fb423a52a20f3752071398883e63886a54595256ba4580462ba0a3e951" },
+    { "file": "book_burrow.glb", "bytes": 433120, "nodes": 33, "meshes": 33, "materials": 9, "sha256": "38fa7d6626af2d7b61519d03f5faa3bdc74c5313ed903a1c5696a284ac490857" },
+    { "file": "wellness_willow.glb", "bytes": 359368, "nodes": 29, "meshes": 29, "materials": 10, "sha256": "b1024f4ba82ea9dac9c96f5fae857cc2a5af280a4ba05d54c4c8661b88338ad1" },
+    { "file": "food_hall.glb", "bytes": 387980, "nodes": 28, "meshes": 28, "materials": 8, "sha256": "b7acd3f198946b5677ac8df275b10ea5b834ec9294b9c2ae55f2feaafef76b4f" },
+    { "file": "rooftop_garden.glb", "bytes": 300424, "nodes": 24, "meshes": 24, "materials": 6, "sha256": "0d7f73f00a685a0fad78a3bd4bbaa6e00a847b4793ee9c681f413ad32a60d58c" }
+  ]
+}

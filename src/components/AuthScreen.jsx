@@ -1,5 +1,21 @@
 import { useState } from "react";
-import { supabase } from "../lib/supabase.js";
+import { supabase, setLocalOnly } from "../lib/supabase.js";
+
+// Every browser words a dead connection differently: "Failed to fetch" in
+// Chrome, "Load failed" in Safari, "NetworkError when attempting to fetch
+// resource." in Firefox. None of them mean anything to a player.
+const NETWORK_ERROR_RE = /failed to fetch|load failed|networkerror|fetch failed|network request failed/i;
+
+function isNetworkFailure(err) {
+  if (!err) return false;
+  return err.name === "AuthRetryableFetchError"
+      || err.status === 0
+      || NETWORK_ERROR_RE.test(err.message ?? "");
+}
+
+const UNREACHABLE_MESSAGE =
+  "Can't reach the Kindred server, so accounts aren't available right now. " +
+  "You can keep playing on this device — your world saves here.";
 
 /**
  * Email + password sign in / sign up.
@@ -7,13 +23,14 @@ import { supabase } from "../lib/supabase.js";
  * Reuses the .login-world markup so the full-bleed sky backdrop keyed off
  * `.viewport-fit:has(.login-world)` applies here too.
  */
-export default function AuthScreen() {
+export default function AuthScreen({ onContinueOffline }) {
   const [mode, setMode]         = useState("signin");   // "signin" | "signup"
   const [email, setEmail]       = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy]         = useState(false);
   const [error, setError]       = useState("");
   const [notice, setNotice]     = useState("");
+  const [offline, setOffline]   = useState(false);
 
   const isSignUp = mode === "signup";
 
@@ -21,6 +38,7 @@ export default function AuthScreen() {
     e.preventDefault();
     setError("");
     setNotice("");
+    setOffline(false);
 
     if (isSignUp && password.length < 6) {
       setError("Password needs to be at least 6 characters.");
@@ -28,23 +46,37 @@ export default function AuthScreen() {
     }
 
     setBusy(true);
-    const { data, error: authError } = isSignUp
-      ? await supabase.auth.signUp({ email: email.trim(), password })
-      : await supabase.auth.signInWithPassword({ email: email.trim(), password });
-    setBusy(false);
+    try {
+      const { data, error: authError } = isSignUp
+        ? await supabase.auth.signUp({ email: email.trim(), password })
+        : await supabase.auth.signInWithPassword({ email: email.trim(), password });
 
-    if (authError) {
-      setError(authError.message);
-      return;
-    }
+      if (authError) throw authError;
 
-    // With email confirmation switched on, sign-up returns a user but no
-    // session — nothing else happens until they click the link in their inbox.
-    if (isSignUp && !data.session) {
-      setNotice("Check your email for a confirmation link, then sign in.");
-      setMode("signin");
+      // With email confirmation switched on, sign-up returns a user but no
+      // session — nothing else happens until they click the link in their inbox.
+      if (isSignUp && !data.session) {
+        setNotice("Check your email for a confirmation link, then sign in.");
+        setMode("signin");
+      }
+      // On success SessionProvider's auth listener swaps this screen out.
+    } catch (err) {
+      if (isNetworkFailure(err)) {
+        setOffline(true);
+        setError(UNREACHABLE_MESSAGE);
+      } else {
+        setError(err.message || "Something went wrong. Please try again.");
+      }
+    } finally {
+      // Always clears. A thrown error used to skip the old setBusy(false) and
+      // leave the button stuck on "One moment…" with no way to retry.
+      setBusy(false);
     }
-    // On success SessionProvider's auth listener swaps this screen out.
+  }
+
+  function continueOffline() {
+    setLocalOnly(true);
+    onContinueOffline?.();
   }
 
   return (
@@ -97,6 +129,12 @@ export default function AuthScreen() {
         >
           {isSignUp ? "Already have an account? Sign in" : "New here? Create an account"}
         </button>
+
+        {offline && (
+          <button type="button" className="auth-switch" onClick={continueOffline}>
+            Continue without an account
+          </button>
+        )}
       </section>
     </main>
   );

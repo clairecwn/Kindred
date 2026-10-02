@@ -20,11 +20,20 @@ export function SessionProvider({ children }) {
 
     let cancelled = false;
 
-    supabase.auth.getSession().then(({ data }) => {
-      if (cancelled) return;
-      setSession(data.session ?? null);
-      setLoading(false);
-    });
+    supabase.auth.getSession()
+      .then(({ data }) => {
+        if (cancelled) return;
+        setSession(data.session ?? null);
+        setLoading(false);
+      })
+      .catch(() => {
+        // Refreshing a stored token hits the network, so an unreachable backend
+        // rejects here. Fall through to the sign-in gate — which can offer
+        // local-only play — rather than stranding the app on "Waking up…".
+        if (cancelled) return;
+        setSession(null);
+        setLoading(false);
+      });
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, next) => {
       setSession(next ?? null);

@@ -17,6 +17,17 @@ npm-debug.log*
 
 # Temp / scratch output
 tmp/
+_to_delete/
+**/_to_delete/
+_blender_preview/
+**/_preview/
+.DS_Store
+*.blend1
+__pycache__/
+*.pyc
+*.bak
+*.bak1
+*.bak2
 
 # AI coding tool configs & skills (local to each contributor, not app source)
 .agent/

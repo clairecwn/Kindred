@@ -1,0 +1,16 @@
+{
+  "schema": "kindred.grove-home-nook-assets.v1",
+  "shopId": "home-nook",
+  "status": "prototype",
+  "items": [
+    { "id": "table-lamp", "category": "lighting", "function": "home lighting display", "reuseClass": "home-decor" },
+    { "id": "kettle", "category": "kitchen", "function": "small appliance display", "reuseClass": "kitchenware" },
+    { "id": "mug", "category": "kitchen", "function": "tableware display", "reuseClass": "kitchenware" },
+    { "id": "cushion", "category": "soft-goods", "function": "home textile display", "reuseClass": "soft-goods" },
+    { "id": "plant-pot", "category": "decor", "function": "indoor greenery display", "reuseClass": "home-decor" },
+    { "id": "vase", "category": "decor", "function": "decorative vessel display", "reuseClass": "home-decor" },
+    { "id": "storage-box", "category": "storage", "function": "household organization display", "reuseClass": "storage" },
+    { "id": "folding-chair", "category": "furniture", "function": "small furniture display", "reuseClass": "furniture" }
+  ],
+  "generationPolicy": "prototype items are procedural Blender meshes; no paid external generation submitted"
+}

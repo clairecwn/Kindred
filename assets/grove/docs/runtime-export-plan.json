@@ -1,0 +1,24 @@
+{
+  "schema": "kindred.grove-runtime-export-plan.v1",
+  "status": "integrated-awaiting-runtime-approval",
+  "sourceScenes": [
+    "blender/grove_blockout.blend",
+    "blender/grove_grocer_detail.blend",
+    "blender/thread_and_thimble_detail.blend",
+    "blender/home_nook_detail.blend",
+    "blender/cafe_canopy_detail.blend",
+    "blender/sole_search_detail.blend",
+    "blender/grove_upper_floors.blend",
+    "blender/grove_master_refined.blend"
+  ],
+  "plannedExports": {
+    "architecture": "modular-glb",
+    "shopFixtures": "modular-glb",
+    "interactiveItems": "individual-glb-or-instanced-prefab",
+    "collision": "separate-low-detail-mesh"
+  },
+  "runtimeDestination": "public/models/env/grove/",
+  "exportManifest": "exports/manifest.json",
+  "blockedUntil": ["walkability-review", "collision-review", "performance-budget-review", "runtime-approval"],
+  "characterPipeline": "read-only"
+}

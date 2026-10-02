@@ -3,6 +3,9 @@ import SpriteCharacter from "./SpriteCharacter.jsx";
 import { analyzeEmotionAI } from "../lib/emotion-api.js";
 import { EmotionDetector, AIJournalist, JournalMemory } from "../lib/journal-ai.js";
 import { EMOTIONS } from "../utils/emotion.js";
+import { scoreCheckin, scoreToBand } from "../lib/analysis/checkin-scoring.js";
+import { analyseEntry, buildCompanionHints } from "../lib/analysis/entry-adapter.js";
+import { GATE_THRESHOLDS } from "../lib/analysis/cold-start.js";
 
 // ── Quiz data ─────────────────────────────────────────────────────────────────
 const QUIZ = [
@@ -14,12 +17,16 @@ const QUIZ = [
   { id:"sleep",         dimension:"Sleep & Physical Wellness", q:"How well did you rest last night?",                                      opts:[{label:"Deeply",score:3,emotion:"calm",color:"#1565C0"},{label:"Okay",score:2,emotion:"neutral",color:"#66BB6A"},{label:"Restless",score:1,emotion:"anxious",color:"#FF8A65"},{label:"Very little",score:0,emotion:"tired",color:"#6A1B9A"}] },
   { id:"resilience",    dimension:"Resilience & Coping",       q:"When challenges came up today, how did handling them feel?",        opts:[{label:"Felt capable",score:3,emotion:"calm",color:"#00BCD4"},{label:"Managed okay",score:2,emotion:"neutral",color:"#607D8B"},{label:"Hard but pushed through",score:1,emotion:"tired",color:"#E65100"},{label:"Completely overwhelmed",score:0,emotion:"anxious",color:"#880E4F"}] },
 ];
-const QUIZ_META = { energy:"powerbar", mood:"skyscenes", meaning:"tree", connection:"ripple", accomplishment:"racetrack", sleep:"sleepbed", resilience:"mountain" };
-const WELLBEING_BANDS = [
-  { max:7,  label:"Struggling",  message:"It's been a hard stretch. How you've been feeling matters.", emotion:"sad" },
-  { max:14, label:"Navigating",  message:"You're navigating; Not soaring, not sinking. That counts.", emotion:"neutral" },
-  { max:21, label:"Flourishing", message:"There's something quietly good happening right now.", emotion:"happy" },
-];
+const QUIZ_META = { energy:"powerbar", mood:"skyscenes", meaning:"tree", connection:"ripple", accomplishment:"racetrack", sleep:"sleepbed", resilience:"sapling" };
+// Copy per band, keyed by checkin-scoring.js's scoreToBand() output rather
+// than a hardcoded 7/14 cutoff -- the cutoffs themselves now live in
+// PROVISIONAL_BAND_CUTOFFS (checkin-scoring.js), derived from the scoring
+// model's own 0-21 range instead of round numbers.
+const WELLBEING_BAND_COPY = {
+  struggling:  { label:"Struggling",  message:"It's been a hard stretch. How you've been feeling matters.", roughMessage:"Today felt heavy. I'm glad you checked in.", emotion:"sad" },
+  navigating:  { label:"Navigating",  message:"You're navigating; Not soaring, not sinking. That counts.", roughMessage:"You're navigating; Not soaring, not sinking. That counts.", emotion:"neutral" },
+  flourishing: { label:"Flourishing", message:"There's something quietly good happening right now.", roughMessage:"There's something quietly good happening right now.", emotion:"happy" },
+};
 const EMOTION_SYMBOL = { happy:"☀",excited:"✦",calm:"〜",anxious:"◌",sad:"▾",tired:"☽",angry:"▲",content:"♦",grateful:"♥",neutral:"○" };
 
 function CartoonEmotionFace({ emotion, color }) {
@@ -304,11 +311,11 @@ function PowerBarGame({ opts, disabled, onConfirm }) {
   const BAR_COLORS = ["#df12df", "#ee9725", "#dfd221", "#2e65d1"];
   const color = level !== null ? BAR_COLORS[level] : "#8B6030";
   return (
-    <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:5,width:"100%"}}>
+    <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:5,width:"100%",height:"100%"}}>
       {/* Battery cap */}
       <div style={{width:45,height:12,borderRadius:"7px 7px 0 0",background:"rgba(6,119,34,0.35)",border:"3px solid rgba(31,160,63,0.5)",borderBottom:"none"}}/>
       {/* Battery body */}
-      <div style={{width:96,border:"3.5px solid rgba(31,160,63,0.7)",borderRadius:10,padding:0.5,display:"flex",flexDirection:"column",gap:4,background:"rgba(255,255,255,0.15)",marginTop:-6}}>
+      <div style={{width:"fit-content",minWidth:96,border:"3.5px solid rgba(31,160,63,0.7)",borderRadius:10,padding:3,display:"flex",flexDirection:"column",gap:4,background:"rgba(255,255,255,0.15)",marginTop:-6}}>
         {opts.map((opt,i)=>{
           const c = BAR_COLORS[i];
           const sc = level !== null ? BAR_COLORS[level] : c; // selected bar's colour
@@ -316,7 +323,7 @@ function PowerBarGame({ opts, disabled, onConfirm }) {
           const filled = level !== null && i >= level;
           return (
             <button key={i} onClick={()=>!disabled&&setLevel(i)}
-              style={{width:"100%",padding:"2.5px 1px",borderRadius:7,border:`3px solid ${filled?sc:c+"40"}`,background:filled?sc+"60":"rgb(191,245,180)",cursor:disabled?"default":"pointer",transition:"all 0.18s",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:active?`0 0 12px ${sc}88`:"none"}}>
+              style={{width:"100%",padding:"2.5px 10px",borderRadius:7,border:`3px solid ${filled?sc:c+"40"}`,background:filled?sc+"60":"rgb(191,245,180)",cursor:disabled?"default":"pointer",transition:"all 0.18s",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:active?`0 0 12px ${sc}88`:"none"}}>
               <span style={{fontFamily:"var(--font-game)",fontSize:"0.85rem",fontWeight:active?800:500,color:active?"#231c8a":"#25998f"}}>{opt.label}</span>
             </button>
           );
@@ -324,7 +331,7 @@ function PowerBarGame({ opts, disabled, onConfirm }) {
       </div>
       <button className="scroll-btn-primary" disabled={disabled||level===null}
         onClick={()=>level!==null&&onConfirm(opts[level])}
-        style={{marginTop:-1.5,background:level!==null?`linear-gradient(135deg,${color},${color}bb)`:undefined,padding:"8px 20px",fontSize:"0.75rem",opacity:level===null?0.5:1,color:"#503111",fontWeight:"800",letterSpacing:"0.5px"}}>
+        style={{marginTop:4,background:level!==null?`linear-gradient(135deg,${color},${color}bb)`:undefined,padding:"8px 20px",fontSize:"0.75rem",opacity:level===null?0.5:1,color:"#503111",fontWeight:"800",letterSpacing:"0.5px"}}>
         Next
       </button>
     </div>
@@ -339,9 +346,10 @@ function SkyScenesGame({ opts, disabled, onPick }) {
     {bg:"linear-gradient(160deg,#3F556F 0%,#7E91A4 100%)",text:"rgba(255,255,255,0.92)"},
   ];
   const rows=[[0,1],[2,3]];
-  const OPTION_TOP_OFFSET = 72;
-  const OPTION_HEIGHT = 55;
-  const OPTION_GAP = 6;
+  // The sprite no longer overlaps the game area (see .checkin-quiz-stage), so
+  // these tiles start at the top of the stage instead of being pushed down.
+  const OPTION_HEIGHT = 62;
+  const OPTION_GAP = 8;
   const weather=(i)=>{
     if(i===0)return(
       <>
@@ -371,7 +379,7 @@ function SkyScenesGame({ opts, disabled, onPick }) {
     );
   };
   return (
-    <div style={{display:"grid",gridTemplateRows:`repeat(2, ${OPTION_HEIGHT}px)`,gap:OPTION_GAP,width:"100%",flex:"0 0 auto",height:(OPTION_HEIGHT*2)+OPTION_GAP,marginTop:OPTION_TOP_OFFSET}}>
+    <div style={{display:"grid",gridTemplateRows:`repeat(2, ${OPTION_HEIGHT}px)`,gap:OPTION_GAP,width:"100%",flex:"0 0 auto",height:(OPTION_HEIGHT*2)+OPTION_GAP,maxWidth:"100%"}}>
       {rows.map((pair,ri)=>(
         <div key={ri} style={{display:"grid",gridTemplateColumns:"repeat(2, minmax(0, 1fr))",gap:8,height:OPTION_HEIGHT,minHeight:0}}>
           {pair.map(i=>{
@@ -477,8 +485,13 @@ function ShakeTreeGame({ opts, disabled, onConfirm }) {
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   const TREE_W         = 490;   // tree image width in px
   const TREE_H         = 300;   // tree image height in px
-  const TREE_OFFSET_X  = -50;    // shift tree left (negative) / right (positive) in px  ← EDIT THIS
-  const TREE_OFFSET_Y  = -99;  // shift tree up (negative) / down (positive) in px     ← EDIT THIS
+  const TREE_OFFSET_X  = 0;     // shift tree left (negative) / right (positive) in px  ← EDIT THIS
+  const TREE_OFFSET_Y  = 12;    // keep the enlarged canopy clear of the question bar
+  const TREE_ART_SCALE = 1.4;   // scales the tree and every apple as one aligned scene
+  // The 490x300 art above is a coordinate space, not an on-screen size: the whole
+  // frame is scaled by TREE_FIT so it lands inside the stage's height budget
+  // (--checkin-stage-h in styles.css) without touching a single apple position.
+  const TREE_FIT       = 0.56;
   const SCALE          = 1;    // reserved — don't touch
   const APPLE_W        = 90;   // apple width in px  ← EDIT THIS
   const APPLE_H        = 50;   // apple height in px ← EDIT THIS
@@ -486,13 +499,9 @@ function ShakeTreeGame({ opts, disabled, onConfirm }) {
   const FALLEN_H       = 50;   // fallen apple height in px ← EDIT THIS
   const ROOT_GROUND_Y  = 252;  // y where the tree roots meet the ground, in the tree frame
   const GROUND_PADDING = 0;   // gap kept between the landed apple's bottom edge and the root ground
-  const HINT_FONT      = "0.60rem";   // hint / sub-label text size
-  const HINT_OFFSET_X  = 115;    // shift hint text left (negative) / right (positive) in px  ← EDIT THIS
-  const HINT_OFFSET_Y  = -20    // shift hint text up (negative) / down (positive) in px     ← EDIT THIS
-  const LABEL_FONT     = "0.92rem";   // "It barely mattered" text size
-  const LABEL_OFFSET_X = 334;    // shift label left (negative) / right (positive) in px  ← EDIT THIS
-  const LABEL_OFFSET_Y = 100;    // shift label up (negative) / down (positive) in px     ← EDIT THIS
-  const BTN_FONT       = "0.75rem";   // "That's it!" button text size
+  const HINT_FONT      = "0.62rem";   // hint / sub-label text size
+  const LABEL_FONT     = "0.86rem";   // "It barely mattered" text size
+  const BTN_FONT       = "0.74rem";   // "That's it!" button text size
   // Slight tilt per apple slot — keep values small (±15° max looks natural)
   const TILT_ANGLES = [-8, 5, -12, 3, -6];
   const BTN_PAD        = "7px 18px";  // button padding (top/bottom left/right)
@@ -581,51 +590,21 @@ function ShakeTreeGame({ opts, disabled, onConfirm }) {
       : "Keep shaking…";
 
   return (
-    <div style={{ position:"relative", display:"flex", flexDirection:"column", alignItems:"center", width:"100%", userSelect:"none", gap:6 }}>
+    <div style={{ position:"relative", display:"flex", flexDirection:"column", alignItems:"stretch",
+      width:"100%", height:"100%", userSelect:"none", gap:4 }}>
 
-      {/* ── CONTROLS BAR ── */}
-      <div style={{ width:"100%", display:"flex", alignItems:"center", gap:10,
-        padding:"4px 0", flexShrink:0, minHeight:52, height:52, position:"relative", zIndex:30 }}>
-
-        {/* Hint text — "Shake the tree!" / "Keep shaking…" */}
-        {!currentOpt && (
-          <div style={{ fontSize:HINT_FONT, color:"var(--text-3)", fontStyle:"italic",
-            position:"relative", left:HINT_OFFSET_X, top:HINT_OFFSET_Y, flexShrink:0 }}>
-            {hintText}
-          </div>
-        )}
-
-        {/* Label — "1 apple means… / It didn't really matter" */}
-        {currentOpt && (
-          <div style={{ position:"relative", left:LABEL_OFFSET_X, top:LABEL_OFFSET_Y,
-            lineHeight:1.3, flexShrink:0 }}>
-            <div style={{ fontSize:HINT_FONT, color:"var(--text-3)" }}>
-              {fallen} apple{fallen!==1?"s":""} means…
-            </div>
-            <div style={{ fontWeight:800, fontSize:LABEL_FONT, color:labelColor, transition:"color 0.3s" }}>
-              {currentOpt.label}
-            </div>
-          </div>
-        )}
-
-        <div style={{ flex:1 }}/>{/* spacer pushes button to the right */}
-
-        {/* That's it! button */}
-        <button className="scroll-btn-primary" type="button" disabled={disabled || fallen===0}
-          onClick={() => fallen > 0 && onConfirm(opts[fallen - 1])}
-          style={{ background: fallen>0 ? `linear-gradient(135deg,${labelColor},${labelColor}bb)` : undefined,
-            padding:BTN_PAD, fontSize:BTN_FONT, opacity: fallen>0 ? 1 : 0.42, flexShrink:0, position:"relative", zIndex:31, pointerEvents:"auto" }}>
-          That's it!
-        </button>
-      </div>
-
+      {/* Scaled viewport for the tree: clips to the stage, centres the frame. */}
+      <div style={{ flex:1, minHeight:0, width:"100%", position:"relative", overflow:"hidden" }}>
+      <div style={{ position:"absolute", left:"50%", top:0,
+        width:TREE_W, height:TREE_H, transform:`translateX(-50%) scale(${TREE_FIT})`, transformOrigin:"top center" }}>
       {/* ── TREE — can extend below the white box; trunk is decorative ──
           Stable (non-rotating) frame: defines the ax/ay coordinate space that
           the falling/landed apples are positioned in, so they never inherit
           the tree's shake wobble once they've left the branch. */}
       <div ref={treeRef}
-        style={{ position:"relative", width:TREE_W, height:TREE_H, flexShrink:0,
-          marginTop: TREE_OFFSET_Y, marginLeft: TREE_OFFSET_X, zIndex:1 }}>
+        style={{ position:"absolute", inset:0, width:TREE_W, height:TREE_H,
+          marginTop:TREE_OFFSET_Y, marginLeft:TREE_OFFSET_X, zIndex:1,
+          transform:`scale(${TREE_ART_SCALE})`, transformOrigin:"center 58%" }}>
 
         {/* Rotating layer — wobbles when shaken: tree art + apples still on the branch */}
         <div ref={shakeRef}
@@ -676,6 +655,38 @@ function ShakeTreeGame({ opts, disabled, onConfirm }) {
           </button>
         ))}
       </div>
+      </div>
+      </div>
+
+      {/* ── CONTROLS BAR — flows above the tree; no magic pixel offsets, so the
+             text and the button can never drift outside the box ── */}
+      <div style={{ width:"100%", display:"flex", flexDirection:"column", alignItems:"center",
+        justifyContent:"center", gap:6, flexShrink:0, minHeight:34 }}>
+
+        <div style={{ width:"100%", minWidth:0, lineHeight:1.2, textAlign:"center" }}>
+          {currentOpt ? (
+            <>
+              <div style={{ fontSize:HINT_FONT, color:"var(--text-3)" }}>
+                {fallen} apple{fallen!==1?"s":""} means…
+              </div>
+              <div style={{ fontWeight:800, fontSize:LABEL_FONT, color:labelColor, transition:"color 0.3s",
+                overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
+                {currentOpt.label}
+              </div>
+            </>
+          ) : (
+            <div style={{ fontSize:HINT_FONT, color:"var(--text-3)", fontStyle:"italic" }}>{hintText}</div>
+          )}
+        </div>
+
+        {/* That's it! button */}
+        <button className="scroll-btn-primary" type="button" disabled={disabled || fallen===0}
+          onClick={() => fallen > 0 && onConfirm(opts[fallen - 1])}
+          style={{ background: fallen>0 ? `linear-gradient(135deg,${labelColor},${labelColor}bb)` : undefined,
+            padding:BTN_PAD, fontSize:BTN_FONT, opacity: fallen>0 ? 1 : 0.42, flexShrink:0 }}>
+          That's it!
+        </button>
+      </div>
 
       {/* Remove popup */}
       {confirmRemove && (
@@ -716,9 +727,9 @@ function RippleZoneGame({ opts, disabled, onPick }) {
   }
 
   return (
-    <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:8,width:"100%",paddingTop:2}}>
-      <div style={{position:"relative",width:330,height:160,maxWidth:"100%",flexShrink:0}}>
-        <svg width="330" height="160" viewBox="0 0 330 160" fill="none" style={{position:"absolute",inset:0,pointerEvents:"none"}}>
+    <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",width:"100%",height:"100%"}}>
+      <div style={{position:"relative",width:330,height:150,maxWidth:"100%",flexShrink:0}}>
+        <svg width="100%" height="100%" viewBox="0 0 330 160" preserveAspectRatio="none" fill="none" style={{position:"absolute",inset:0,pointerEvents:"none"}}>
           <defs>
             <radialGradient id="connectionGlow" cx="50%" cy="50%" r="50%">
               <stop offset="0%" stopColor="#FFE7A3" stopOpacity="0.95"/>
@@ -766,20 +777,20 @@ function RaceTrackGame({ opts, disabled, onConfirm }) {
   const SCENE_W        = 300;   // width of the sky/road scene (and checkpoint row below it) at full size —
                                  // shrinks to fit narrower boxes via maxWidth:"100%" below (same pattern as
                                  // RippleZoneGame's width:330,maxWidth:"100%")                    ← EDIT THIS
-  const SCENE_H        = 72;    // height of the sky/road scene. This height (plus the rows below it)
+  const SCENE_H        = 92;    // fills the available stage while leaving room for controls
                                  // is tuned to fit the white box's vertical budget on short screens —
                                  // the box doesn't scroll or clip overflow, so grow this only if you've
                                  // re-measured against a short viewport (~560-640px tall) and confirmed
                                  // "That's it" still lands inside the box.                       ← EDIT THIS
-  const SCENE_TOP      = 6;     // small gap below the sprite row. The sprite/speech-bubble row has a
+  const SCENE_TOP      = 0;     // the stage no longer overlaps anything above it. The sprite/speech-bubble row has a
                                  // -82px margin so it visually overlaps this game area — it's kept
                                  // above the scene via z-index (see .checkin-quiz-sprite-row in
                                  // styles.css) rather than by pushing the scene down to clear it,
                                  // which would eat too much of the box's vertical budget.          ← EDIT THIS
-  const CAR_W          = 34;    // car svg width  ← EDIT THIS
-  const CAR_H          = 22;    // car svg height ← EDIT THIS
-  const ROAD_Y         = 36;    // road's y position within the scene (car/flags are derived from this) ← EDIT THIS
-  const ROAD_H         = 14;    // road thickness                                                        ← EDIT THIS
+  const CAR_W          = 44;    // car svg width  ← EDIT THIS
+  const CAR_H          = 28;    // car svg height ← EDIT THIS
+  const ROAD_Y         = 56;    // road's y position within the scene (car/flags are derived from this) ← EDIT THIS
+  const ROAD_H         = 18;    // road thickness                                                        ← EDIT THIS
   const LANE_FONT      = "0.72rem";  // checkpoint flavor-text size ("Stalled", "Cruising"...)  ← EDIT THIS
   const LABEL_FONT     = "0.88rem";  // selected-answer feedback text size                      ← EDIT THIS
   const BTN_PAD        = "7px 20px"; // "That's it" button padding  ← EDIT THIS
@@ -797,9 +808,9 @@ function RaceTrackGame({ opts, disabled, onConfirm }) {
   const carLeft  = `${((activeLane + 0.5) / n) * 100}%`;
 
   return (
-    <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:ROW_GAP,width:"100%"}}>
+    <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:ROW_GAP,width:"100%",height:"100%"}}>
       {/* Scene: sky + grass + road + car */}
-      <div style={{position:"relative",width:SCENE_W,maxWidth:"100%",height:SCENE_H,borderRadius:14,marginTop:SCENE_TOP,
+      <div style={{position:"relative",width:"100%",height:SCENE_H,borderRadius:14,marginTop:SCENE_TOP,
         overflow:"hidden",flexShrink:0,
         background:"linear-gradient(180deg,#BEE3F5 0%,#E7F3D8 62%,#8FC168 62%,#7AB258 100%)"}}>
         {/* sun + clouds */}
@@ -827,7 +838,7 @@ function RaceTrackGame({ opts, disabled, onConfirm }) {
         </svg>
 
         {/* Car */}
-        <svg width={CAR_W} height={CAR_H} viewBox={`0 0 ${CAR_W} ${CAR_H}`} style={{position:"absolute",top:ROAD_Y-CAR_H+3,left:carLeft,
+        <svg width={CAR_W} height={CAR_H} viewBox="0 0 34 22" style={{position:"absolute",top:ROAD_Y-CAR_H+3,left:carLeft,
           transform:"translateX(-50%)",transition:"left 0.35s cubic-bezier(0.34,1.56,0.64,1)",
           filter:"drop-shadow(0 3px 2px rgba(0,0,0,0.25))"}}>
           <rect x="2" y="10" width="30" height="9" rx="4.5" fill={color}/>
@@ -849,7 +860,7 @@ function RaceTrackGame({ opts, disabled, onConfirm }) {
           the box has a tight vertical budget (see SCENE_H note above) and a
           two-row dot+label button was tall enough to push "That's it" past the
           bottom of the box on shorter screens. */}
-      <div style={{display:"flex",width:SCENE_W,maxWidth:"100%",gap:6}}>
+      <div style={{display:"flex",width:"100%",gap:6}}>
         {Array.from({length:n}).map((_,i)=>{
           const optIdx = n-1-i; const opt = opts[optIdx]; const c = opt.color || getEmotionStyle(opt.emotion).color;
           const active = selected === optIdx;
@@ -919,8 +930,8 @@ function SleepBedGame({ opts, disabled, onConfirm }) {
   // longer paints its own background/border — it's just the coordinate space the
   // clouds + bed are laid out in, sized to fill most of that box.
   const VB_W       = 260, VB_H = 90;
-  const SCENE_W    = 420;   // on-screen panel width  — bump this to make the game bigger ← EDIT THIS
-  const SCENE_H    = 90;    // on-screen panel height — re-check against a short viewport
+  const SCENE_W    = 336;   // on-screen panel width  — bump this to make the game bigger ← EDIT THIS
+  const SCENE_H    = 92;    // on-screen panel height — re-check against a short viewport
                              // (~480-640px tall) before growing further — the box doesn't
                              // scroll or clip overflow (see RaceTrackGame's SCENE_H note a
                              // few functions up). The box itself is flex:1 inside a
@@ -971,11 +982,11 @@ function SleepBedGame({ opts, disabled, onConfirm }) {
   const awake    = selected === 3;
 
   return (
-    <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:ROW_GAP,width:"100%"}}>
+    <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:ROW_GAP,width:"100%",height:"100%"}}>
       {/* Panel: night sky scattered with tappable, always-labelled dream-clouds + bed + sleeping character.
           No background/border of its own — the parent box already wears the night palette
           (checkin-quiz-box--night), so this is purely a layout/coordinate space. */}
-      <div style={{position:"relative",width:SCENE_W,maxWidth:"100%",height:SCENE_H,marginTop:8,marginBottom:6,
+      <div style={{position:"relative",width:SCENE_W,maxWidth:"100%",height:SCENE_H,marginTop:14,marginBottom:14,
         overflow:"visible",flexShrink:0}}>
         {/* moon — decorative only, the clouds are the picker */}
         <div style={{position:"absolute",top:`${6/VB_H*100}%`,left:"50%",transform:"translateX(-50%)",width:13,height:13,borderRadius:"50%",
@@ -1078,26 +1089,174 @@ function SleepBedGame({ opts, disabled, onConfirm }) {
   );
 }
 
-function MountainWaypointGame({ opts, disabled, onPick }) {
-  const WPS=[{label:"Base",cx:110,cy:152,idx:0},{label:"Lower",cx:92,cy:122,idx:1},{label:"Near summit",cx:74,cy:90,idx:2},{label:"Peak",cx:66,cy:52,idx:3}];
-  const [hovered,setHovered]=useState(null);
+/* ── Q7 · Resilience & Coping — "Bend, don't break" ───────────────────────────
+   Every other check-in game is a *pick*: tap a tile, a node, a checkpoint, a
+   cloud. This one is the odd one out on purpose — the answer is set by DRAGGING
+   the sapling over against the wind and feeling it spring back, so the question
+   about coping is answered with an act of coping rather than a menu choice.
+   The four gust markers along the arc are the same answer set, kept tappable so
+   the game still works with a mouse click, a keyboard or a screen reader.
+   Shares the house chrome with the other six: live feedback line + "That's it". */
+function WindSaplingGame({ opts, disabled, onConfirm }) {
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // EASY ADJUSTMENT CONSTANTS — edit these
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  const VB_W       = 300, VB_H = 112;  // drawing coordinate space
+  const ROOT_X     = 84;    // where the sapling meets the ground, in VB units      ← EDIT THIS
+  const ROOT_Y     = 78;    // ground line — matches the 66% stop in the sky/grass
+                             // gradient painted on the scene panel below
+  const TRUNK_H    = 58;    // upright trunk height                                 ← EDIT THIS
+  const LEAN_SPAN  = 132;   // how far the crown travels from upright to flattened  ← EDIT THIS
+  const MARK_DROP  = 20;    // markers hang below the arc, and downwind of the
+                             // trunk, so none of them sits under the sapling       ← EDIT THIS
+  const MARK_LEAD  = 22;    // downwind offset for the same reason                 ← EDIT THIS
+  const LABEL_FONT = "0.84rem";  // feedback text size    ← EDIT THIS
+  const HINT_FONT  = "0.6rem";   // "drag the sapling" hint size
+  const BTN_PAD    = "7px 20px";
+  const BTN_FONT   = "0.78rem";
+
+  const n = opts.length;                       // 4: capable → managed → pushed through → overwhelmed
+  const [selected, setSelected] = useState(null);
+  const [drag, setDrag]         = useState(null);   // live bend while dragging, 0..n-1 (fractional)
+  const [gusting, setGusting]   = useState(false);
+  const svgRef = useRef(null);
+
+  const bend    = drag ?? (selected ?? 0);          // 0 = upright, n-1 = flattened
+  const t       = n > 1 ? bend / (n - 1) : 0;       // 0..1
+  // While a drag is in flight the feedback line follows the finger, so the text
+  // never contradicts what the sapling is visibly doing.
+  const live    = drag !== null ? opts[Math.max(0, Math.min(n-1, Math.round(drag)))] : null;
+  const current = live ?? (selected !== null ? opts[selected] : null);
+  const color   = current ? (current.color || getEmotionStyle(current.emotion).color) : "#6C8F4A";
+
+  // Crown position: leans downwind on an arc, losing height as it bends over.
+  const crownX = ROOT_X + LEAN_SPAN * t;
+  const crownY = ROOT_Y - TRUNK_H * (1 - 0.42 * t * t);
+  const ctrlX  = ROOT_X + LEAN_SPAN * t * 0.16;
+  const ctrlY  = ROOT_Y - TRUNK_H * (0.62 + 0.08 * t);
+  const markerAt = (i) => {
+    const tt = n > 1 ? i / (n - 1) : 0;
+    return { x: ROOT_X + MARK_LEAD + LEAN_SPAN * tt * 0.9, y: ROOT_Y - TRUNK_H * (1 - 0.42 * tt * tt) + MARK_DROP };
+  };
+
+  function bendFromPointer(e) {
+    const el = svgRef.current; if (!el) return null;
+    const r = el.getBoundingClientRect();
+    const px = ((e.clientX - r.left) / r.width) * VB_W;
+    const raw = (px - ROOT_X) / LEAN_SPAN;                 // 0..1 along the arc
+    return Math.max(0, Math.min(n - 1, raw * (n - 1)));
+  }
+  function commit(b) {
+    const i = Math.max(0, Math.min(n - 1, Math.round(b)));
+    setSelected(i); setDrag(null);
+    setGusting(true); setTimeout(() => setGusting(false), 520);   // spring-back flourish
+  }
+  const onDown = (e) => { if (disabled) return; e.currentTarget.setPointerCapture?.(e.pointerId); setDrag(bendFromPointer(e)); };
+  const onMove = (e) => { if (disabled || drag === null) return; setDrag(bendFromPointer(e)); };
+  const onUp   = (e) => { if (disabled) return; const b = drag ?? bendFromPointer(e); if (b !== null) commit(b); };
+  const step   = (d) => !disabled && commit((selected ?? 0) + d);
+
+  // The crown dulls rather than dies as the day pushes harder — a muddy brown
+  // read as "dead plant", which is not what "a hard day" should look like here.
+  const leafColor = (i) => [ "#5E9B3F", "#6CA646", "#7E9C3C", "#8A9240" ][i] ?? "#6CA646";
+  const crown = leafColor(Math.round(bend));
+
   return (
-    <div style={{display:"flex",justifyContent:"center"}}>
-      <svg width="170" height="172" viewBox="0 0 170 172" fill="none">
-        <path d="M8 168 L66 30 L148 168 Z" fill="var(--bg-2)" stroke="var(--text-3)" strokeWidth="1.8" strokeLinejoin="round" opacity="0.65"/>
-        <path d="M66 30 L52 70 L80 70 Z" fill="white" opacity="0.45"/>
-        <path d="M110 152 L92 122 L74 90 L66 52" stroke="var(--text-3)" strokeWidth="1.2" strokeDasharray="3 3" opacity="0.3" strokeLinecap="round"/>
-        {WPS.map(({label,cx,cy,idx})=>{
-          const opt=opts[idx]; const c=getEmotionStyle(opt.emotion).color; const isHov=hovered===idx;
+    <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:6,width:"100%",height:"100%"}}>
+      <div style={{position:"relative",width:"100%",flex:"1 1 auto",minHeight:120,
+        borderRadius:14,overflow:"hidden",
+        background:"linear-gradient(180deg,#CFE8F7 0%,#E9F4DA 66%,#8FBF63 66%,#79AE52 100%)"}}>
+        <svg ref={svgRef} width="100%" height="100%" viewBox={`0 0 ${VB_W} ${VB_H}`} preserveAspectRatio="none"
+          role="group" aria-label="Bend the sapling to show how today's challenges felt"
+          style={{touchAction:"none",cursor:disabled?"default":(drag!==null?"grabbing":"grab"),display:"block"}}
+          onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={()=>setDrag(null)}>
+
+          {/* wind — more lines, faster, the harder the day pushed */}
+          {[0,1,2,3].map(i=>(
+            <path key={i} d={`M${4+i*5} ${18+i*17} q 22 ${-6+i*3} 46 0`} fill="none"
+              stroke="#9FB7C9" strokeWidth={1.4} strokeLinecap="round"
+              opacity={0.18 + t * 0.5}
+              style={{animation:`cloud-drift ${2.6 - t*1.1 + i*0.25}s ease-in-out ${i*0.12}s infinite`}}/>
+          ))}
+
+          {/* far hills + a couple of drifting clouds, so the sapling stands in a
+              place rather than on a bare line */}
+          <path d={`M0 ${ROOT_Y} Q 60 ${ROOT_Y-16} 130 ${ROOT_Y} T ${VB_W} ${ROOT_Y-6} L${VB_W} ${ROOT_Y} Z`} fill="#A8CE84" opacity="0.75"/>
+          <ellipse cx="238" cy="20" rx="21" ry="8"  fill="#fff" opacity="0.75" style={{animation:"cloud-drift 6s ease-in-out infinite"}}/>
+          <ellipse cx="252" cy="16" rx="13" ry="7"  fill="#fff" opacity="0.7"  style={{animation:"cloud-drift 6s ease-in-out infinite"}}/>
+          <path d={`M0 ${ROOT_Y} L${VB_W} ${ROOT_Y}`} stroke="#6F9C48" strokeWidth="1.6" opacity="0.5"/>
+          {/* grass tufts, bent by the same wind that is bending the sapling */}
+          {[18,48,196,226,262,286].map((gx,i)=>(
+            <path key={gx} d={`M${gx} ${ROOT_Y+9} q ${3+t*7} -6 ${6+t*9} -9`} fill="none"
+              stroke="#5F8F3E" strokeWidth="1.8" strokeLinecap="round" opacity="0.8"
+              style={{transition:"d 300ms ease",animation:`cloud-drift ${2.4+i*0.2}s ease-in-out infinite`}}/>
+          ))}
+
+          {/* the arc the crown travels along + the four gust markers */}
+          <path d={`M${markerAt(0).x} ${markerAt(0).y} Q ${markerAt(1).x+10} ${markerAt(1).y-10} ${markerAt(n-1).x} ${markerAt(n-1).y}`}
+            fill="none" stroke="#8B6030" strokeWidth="1.2" strokeDasharray="3 6" opacity="0.35"/>
+
+          {/* trunk — a quadratic that straightens or flattens with the bend */}
+          <path d={`M${ROOT_X} ${ROOT_Y} Q ${ctrlX} ${ctrlY} ${crownX} ${crownY}`}
+            fill="none" stroke="#7A5230" strokeWidth="7" strokeLinecap="round"
+            style={{transition: drag===null ? "d 420ms cubic-bezier(0.34,1.56,0.64,1)" : "none"}}/>
+
+          {/* crown — three leaf lobes that squash as the sapling is pushed over */}
+          <g style={{transition: drag===null ? "transform 420ms cubic-bezier(0.34,1.56,0.64,1)" : "none",
+                     transform:`translate(${crownX}px, ${crownY}px) rotate(${t*46}deg)`}}>
+            <ellipse cx="0"   cy="-10" rx="20" ry="15" fill={crown}/>
+            <ellipse cx="-15" cy="1"   rx="14" ry="11" fill={crown} opacity="0.92"/>
+            <ellipse cx="15"  cy="-1"  rx="13" ry="11" fill={crown} opacity="0.86"/>
+            <ellipse cx="-4"  cy="-17" rx="10" ry="7"  fill="#fff" opacity="0.18"/>
+          </g>
+
+          {/* leaves torn loose once the day really pushed */}
+          {bend >= 2 && [0,1,2].map(i=>(
+            <ellipse key={i} cx={crownX+22+i*16} cy={crownY+4+i*9} rx="4.4" ry="3" fill={crown} opacity="0.75"
+              style={{animation:`cloud-drift ${1.8+i*0.3}s ease-in-out ${i*0.2}s infinite`}}/>
+          ))}
+
+          {/* it sprang back — a small pop of relief on release */}
+          {gusting && (
+            <circle cx={crownX} cy={crownY} r="24" fill="none" stroke={color} strokeWidth="2" opacity="0.55"
+              style={{animation:"ring-expand 0.6s ease-out"}}/>
+          )}
+        </svg>
+
+        {/* Gust markers — the same four answers, tappable and focusable so the
+            game is playable without a drag (mouse click, keyboard, assistive tech). */}
+        {opts.map((opt,i)=>{
+          const m = markerAt(i);
+          const c = opt.color || getEmotionStyle(opt.emotion).color;
+          const active = selected === i;
           return (
-            <g key={idx} style={{cursor:disabled?"default":"pointer"}} onClick={()=>!disabled&&onPick(opt)} onMouseEnter={()=>setHovered(idx)} onMouseLeave={()=>setHovered(null)}>
-              <circle cx={cx} cy={cy} r={isHov?13:9} fill={isHov?c+"30":c+"18"} stroke={c} strokeWidth={isHov?2:1.5} style={{transition:"all 0.12s"}}/>
-              <circle cx={cx} cy={cy} r="3.5" fill={c} opacity="0.9"/>
-              <text x={cx+14} y={cy+4} style={{fontSize:"8px",fontWeight:700,fill:c,pointerEvents:"none"}}>{label}</text>
-            </g>
+            <button key={i} type="button" disabled={disabled}
+              aria-label={opt.label} aria-pressed={active}
+              onClick={()=>!disabled&&commit(i)}
+              onKeyDown={e=>{ if(e.key==="ArrowRight"){e.preventDefault();step(1);} if(e.key==="ArrowLeft"){e.preventDefault();step(-1);} }}
+              style={{position:"absolute",left:`${m.x/VB_W*100}%`,top:`${m.y/VB_H*100}%`,transform:"translate(-50%,-50%)",
+                width:16,height:16,borderRadius:"50%",padding:0,zIndex:2,
+                background:active?c:"rgba(255,255,255,0.9)",
+                border:`2px solid ${active?c:"rgba(139,80,30,0.45)"}`,
+                boxShadow:active?`0 0 0 5px ${c}22`:"0 2px 0 rgba(80,40,8,0.16)",
+                cursor:disabled?"default":"pointer",transition:"all 0.15s"}}/>
           );
         })}
-      </svg>
+      </div>
+
+      {/* Feedback label — same shape as RaceTrack/SleepBed so the run of seven
+          questions reads as one game rather than seven unrelated ones. */}
+      <div style={{fontFamily:"var(--font-game)",fontWeight:800,fontSize:current?LABEL_FONT:HINT_FONT,
+        color:current?color:"var(--text-3)",minHeight:18,textAlign:"center",fontStyle:current?"normal":"italic"}}>
+        {current?.label ?? "Drag the sapling into the wind"}
+      </div>
+
+      <button className="scroll-btn-primary" disabled={disabled||selected===null}
+        onClick={()=>selected!==null&&onConfirm(opts[selected])}
+        style={{background:current?`linear-gradient(135deg,${color},${color}bb)`:undefined,
+          padding:BTN_PAD,fontSize:BTN_FONT,opacity:selected===null?0.5:1}}>
+        That's it
+      </button>
     </div>
   );
 }
@@ -1127,7 +1286,7 @@ function ScrollPage({ children }) {
 // ── Book content wrapper ──────────────────────────────────────────────────────
 function BookPage({ leftContent, rightContent }) {
   return (
-    <div className="wellness-content">
+    <div className="wellness-content wellness-book-content-area">
       <img src="/assets/book-bg.png" alt="" aria-hidden="true" className="wellness-bg-img wellness-book-bg"
         onError={e=>e.currentTarget.style.display="none"}/>
       <div className="wellness-book-overlay">
@@ -1176,6 +1335,8 @@ export default function WellnessView({
   const [quizScore, setQuizScore]       = useState(0);
   const [quizEmot, setQuizEmot]         = useState(null);
   const [quizVotes, setQuizVotes]       = useState({});
+  const [quizItemScores, setQuizItemScores] = useState({});
+  const [lastCheckinAnalysis, setLastCheckinAnalysis] = useState(null);
   const [quizAnalyzing, setQuizAnalyzing] = useState(false);
   const [quizReacting, setQuizReacting] = useState(false);
   const [lastReaction, setLastReaction] = useState(null);
@@ -1213,26 +1374,40 @@ export default function WellnessView({
     if (analyzing) return;
     if (!text) { alert("Please write something first."); return; }
     setAnalyzing(true); setAiResult(null); setCompanion(null); setConfirmStage(null);
+    // Cultural calibration + text-feature hints (hedging, minimisation, somatic
+    // idioms, dialectical affect, cold-start gates) computed client-side, no
+    // LLM call, and folded into the companion's response so it reads distress
+    // idioms correctly and never claims a trend before the gates allow it.
+    let hints={}; try{ hints=buildCompanionHints(journalEntries,text); }catch(err){ console.warn("[Kindred] companion hints failed:",err); }
     try {
       const dr=detector.analyze(text,journalEntries);
-      const [hf,resp]=await Promise.all([analyzeEmotionAI(text),journalist.generateResponse(text,dr,journalEntries,player?.name)]);
-      let m=mergeAnalysis(dr,hf??{emotion:"neutral",confidence:50,source:"fallback"});
-      if (resp?.emotion) m={...m,emotion:resp.emotion,confidence:Math.max(m.confidence,80)};
+      const [hf,resp]=await Promise.all([analyzeEmotionAI(text),journalist.generateResponse(text,dr,journalEntries,player?.name,hints)]);
+      const m=mergeAnalysis(dr,hf);
       const initialAiChat=resp?.text?[{role:"ai",text:resp.text}]:[];
-      const entry={id:crypto.randomUUID(),date:localDateKey(),text,emotion:m.emotion,confidence:m.confidence,source:hf?"ai":"local",aiChat:initialAiChat,companionResponse:resp?.text??""};
+      const entry={id:crypto.randomUUID(),date:localDateKey(),text,emotion:m.emotion,confidence:m.confidence,source:hf?"analysed":"local",aiChat:initialAiChat,companionResponse:resp?.text??"",isCrisisResponse:!!resp?.isCrisisResponse,textFeatures:hints.textFeatures,analysis:hints.analysis,
+        aiInterpretation:resp?.llmEmotion?{emotion:resp.llmEmotion,cause:resp.emotionCause||"",source:resp.source,overruled:!!resp.emotionOverruled,influencedScore:false}:undefined};
       setAiResult(m); setCompanion(resp); setPendingEntry(entry); setConfirmStage("confirm");
     } catch(err) {
       console.warn("[Kindred] analyzeEntry failed, saving locally:", err);
       const dr=detector.analyze(text,journalEntries);
       const resp=journalist._templateResponse?.(text,dr,journalEntries);
-      const entry={id:crypto.randomUUID(),date:localDateKey(),text,emotion:dr.emotion,confidence:dr.confidence??60,source:"local",aiChat:resp?.text?[{role:"ai",text:resp.text}]:[],companionResponse:resp?.text??""};
+      const entry={id:crypto.randomUUID(),date:localDateKey(),text,emotion:dr.emotion,confidence:dr.confidence??60,source:"local",aiChat:resp?.text?[{role:"ai",text:resp.text}]:[],companionResponse:resp?.text??"",textFeatures:hints.textFeatures,analysis:hints.analysis};
       setJournalEntries(p=>[entry,...p]); setEmotion(dr.emotion); setDraft("");
       if(setCoins) setCoins(c=>c+15);
     } finally {
       setAnalyzing(false);
     }
   }
-  function mergeAnalysis(dr,hf){if(dr.overrideReason)return dr;if(hf.confidence>74&&hf.emotion===dr.emotion)return{...dr,confidence:Math.min(92,dr.confidence+8)};if(hf.emotion!==dr.emotion&&hf.confidence>68)return{...dr,confidence:Math.max(54,dr.confidence-8)};return dr;}
+  function mergeAnalysis(dr,hf){
+    // `analyzeEmotionAI` always exposes the deterministic VAD reading at the
+    // top level; any LLM wording is nested under `llm`. Never let the older
+    // keyword fallback erase dialect/cultural evidence by calling it neutral.
+    if(hf?.evidence>0&&hf?.emotion){
+      return {...dr,emotion:hf.emotion,confidence:hf.confidence,source:hf.source,
+        vad:hf.vad,evidence:hf.evidence,llm:hf.llm};
+    }
+    return dr;
+  }
   function getSavedChatHistory(){
     const initialReply=String(companionResponse?.text||"").trim();
     const saved=chatHistory.map(m=>({role:m.role,text:String(m.text||"")})).filter(m=>m.text.trim());
@@ -1253,14 +1428,17 @@ export default function WellnessView({
     const userMsg=replyingTo?{role:"user",text:msg,replyTo:replyingTo.text}:{role:"user",text:msg};
     const newHistory=[...chatHistory,userMsg];
     setChatHistory(newHistory); setChatInput(""); setReplyingTo(null); setChatLoading(true);
-    const reply=await journalist.generateChatReply(msg,newHistory,pendingEntry?.text??"",aiResult?.emotion??"",player?.name);
+    // Pass completed prior turns only. generateChatReply appends `msg` once as
+    // the current turn; including newHistory here used to duplicate it.
+    const reply=await journalist.generateChatReply(msg,chatHistory,pendingEntry?.text??"",aiResult?.emotion??"",player?.name,journalEntries);
     setChatHistory(h=>[...h,{role:"ai",text:reply}]); setChatLoading(false);
   }
 
   // ── Quiz ─────────────────────────────────────────────────────────────────────
   async function answerQuiz(opt){
     const votes={...quizVotes,[QUIZ[quizIdx].id]:opt.emotion};
-    const running=quizScore+opt.score; setQuizVotes(votes);
+    const itemScores={...quizItemScores,[QUIZ[quizIdx].id]:opt.score};
+    const running=quizScore+opt.score; setQuizVotes(votes); setQuizItemScores(itemScores);
     if(quizIdx<QUIZ.length-1){setQuizIdx(i=>i+1);setQuizScore(running);return;}
     const counts={};Object.values(votes).forEach(em=>{counts[em]=(counts[em]??0)+1;});
     let fb=Object.entries(counts).sort((a,b)=>b[1]-a[1])[0][0];
@@ -1276,7 +1454,16 @@ export default function WellnessView({
       const chosen=q.opts.find(o=>o.emotion===emo);
       return{dimension:q.dimension,question:q.q,answer:chosen?.label??emo,emotion:emo,color:chosen?.color};
     });
-    setJournalEntries(p=>[{id:crypto.randomUUID(),date:localDateKey(),text:"Daily check-in completed.",emotion:final,confidence:gEm?85:76,source:"checkin",answers},...p]);
+    // Real check-in scoring (checkin-scoring.js) + the full analysis layer
+    // (OU-Kalman latent state, dual-EWMA baseline/drift, 28d+90d trend,
+    // cold-start gates, cultural calibration) instead of a raw score sum.
+    let checkinScore=null, analysis=null;
+    try{
+      checkinScore=scoreCheckin(itemScores);
+      analysis=analyseEntry(journalEntries,{date:localDateKey(),itemScores});
+    }catch(err){console.warn("[Kindred] check-in analysis failed, using raw score only:",err);}
+    setLastCheckinAnalysis(analysis);
+    setJournalEntries(p=>[{id:crypto.randomUUID(),date:localDateKey(),text:"Daily check-in completed.",emotion:final,confidence:gEm?85:76,source:"checkin",answers,itemScores,checkinScore,analysis},...p]);
     if(setCoins)setCoins(c=>c+10);
   }
   async function handleQuizTap(opt){
@@ -1288,8 +1475,8 @@ export default function WellnessView({
     setLastReaction({text,score:opt.score});
     setTimeout(()=>{setQuizReacting(false);setLastReaction(null);answerQuiz(opt);},1800);
   }
-  function goBackQuiz(){if(quizIdx===0||quizReacting)return;const pi=quizIdx-1,pq=QUIZ[pi],pe=quizVotes[pq.id],po=pq.opts.find(o=>o.emotion===pe);setQuizIdx(pi);setQuizScore(s=>s-(po?.score??0));setQuizVotes(v=>{const n={...v};delete n[pq.id];return n;});setLastReaction(null);setQuizReacting(false);}
-  function resetQuiz(){setQuizStarted(false);setQuizIdx(0);setQuizDone(false);setQuizEmot(null);setQuizVotes({});setQuizScore(0);setQuizAnalyzing(false);setQuizReacting(false);setLastReaction(null);}
+  function goBackQuiz(){if(quizIdx===0||quizReacting)return;const pi=quizIdx-1,pq=QUIZ[pi],pe=quizVotes[pq.id],po=pq.opts.find(o=>o.emotion===pe);setQuizIdx(pi);setQuizScore(s=>s-(po?.score??0));setQuizVotes(v=>{const n={...v};delete n[pq.id];return n;});setQuizItemScores(v=>{const n={...v};delete n[pq.id];return n;});setLastReaction(null);setQuizReacting(false);}
+  function resetQuiz(){setQuizStarted(false);setQuizIdx(0);setQuizDone(false);setQuizEmot(null);setQuizVotes({});setQuizItemScores({});setQuizScore(0);setQuizAnalyzing(false);setQuizReacting(false);setLastReaction(null);}
 
   // ── Goal ─────────────────────────────────────────────────────────────────────
   function markGoalAchieved(){setPlayer(p=>({...p,goalAchieved:true,goalAchievedAt:new Date().toISOString().slice(0,10)}));setShowGoalPrompt(false);}
@@ -1314,7 +1501,15 @@ export default function WellnessView({
     setActiveIdx(i=>Math.max(0,i-1));
   }
 
-  const wellbeingBand=WELLBEING_BANDS.find(b=>(quizScore||0)<=b.max)??WELLBEING_BANDS[2];
+  // Real bands (checkin-scoring.js), not the old hardcoded 7/14 cutoffs, and
+  // "rough patch" framing is withheld until the cold-start gate (14
+  // check-ins) is actually met -- before that, a struggling day gets a
+  // same-day acknowledgement instead of a "hard stretch" pattern claim.
+  const checkinCount = lastCheckinAnalysis?.checkinCount ?? journalEntries.filter(e=>e.source==="checkin").length;
+  const bandKey = scoreToBand(lastCheckinAnalysis?.todayScore?.graded ?? quizScore) ?? "navigating";
+  const roughPatchAllowed = checkinCount >= GATE_THRESHOLDS.roughPatch;
+  const bandCopy = WELLBEING_BAND_COPY[bandKey] ?? WELLBEING_BAND_COPY.navigating;
+  const wellbeingBand = { label: bandCopy.label, message: roughPatchAllowed ? bandCopy.message : bandCopy.roughMessage, emotion: bandCopy.emotion };
 
   // Most-felt emotion across all entries (raw AI word → single-word via getEmotionStyle)
   const dominantRawEmotion=useMemo(()=>{
@@ -1383,7 +1578,7 @@ export default function WellnessView({
         <ScrollPage>
           <h2 className="scroll-title">JOURNAL</h2>
           <div className="scroll-subtitle-blue">Unravel your inner thoughts</div>
-          <div className="scroll-subtitle-brown" style={{marginBottom:8}}>Your companion is here for you.</div>
+          <div className="scroll-subtitle-brown">Your companion is here for you.</div>
 
           {/* ── White content box ── */}
           <div className="scroll-white-box">
@@ -1392,12 +1587,12 @@ export default function WellnessView({
               <div style={{display:"flex",flexDirection:"column",gap:10,flex:1,minHeight:0}}>
                 {companionResponse&&<p style={{fontSize:"0.76rem",lineHeight:1.6,color:"#3D2010",fontFamily:"'Poppins',Georgia,serif",margin:0,padding:"10px 12px",background:"rgba(212,136,42,0.08)",borderRadius:10,borderLeft:"3px solid #D4882A"}}>{companionResponse.text}</p>}
                 <div style={{fontFamily:"var(--font-game)",fontSize:"0.74rem",color:"#503111"}}>
-                  I'm sensing <span style={{color:getEmotionStyle(aiResult.emotion).color,fontWeight:700}}>{EMOTIONS[aiResult.emotion]?.label??aiResult.emotion}</span>. Does that feel right?
+                  If you wanted to name the feeling, would <span style={{color:getEmotionStyle(aiResult.emotion).color,fontWeight:700}}>{EMOTIONS[aiResult.emotion]?.label??aiResult.emotion}</span> fit?
                 </div>
                 <div style={{display:"flex",flexDirection:"column",gap:6}}>
                   <button className="scroll-btn-primary" onClick={acceptEmotion} style={{fontSize:"0.72rem",padding:"8px 14px",textAlign:"left"}}>Yes, that's right!</button>
-                  <button className="scroll-btn-secondary" onClick={()=>{setChatHistory([{role:"ai",text:companionResponse?.text??"I'm here. Tell me more."}]);setConfirmStage("chat");}} style={{fontSize:"0.72rem",padding:"8px 12px",textAlign:"left"}}>Talk to me more about this</button>
-                  <button className="scroll-btn-secondary" onClick={()=>setConfirmStage("pick")} style={{fontSize:"0.72rem",padding:"8px 12px",textAlign:"left"}}>No, but I would like to pick my own emotions</button>
+                  <button className="scroll-btn-secondary" onClick={()=>{setChatHistory([{role:"ai",text:companionResponse?.text??"I'm here. Tell me more."}]);setConfirmStage("chat");}} style={{fontSize:"0.72rem",padding:"8px 14px",textAlign:"left"}}>Talk to me more about this</button>
+                  <button className="scroll-btn-secondary" onClick={()=>setConfirmStage("pick")} style={{fontSize:"0.72rem",padding:"8px 14px",textAlign:"left"}}>No, but I would like to pick my own emotions</button>
                 </div>
               </div>
             )}
@@ -1508,13 +1703,11 @@ export default function WellnessView({
       {view==="checkin"&&!quizDone&&!quizStarted&&(
         <ScrollPage>
           <h2 className="scroll-title">DAILY CHECK-IN</h2>
-          <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:50,flex:1}}>
-            {/* sprite + bubble side by side, centred */}
-            <div style={{display:"flex",flexDirection:"row",alignItems:"center",justifyContent:"center",gap:18}}>
-              <SpriteCharacter emotion={emotion} character={character} interactive={false} size={{width:175,height:260}}/>
+          <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:14,flex:1}}>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"center"}}>
               <div className="checkin-speech-bubble">Let's do our daily pop quiz!</div>
             </div>
-            <div style={{textAlign:"center",flexShrink:0, marginTop: -50}}>
+            <div style={{textAlign:"center",flexShrink:0}}>
               <button className="checkin-quiz-btn" onClick={()=>setQuizStarted(true)}>Quiz me!</button>
             </div>
           </div>
@@ -1536,30 +1729,26 @@ export default function WellnessView({
             <span className="checkin-dimension-label">{QUIZ[quizIdx].dimension}</span>
           </div>
 
-          {/* White content box: sprite + question + mini-game.
-              Question 6 (sleep) swaps this to the night-sky palette so the bed/star
-              scene isn't a small dark panel floating inside an otherwise white box —
-              the bubble gets its own light variant so its text stays readable against
-              the darker box. */}
+          {/* White content box — bubble on top, then the character + mini-game
+              stage. The sleep question swaps the box to the night-sky palette
+              (and the bubble to its light variant so the text stays readable);
+              nothing else about the layout changes per question. */}
           <div className={`checkin-quiz-box${QUIZ[quizIdx].id==="sleep"?" checkin-quiz-box--night":""}`}>
-            <div className={`checkin-quiz-sprite-row${QUIZ[quizIdx].id==="sleep"?" checkin-quiz-sprite-row--night":""}`}>
-              <div className="checkin-quiz-sprite">
-                <SpriteCharacter emotion={emotion} character={character} interactive={false} size={{width:80,height:120}}/>
+            <div className={`checkin-quiz-bubble${QUIZ[quizIdx].id==="sleep"?" checkin-quiz-bubble--night":""}`}>{QUIZ[quizIdx].q}</div>
+            <div className="checkin-quiz-stage">
+              <div className="checkin-quiz-game-area">
+                {(()=>{
+                  const q=QUIZ[quizIdx]; const t=QUIZ_META[q.id]; const c={opts:q.opts,disabled:quizReacting};
+                  if(t==="powerbar")  return <PowerBarGame      {...c} onConfirm={handleQuizTap}/>;
+                  if(t==="skyscenes") return <SkyScenesGame     {...c} onPick={handleQuizTap}/>;
+                  if(t==="stars")     return <StarTapGame       {...c} onConfirm={handleQuizTap}/>;
+                  if(t==="tree")      return <ShakeTreeGame     {...c} onConfirm={handleQuizTap}/>;
+                  if(t==="ripple")    return <RippleZoneGame    {...c} onPick={handleQuizTap}/>;
+                  if(t==="racetrack") return <RaceTrackGame     {...c} onConfirm={handleQuizTap}/>;
+                  if(t==="sleepbed")  return <SleepBedGame      {...c} onConfirm={handleQuizTap}/>;
+                  if(t==="sapling")   return <WindSaplingGame   {...c} onConfirm={handleQuizTap}/>;
+                })()}
               </div>
-              <div className={`checkin-quiz-bubble${QUIZ[quizIdx].id==="sleep"?" checkin-quiz-bubble--night":""}`}>{QUIZ[quizIdx].q}</div>
-            </div>
-            <div className="checkin-quiz-game-area">
-              {(()=>{
-                const q=QUIZ[quizIdx]; const t=QUIZ_META[q.id]; const c={opts:q.opts,disabled:quizReacting};
-                if(t==="powerbar")  return <PowerBarGame      {...c} onConfirm={handleQuizTap}/>;
-                if(t==="skyscenes") return <SkyScenesGame     {...c} onPick={handleQuizTap}/>;
-                if(t==="stars")     return <StarTapGame       {...c} onConfirm={handleQuizTap}/>;
-                if(t==="tree")      return <ShakeTreeGame     {...c} onConfirm={handleQuizTap}/>;
-                if(t==="ripple")    return <RippleZoneGame    {...c} onPick={handleQuizTap}/>;
-                if(t==="racetrack") return <RaceTrackGame     {...c} onConfirm={handleQuizTap}/>;
-                if(t==="sleepbed")  return <SleepBedGame      {...c} onConfirm={handleQuizTap}/>;
-                if(t==="mountain")  return <MountainWaypointGame {...c} onPick={handleQuizTap}/>;
-              })()}
             </div>
             {quizReacting&&lastReaction&&<div className="checkin-reaction" style={{position:"absolute",bottom:8,left:8,right:8,zIndex:3}}>{lastReaction.text}</div>}
           </div>
@@ -1595,13 +1784,19 @@ export default function WellnessView({
 
       {/*MY JOURNEY*/}
       {view==="journey"&&(()=>{
+        // Latest analysis (OU-Kalman latent state, dual-EWMA baseline/drift,
+        // 28d+90d trend) from the most recent check-in, honouring the
+        // cold-start gates -- nothing is shown where sayNothing/the gates
+        // say there isn't enough history to say it honestly yet.
+        const latestAnalysis = lastCheckinAnalysis ?? checkinOnly[0]?.analysis ?? null;
+        const showWellbeing = latestAnalysis && !latestAnalysis.sayNothing;
         // Left page content
         const leftPage=(
           <>
-            <div style={{fontFamily:"var(--font-game)",fontSize:"1.6rem",color:"#503111",fontWeight:800,letterSpacing:"1px",borderBottom:"1.5px solid rgba(139,80,30,0.25)",paddingBottom:5,marginBottom:10}}><span style={{display:"inline-block",transform:"translateY(10px)"}}>MY JOURNEY</span></div>
+            <div style={{fontFamily:"var(--font-game)",fontSize:"1.5rem",lineHeight:1.05,color:"#503111",fontWeight:800,letterSpacing:"0.5px",borderBottom:"1.5px solid rgba(139,80,30,0.25)",paddingBottom:8,marginBottom:10,flexShrink:0}}>MY JOURNEY</div>
 
             {/* Stats */}
-            <div style={{display:"flex",gap:6,marginBottom:9}}>
+            <div style={{display:"flex",gap:8,marginBottom:12,flexWrap:"wrap"}}>
               <div className="journey-stat-box">
                 <div className="journey-stat-num">{activeEntries.length}</div>
                 <div className="journey-stat-label">Total Entries</div>
@@ -1612,12 +1807,26 @@ export default function WellnessView({
                   <div className="journey-stat-label">Most Felt</div>
                 </div>
               )}
+              {showWellbeing&&(
+                <div className="journey-stat-box">
+                  <div className="journey-stat-num">{Math.round(latestAnalysis.latentState?.theta ?? latestAnalysis.todayScore?.graded ?? 0)}</div>
+                  <div className="journey-stat-label">Wellbeing Index{typeof latestAnalysis.confidence==="number"?` (±${Math.round((1-latestAnalysis.confidence)*10.5)})`:""}</div>
+                </div>
+              )}
             </div>
 
+            {showWellbeing&&(latestAnalysis.gates?.trend)&&(
+              <div style={{fontSize:"0.68rem",color:"#7B2A20",marginBottom:10,fontFamily:"var(--font-game)"}}>
+                28-day trend: {latestAnalysis.trend?.window28?.direction ?? "insufficient_data"}
+                {latestAnalysis.gates?.fullFeatureSet&&latestAnalysis.trend?.window90?.direction&&latestAnalysis.trend.window90.direction!=="insufficient_data"&&(
+                  <> · 90-day trend: {latestAnalysis.trend.window90.direction}</>
+                )}
+              </div>
+            )}
             {/* Mood chart */}
-            <div style={{marginBottom:8}}>
-              <div style={{fontFamily:"var(--font-game)",fontSize:"1rem",color:"#7B2A20",marginBottom:-3,letterSpacing:"0.1px"}}>MY MOOD CHART</div>
-              <div style={{fontFamily:"var(--font-game)",fontSize:"0.7rem",color:"#a03d30",marginBottom:4,letterSpacing:"0.1px"}}>From the past 7 days</div>
+            <div style={{marginBottom:12}}>
+              <div style={{fontFamily:"var(--font-game)",fontSize:"1rem",lineHeight:1.1,color:"#7B2A20",marginBottom:2,letterSpacing:"0.1px"}}>MY MOOD CHART</div>
+              <div style={{fontFamily:"var(--font-game)",fontSize:"0.7rem",lineHeight:1.2,color:"#a03d30",marginBottom:6,letterSpacing:"0.1px"}}>From the past 7 days</div>
               <div className="journey-mood-chart">
                 {moodWeek.map(({day,ds,mood})=>(
                   <div key={ds} className="journey-mood-day">
@@ -1635,8 +1844,8 @@ export default function WellnessView({
             </div>
 
             {/* Goals */}
-            <div style={{marginTop:"10px"}}>
-              <div style={{fontFamily:"var(--font-game)",fontSize:"1rem",color:"#7B2A20",marginBottom:-3,letterSpacing:"0.1px"}}>MY GOALS</div>
+            <div>
+              <div style={{fontFamily:"var(--font-game)",fontSize:"1rem",lineHeight:1.1,color:"#7B2A20",marginBottom:6,letterSpacing:"0.1px"}}>MY GOALS</div>
               {showGoalPrompt?(
                 <form onSubmit={submitNewGoal}>
                   <textarea value={newGoalInput} onChange={e=>setNewGoalInput(e.target.value)} placeholder="Enter your new goal..."
@@ -1645,7 +1854,7 @@ export default function WellnessView({
                 </form>
               ):player?.goal?(
                 <div>
-                  <div style={{height:60,minHeight:60,maxHeight:60,overflowY:"auto",background:"transparent",border:"none",borderRadius:8,padding:"0 1px",marginBottom:4,boxSizing:"border-box"}}>
+                  <div style={{maxHeight:60,overflowY:"auto",background:"transparent",border:"none",borderRadius:8,padding:"0 1px",marginBottom:8,boxSizing:"border-box"}}>
                     <p style={{fontFamily:"var(--font-game)",...getGoalTextSize(player.goal),color:"#582f25",margin:0,whiteSpace:"pre-wrap",overflowWrap:"anywhere"}}>{player.goal}</p>
                   </div>
                   {player.goalAchieved
@@ -1653,9 +1862,9 @@ export default function WellnessView({
                         <div className="journey-achieved-badge" style={{fontSize:"0.58rem"}}>Achieved{player.goalAchievedAt&&` · ${player.goalAchievedAt}`}</div>
                         <button className="scroll-btn-primary" style={{width:"100%",marginTop:3,fontSize:"0.6rem",padding:"4px 0"}} onClick={()=>{setNewGoalInput("");setShowGoalPrompt(true);}}>Set new goal</button>
                       </div>
-                    :<button className="journey-achieve-btn" onClick={markGoalAchieved} style={{width:"100%",marginTop:8,fontSize:"0.74rem",padding:"5px 0"}}>I have achieved it!</button>
+                    :<button className="journey-achieve-btn" onClick={markGoalAchieved} style={{width:"100%",fontSize:"0.74rem",padding:"5px 0"}}>I have achieved it!</button>
                   }
-                  <div style={{display:"flex",gap:5,marginTop:9}}>
+                  <div style={{display:"flex",gap:8,marginTop:8}}>
                     <button type="button" onClick={editGoal} style={{flex:1,padding:"6px 0",borderRadius:10,fontFamily:"var(--font-game)",fontSize:"0.7rem",color:"#582f25",background:"rgba(255,255,255,0.62)",border:"1.5px solid rgba(139,80,30,0.24)",boxShadow:"0 2px 0 rgba(80,40,8,0.18)",cursor:"pointer"}}>Modify Goal</button>
                     <button type="button" onClick={deleteGoal} style={{flex:1,padding:"6px 0",borderRadius:10,fontFamily:"var(--font-game)",fontSize:"0.7rem",color:"#fff",background:"rgb(211, 48, 48)",border:"1.5px solid rgb(139, 35, 35)",boxShadow:"0 2px 0 rgba(107, 26, 26, 0.22)",cursor:"pointer"}}>Delete Goal</button>
                   </div>
@@ -1673,12 +1882,10 @@ export default function WellnessView({
         // Right page content — single entry at a time
         const rightPage=(
           <>
-            <div style={{fontFamily:"var(--font-game)",fontSize:"1.6rem",color:"#503111",fontWeight:800,letterSpacing:"1px",borderBottom:"1.5px solid rgba(139,80,30,0.25)",paddingBottom:5,marginBottom:6,flexShrink:0}}>
-              <span style={{display:"inline-block",transform:"translateY(10px)"}}>{rightTab==="journal"?"JOURNAL ENTRIES":"CHECK-IN ENTRIES"}</span>
-            </div>
+            <div style={{fontFamily:"var(--font-game)",fontSize:"1.5rem",lineHeight:1.05,color:"#503111",fontWeight:800,letterSpacing:"0.5px",borderBottom:"1.5px solid rgba(139,80,30,0.25)",paddingBottom:8,marginBottom:10,flexShrink:0}}>{rightTab==="journal"?"JOURNAL ENTRIES":"CHECK-IN ENTRIES"}</div>
 
             {/* Tab switcher: Journal Entries | Previous Daily Check-Ins */}
-            <div style={{display:"flex",gap:20,marginBottom:7,flexShrink:0}}>
+            <div style={{display:"flex",gap:8,marginBottom:8,flexShrink:0}}>
               <button
                 onClick={()=>{setRightTab("journal");setJournalIdx(0);setOpenChatEntryId(null);}}
                 style={{flex:1,padding:"6px 0",borderRadius:10,fontFamily:"var(--font-game)",fontSize:"0.6rem",color:"#582f25",background:rightTab==="journal"?"rgb(255, 184, 210)":"rgba(255, 184, 210, 0.58)",border:"1.5px solid rgba(190,80,120,0.28)",boxShadow:"0 2px 0 rgba(120,45,80,0.18)",cursor:"pointer",filter:rightTab==="journal"?"none":"saturate(0.85)"}}>

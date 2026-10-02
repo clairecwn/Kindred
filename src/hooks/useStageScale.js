@@ -47,6 +47,11 @@ export function useStageScale() {
   );
 
   useEffect(() => {
+    // --design-h lets views that were composed as fixed artwork (the journal
+    // scroll, the journey book) cap themselves at the original canvas height
+    // instead of stretching into the extra room the flex canvas provides.
+    document.documentElement.style.setProperty("--design-h", `${DESIGN_H}px`);
+
     const update = () => {
       const next = computeStage();
       currentScale = next.scale;

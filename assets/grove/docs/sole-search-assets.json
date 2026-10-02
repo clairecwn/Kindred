@@ -1,0 +1,16 @@
+{
+  "schema": "kindred.grove-sole-search-assets.v1",
+  "shopId": "sole-search",
+  "floor": "level-2",
+  "status": "prototype",
+  "items": [
+    { "id": "chunky-sneaker", "category": "footwear", "function": "hero casual shoe display", "reuseClass": "footwear" },
+    { "id": "ankle-boot", "category": "footwear", "function": "seasonal shoe display", "reuseClass": "footwear" },
+    { "id": "sandal", "category": "footwear", "function": "warm-weather shoe display", "reuseClass": "footwear" },
+    { "id": "shoe-box", "category": "packaging", "function": "stock and display prop", "reuseClass": "retail-packaging" },
+    { "id": "sock-roll", "category": "accessories", "function": "small accessory display", "reuseClass": "accessory-display" },
+    { "id": "shoe-bench", "category": "furniture", "function": "customer fitting seat", "reuseClass": "seating" },
+    { "id": "display-pedestal", "category": "fixture", "function": "hero footwear presentation", "reuseClass": "shop-fixture" }
+  ],
+  "generationPolicy": "prototype items are procedural Blender meshes guided by the Thread + Thimble reference; no paid external generation submitted"
+}

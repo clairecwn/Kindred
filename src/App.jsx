@@ -3,14 +3,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import CharacterView from "./components/CharacterView.jsx";
 import LandView from "./components/LandView.jsx";
 import RealWorldView from "./components/RealWorldView.jsx";
-import SocialView from "./components/SocialView.jsx";
+import GroveView from "./grove/GroveView.jsx";
 import WellnessView from "./components/WellnessView.jsx";
 import HomeView from "./components/HomeView.jsx";
 import SettingsPanel from "./components/SettingsPanel.jsx";
 import AuthScreen from "./components/AuthScreen.jsx";
 import { initialActivities, initialJournalEntries } from "./data/seed.js";
 import { useDatabaseState } from "./hooks/useDatabaseState.js";
-import { isSupabaseConfigured, supabase } from "./lib/supabase.js";
+import { isSupabaseConfigured, supabase, isLocalOnly, setLocalOnly } from "./lib/supabase.js";
 import { useSession } from "./lib/SessionProvider.jsx";
 import { sfx } from "./lib/sound.js";
 import { getWorldMood, getNPCBehavior } from "./lib/journal-ai.js";
@@ -55,6 +55,7 @@ const initialLand = {
 
 export default function App() {
   const { session, loading: sessionLoading } = useSession();
+  const [localOnly, setLocalOnlyState] = useState(isLocalOnly);
   const [player, setPlayer]   = useDatabaseState("kindred.player", null);
   const [nameInput, setNameInput] = useState("");
   const [goalInput, setGoalInput] = useState("");
@@ -71,6 +72,14 @@ export default function App() {
   // profile and drops back to onboarding, as it always did.
   async function signOut() {
     setShowUserDetails(false);
+    // Local-only play has no session to end — drop the preference so the next
+    // render offers the sign-in screen again, in case the backend is back.
+    if (localOnly) {
+      setLocalOnly(false);
+      setLocalOnlyState(false);
+      setPlayer(null);
+      return;
+    }
     if (isSupabaseConfigured) await supabase.auth.signOut();
     else setPlayer(null);
   }
@@ -123,7 +132,9 @@ export default function App() {
     );
   }
 
-  if (isSupabaseConfigured && !session) return <AuthScreen />;
+  if (isSupabaseConfigured && !session && !localOnly) {
+    return <AuthScreen onContinueOffline={() => setLocalOnlyState(true)} />;
+  }
 
   // ── Onboarding ───────────────────────────────────────────────────────────
   if (!player) {
@@ -194,10 +205,10 @@ export default function App() {
 
       {/* Main content */}
       <main className="main-content" style={{ filter:worldMood.filter!=="none"?worldMood.filter:undefined, transition:"filter 2s ease" }}>
-        {tab==="home"     && <HomeView player={player} character={character} emotion={emotion} coins={coins} setTab={setTab} muted={muted} toggleMute={toggleMute} onOpenSettings={()=>setShowSettings(true)} onOpenUser={()=>setShowUserDetails(true)}/>}
+        {tab==="home"     && <HomeView player={player} character={character} emotion={emotion} coins={coins} journalEntries={journalEntries} setTab={setTab} muted={muted} toggleMute={toggleMute} onOpenSettings={()=>setShowSettings(true)} onOpenUser={()=>setShowUserDetails(true)}/>}
         {tab==="journal"  && <WellnessView emotion={emotion} setEmotion={setEmotion} journalEntries={journalEntries} setJournalEntries={setJournalEntries} character={character} coins={coins} setCoins={setCoins} player={player} setPlayer={setPlayer} muted={muted} toggleMute={toggleMute} onOpenSettings={()=>setShowSettings(true)} onOpenUser={()=>setShowUserDetails(true)}/>}
-        {tab==="grove"    && <SocialView character={character} inventory={inventory} setInventory={setInventory} friends={friends} setFriends={setFriends} coins={coins} setCoins={setCoins} emotion={emotion} npcBehavior={npcBehavior} journalledToday={journalledToday}/>}
-        {tab==="ventures" && <RealWorldView emotion={emotion} character={character} activities={activities} setActivities={setActivities}/>}
+        {tab==="grove"    && <GroveView character={character}/>}
+        {tab==="ventures" && <RealWorldView emotion={emotion} character={character} activities={activities} setActivities={setActivities} journalEntries={journalEntries} player={player}/>}
         {tab==="kingdom"  && <LandView emotion={emotion} character={character} land={land} setLand={setLand} coins={coins} setCoins={setCoins} inventory={inventory} friends={friends}/>}
         {tab==="wardrobe" && <CharacterView emotion={emotion} character={character} setCharacter={setCharacter}/>}
       </main>

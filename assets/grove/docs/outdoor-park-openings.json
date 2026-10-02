@@ -1,0 +1,21 @@
+{
+  "schema": "kindred.grove-outdoor-park-openings.v1",
+  "areaId": "canopy-park",
+  "primaryArrival": "park-to-mall-lobby",
+  "openings": [
+    {
+      "id": "park-to-mall-lobby",
+      "kind": "door",
+      "wall": "commons-park-lobby-south",
+      "widthMeters": 2.7,
+      "heightMeters": 3.33,
+      "threshold": [-14.1, 32.8],
+      "destination": "The Grove Mall, Level 1",
+      "passageDepthMeters": 4.0,
+      "triggerPosition": [-14.1, 33.5],
+      "returnPosition": [-14.1, 31.0],
+      "collisionOpening": "two structural front-wall stubs and one lintel leave the doorway center unobstructed"
+    }
+  ],
+  "note": "The flower arch and paved apron align directly with a real, collision-safe mall vestibule. The transition fires only after the player crosses the exterior threshold."
+}
