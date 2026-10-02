@@ -1,24 +1,9 @@
-import { useState } from "react";
-import SpriteCharacter from "./SpriteCharacter.jsx";
+import { useMemo, useState } from "react";
+import AvatarStage from "../avatar/AvatarStage.jsx";
+import { SPECIES_LIST, SPECIES_NAME, getPersonality, COLOURWAYS } from "../avatar/index.js";
+import "../avatar/avatar.css";
 
-// ── Roster — each animal has a lore name, role and rarity ────────
-const ROSTER = [
-  { id: "fox",    name: "Ember Kit",    role: "Swift Trickster",  rarity: "rare",      desc: "Quick, bright, endlessly expressive." },
-  { id: "rabbit", name: "Mochi Hop",    role: "Gentle Soul",      rarity: "common",    desc: "Alert, warm, and loves a good nap." },
-  { id: "bear",   name: "Bramble Cub",  role: "Steady Guardian",  rarity: "rare",      desc: "Quiet strength wrapped in cozy fur." },
-  { id: "cat",    name: "Nori",         role: "Curious Wanderer", rarity: "epic",      desc: "Stylish, composed, perpetually intrigued." },
-  { id: "dog",    name: "Pip Pup",      role: "Loyal Companion",  rarity: "common",    desc: "Boundless warmth. Will always show up." },
-  { id: "panda",  name: "Bamboo Bean",  role: "Dreamy Scholar",   rarity: "legendary", desc: "Sleepy genius. Moves at their own pace." },
-];
-
-const RARITY_COLOR = {
-  common:    "#8A9BAA",
-  rare:      "#5B9B8A",
-  epic:      "#9B72CF",
-  legendary: "#D4A853",
-};
-
-// ── Customisation options ────────────────────────────────────────
+// ── Customisation options (ids match src/avatar/adapter.js's legacy maps) ──
 const SKINS = [
   { id: "honey",  label: "Honey",  color: "#F2B66D" },
   { id: "ivory",  label: "Ivory",  color: "#F4DCC4" },
@@ -58,6 +43,14 @@ const ACCESSORIES = [
   { id: "heart",   label: "Heart Pin", icon: "♥",  premium: false },
 ];
 
+const BOTTOMS = [
+  { id: "none",     label: "Bare",     icon: "○",  premium: false },
+  { id: "shorts",   label: "Shorts",   icon: "▭",  premium: false },
+  { id: "trousers", label: "Trousers", icon: "⌷",  premium: false },
+  { id: "skirt",    label: "Skirt",    icon: "△",  premium: false },
+  { id: "leggings", label: "Leggings", icon: "‖",  premium: false },
+];
+
 const SHOES = [
   { id: "none",     label: "Barefoot", icon: "○",  premium: false },
   { id: "sneakers", label: "Sneakers", icon: "👟", premium: false },
@@ -92,6 +85,8 @@ const CATEGORIES = [
   { id: "roster",      label: "Character" },
   { id: "skins",       label: "Skin Tone" },
   { id: "outfits",     label: "Outfit" },
+  { id: "bottoms",     label: "Bottoms" },
+  { id: "colours",     label: "Colour" },
   { id: "hats",        label: "Headwear" },
   { id: "accessories", label: "Accessories" },
   { id: "shoes",       label: "Shoes" },
@@ -99,23 +94,68 @@ const CATEGORIES = [
   { id: "emotes",      label: "Emotes" },
 ];
 
+/** Item tile: a swatch/icon button that also previews live on hover. */
+function ItemTile({ item, active, onSelect, onHover }) {
+  return (
+    <button
+      className={`item-card${active ? " active" : ""}`}
+      onClick={onSelect}
+      onMouseEnter={onHover}
+      onMouseLeave={() => onHover(null)}
+      onFocus={onHover}
+      onBlur={() => onHover(null)}
+    >
+      {item.premium && <span className="item-premium-badge">Coins</span>}
+      <div className="item-card-icon">{item.icon}</div>
+      <div className="item-card-name">{item.label}</div>
+    </button>
+  );
+}
+
 export default function CharacterView({ emotion, character, setCharacter }) {
   const [cat, setCat] = useState("roster");
+  const [hoverPatch, setHoverPatch] = useState(null); // {key, value} | null
+  const [reactKey, setReactKey] = useState(0);
 
   function patch(key, value) {
     setCharacter((c) => ({ ...c, [key]: value }));
+    setReactKey((k) => k + 1);
   }
 
-  const currentAnimal = ROSTER.find((r) => r.id === character.animal) ?? ROSTER[0];
+  function hover(key, value) {
+    return (eOrNull) => {
+      if (eOrNull === null) { setHoverPatch(null); return; }
+      setHoverPatch({ key, value });
+    };
+  }
+
+  const speciesId = SPECIES_LIST.includes(character.animal) ? character.animal : "bear";
+  const personality = getPersonality(speciesId);
+  const speciesName = SPECIES_NAME[speciesId] ?? speciesId;
+
+  // The hero preview shows the live shared descriptor, with a hovered item's
+  // effect temporarily overlaid — never a second copy of state, just a
+  // display-only merge of the one source of truth.
+  const previewCharacter = useMemo(
+    () => (hoverPatch ? { ...character, [hoverPatch.key]: hoverPatch.value } : character),
+    [character, hoverPatch]
+  );
 
   return (
     <div className="page-container anim-fade-in">
-      {/* ── Top preview section (large 3D character + info) ──── */}
+      {/* ── Top preview section (large 3D hero + info) ──────────────────── */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, alignItems: "start" }}>
 
-        {/* Character stage */}
-        <div className="character-stage-wrap" style={{ height: 320 }}>
-          <SpriteCharacter emotion={emotion} character={character} interactive size={{ width: 200, height: 260 }} />
+        {/* Hero 3D stage — idles per personality, reacts on any change */}
+        <div className="character-stage-wrap" style={{ height: 320, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <AvatarStage
+            character={previewCharacter}
+            clip={personality.idleEmotion}
+            reactKey={reactKey}
+            reactClip={personality.reactionClip}
+            angle={0.4}
+            size={{ width: 240, height: 300 }}
+          />
         </div>
 
         {/* Character info panel */}
@@ -123,23 +163,18 @@ export default function CharacterView({ emotion, character, setCharacter }) {
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
               <span style={{
-                background: RARITY_COLOR[currentAnimal.rarity] + "22",
-                color: RARITY_COLOR[currentAnimal.rarity],
+                background: "var(--brand)22", color: "var(--brand)",
                 fontSize: "0.7rem", fontWeight: 800,
                 padding: "3px 10px", borderRadius: 999,
-                textTransform: "capitalize"
               }}>
-                {currentAnimal.rarity}
+                {personality.temperament}
               </span>
             </div>
             <div style={{ fontSize: "1.55rem", fontWeight: 900, color: "var(--text)", lineHeight: 1.15, marginBottom: 4 }}>
-              {currentAnimal.name}
-            </div>
-            <div style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--brand)", marginBottom: 12 }}>
-              {currentAnimal.role}
+              {speciesName}
             </div>
             <p style={{ fontSize: "0.88rem", color: "var(--text-2)", lineHeight: 1.55 }}>
-              {currentAnimal.desc}
+              {personality.line}
             </p>
           </div>
 
@@ -185,7 +220,7 @@ export default function CharacterView({ emotion, character, setCharacter }) {
         ))}
       </div>
 
-      {/* ── Roster tab ───────────────────────────────────────── */}
+      {/* ── Roster tab: a live 3D thumbnail per species, Brawl-Stars-style ── */}
       {cat === "roster" && (
         <div className="card anim-fade-in">
           <div className="card-header">
@@ -195,31 +230,26 @@ export default function CharacterView({ emotion, character, setCharacter }) {
             </div>
           </div>
           <div className="roster-grid">
-            {ROSTER.map((r) => (
-              <button
-                key={r.id}
-                className={`roster-card${character.animal === r.id ? " active" : ""}`}
-                onClick={() => patch("animal", r.id)}
-              >
-                {/* Mini 3D preview would go here — using a styled placeholder */}
-                <div className="card-animal-preview" style={{
-                  background: `linear-gradient(135deg, ${RARITY_COLOR[r.rarity]}22, ${RARITY_COLOR[r.rarity]}11)`,
-                  border: `2px solid ${RARITY_COLOR[r.rarity]}44`,
-                  fontSize: "2rem"
-                }}>
-                  {r.id === "fox" ? "🦊" : r.id === "rabbit" ? "🐰" : r.id === "bear" ? "🐻" :
-                   r.id === "cat" ? "🐱" : r.id === "dog" ? "🐶" : "🐼"}
-                </div>
-                <strong>{r.name}</strong>
-                <span style={{
-                  fontSize: "0.68rem", fontWeight: 800, color: RARITY_COLOR[r.rarity],
-                  textTransform: "capitalize"
-                }}>
-                  {r.rarity}
-                </span>
-                <small>{r.role}</small>
-              </button>
-            ))}
+            {SPECIES_LIST.map((id) => {
+              const p = getPersonality(id);
+              const rosterDescriptor = { ...character, animal: id };
+              return (
+                <button
+                  key={id}
+                  className={`roster-card${speciesId === id ? " active" : ""}`}
+                  onClick={() => patch("animal", id)}
+                >
+                  <div className="card-animal-preview">
+                    <AvatarStage character={rosterDescriptor} clip={p.idleEmotion} angle={0.4} size={84} static />
+                  </div>
+                  <strong>{SPECIES_NAME[id]}</strong>
+                  <span style={{ fontSize: "0.68rem", fontWeight: 800, color: "var(--brand)" }}>
+                    {p.temperament}
+                  </span>
+                  <small>{p.line}</small>
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
@@ -230,7 +260,7 @@ export default function CharacterView({ emotion, character, setCharacter }) {
           <div className="card-header">
             <div>
               <div className="card-title">Fur Colour</div>
-              <div className="card-sub">All tones are free.</div>
+              <div className="card-sub">All tones are free. Hover to preview.</div>
             </div>
           </div>
           <div className="swatch-row">
@@ -240,6 +270,8 @@ export default function CharacterView({ emotion, character, setCharacter }) {
                 className={`swatch${(character.skin ?? character.color) === s.id ? " active" : ""}`}
                 style={{ "--swatch-color": s.color }}
                 onClick={() => patch("skin", s.id)}
+                onMouseEnter={hover("skin", s.id)}
+                onMouseLeave={hover("skin", null)}
                 title={s.label}
                 aria-label={s.label}
               />
@@ -284,20 +316,62 @@ export default function CharacterView({ emotion, character, setCharacter }) {
           <div className="card-header">
             <div>
               <div className="card-title">Wardrobe</div>
-              <div className="card-sub">Most pieces are free. Premium marked with a badge.</div>
+              <div className="card-sub">Most pieces are free. Premium marked with a badge. Hover to preview.</div>
             </div>
           </div>
           <div className="item-grid">
             {OUTFITS.map((o) => (
-              <button
-                key={o.id}
-                className={`item-card${character.outfit === o.id ? " active" : ""}`}
-                onClick={() => patch("outfit", o.id)}
-              >
-                {o.premium && <span className="item-premium-badge">Coins</span>}
-                <div className="item-card-icon">{o.icon}</div>
-                <div className="item-card-name">{o.label}</div>
-              </button>
+              <ItemTile key={o.id} item={o} active={character.outfit === o.id}
+                onSelect={() => patch("outfit", o.id)} onHover={hover("outfit", o.id)} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── Bottoms tab ──────────────────────────────────────── */}
+      {cat === "bottoms" && (
+        <div className="card anim-fade-in">
+          <div className="card-header">
+            <div>
+              <div className="card-title">Bottoms</div>
+              <div className="card-sub">Real 3D garments, weighted to the same skeleton as your kin.</div>
+            </div>
+          </div>
+          <div className="item-grid">
+            {BOTTOMS.map((b) => (
+              <ItemTile key={b.id} item={b} active={(character.bottoms ?? "none") === b.id}
+                onSelect={() => patch("bottoms", b.id)} onHover={hover("bottoms", b.id)} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── Colourway tab ────────────────────────────────────── */}
+      {cat === "colours" && (
+        <div className="card anim-fade-in">
+          <div className="card-header">
+            <div>
+              <div className="card-title">Colourway</div>
+              <div className="card-sub">One colour set across everything you are wearing.</div>
+            </div>
+          </div>
+          <div className="item-grid">
+            {COLOURWAYS.map((cw) => (
+              <ItemTile
+                key={cw.id}
+                item={{
+                  id: cw.id,
+                  label: cw.name,
+                  icon: <span className="colourway-swatch" style={{
+                    background: `#${cw.main.toString(16).padStart(6, "0")}`,
+                    borderColor: `#${cw.trim.toString(16).padStart(6, "0")}`,
+                  }} />,
+                  premium: false,
+                }}
+                active={(character.colourway ?? "") === cw.id}
+                onSelect={() => patch("colourway", cw.id)}
+                onHover={hover("colourway", cw.id)}
+              />
             ))}
           </div>
         </div>
@@ -314,15 +388,8 @@ export default function CharacterView({ emotion, character, setCharacter }) {
           </div>
           <div className="item-grid">
             {HATS.map((h) => (
-              <button
-                key={h.id}
-                className={`item-card${character.hat === h.id ? " active" : ""}`}
-                onClick={() => patch("hat", h.id)}
-              >
-                {h.premium && <span className="item-premium-badge">Coins</span>}
-                <div className="item-card-icon">{h.icon}</div>
-                <div className="item-card-name">{h.label}</div>
-              </button>
+              <ItemTile key={h.id} item={h} active={character.hat === h.id}
+                onSelect={() => patch("hat", h.id)} onHover={hover("hat", h.id)} />
             ))}
           </div>
         </div>
@@ -339,15 +406,8 @@ export default function CharacterView({ emotion, character, setCharacter }) {
           </div>
           <div className="item-grid">
             {ACCESSORIES.map((a) => (
-              <button
-                key={a.id}
-                className={`item-card${character.accessory === a.id ? " active" : ""}`}
-                onClick={() => patch("accessory", a.id)}
-              >
-                {a.premium && <span className="item-premium-badge">Coins</span>}
-                <div className="item-card-icon">{a.icon}</div>
-                <div className="item-card-name">{a.label}</div>
-              </button>
+              <ItemTile key={a.id} item={a} active={character.accessory === a.id}
+                onSelect={() => patch("accessory", a.id)} onHover={hover("accessory", a.id)} />
             ))}
           </div>
 
@@ -355,15 +415,8 @@ export default function CharacterView({ emotion, character, setCharacter }) {
             <div className="section-label">Glasses</div>
             <div className="item-grid">
               {GLASSES.map((g) => (
-                <button
-                  key={g.id}
-                  className={`item-card${character.glasses === g.id ? " active" : ""}`}
-                  onClick={() => patch("glasses", g.id)}
-                >
-                  {g.premium && <span className="item-premium-badge">Coins</span>}
-                  <div className="item-card-icon">{g.icon}</div>
-                  <div className="item-card-name">{g.label}</div>
-                </button>
+                <ItemTile key={g.id} item={g} active={character.glasses === g.id}
+                  onSelect={() => patch("glasses", g.id)} onHover={hover("glasses", g.id)} />
               ))}
             </div>
           </div>
@@ -381,15 +434,8 @@ export default function CharacterView({ emotion, character, setCharacter }) {
           </div>
           <div className="item-grid">
             {SHOES.map((s) => (
-              <button
-                key={s.id}
-                className={`item-card${character.shoes === s.id ? " active" : ""}`}
-                onClick={() => patch("shoes", s.id)}
-              >
-                {s.premium && <span className="item-premium-badge">Coins</span>}
-                <div className="item-card-icon">{s.icon}</div>
-                <div className="item-card-name">{s.label}</div>
-              </button>
+              <ItemTile key={s.id} item={s} active={character.shoes === s.id}
+                onSelect={() => patch("shoes", s.id)} onHover={hover("shoes", s.id)} />
             ))}
           </div>
         </div>
@@ -448,14 +494,8 @@ export default function CharacterView({ emotion, character, setCharacter }) {
             <div className="section-label">Emote</div>
             <div className="item-grid">
               {EMOTES.map((e) => (
-                <button
-                  key={e.id}
-                  className={`item-card${character.emote === e.id ? " active" : ""}`}
-                  onClick={() => patch("emote", e.id)}
-                >
-                  <div className="item-card-icon" style={{ fontSize: "1.4rem" }}>{e.icon}</div>
-                  <div className="item-card-name">{e.label}</div>
-                </button>
+                <ItemTile key={e.id} item={e} active={character.emote === e.id}
+                  onSelect={() => patch("emote", e.id)} onHover={() => {}} />
               ))}
             </div>
           </div>

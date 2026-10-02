@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { sfx } from "../lib/sound.js";
-import SpriteCharacter from "./SpriteCharacter.jsx";
+import AvatarStage from "../avatar/AvatarStage.jsx";
 
 // ── Island SVG paths (viewBox 360×300) ────────────────────────────
 const BEACH = "M190,22 C242,10 298,32 330,72 C362,112 364,162 344,202 C324,242 288,272 244,284 C200,296 150,294 112,276 C74,258 44,228 28,192 C12,156 14,110 38,76 C62,42 138,34 190,22 Z";
@@ -256,10 +256,10 @@ export default function LandView({ emotion, character, land, setLand, coins, set
           </p>
         </div>
         <div className="hero-character">
-          <SpriteCharacter
-            emotion={emotion}
+          <AvatarStage
             character={character}
-            interactive={false}
+            clip={["happy","excited","grateful"].includes(emotion) ? "happy" : ["sad","tired","anxious","angry"].includes(emotion) ? "sad" : "calm"}
+            angle={0.35}
             size={{ width: 160, height: 190 }}
           />
         </div>
@@ -314,10 +314,10 @@ export default function LandView({ emotion, character, land, setLand, coins, set
             zIndex: 5,
             marginTop: -4,
           }}>
-            <SpriteCharacter
-              emotion={emotion}
+            <AvatarStage
               character={character}
-              interactive={false}
+              clip="calm"
+              angle={0}
               size={{ width: 56, height: 70 }}
             />
           </div>

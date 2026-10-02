@@ -6,7 +6,13 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "build": "vite build",
-    "preview": "vite preview --host 127.0.0.1"
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "node --test src/lib/analysis/__tests__/*.test.js src/ventures/__tests__/*.test.js src/grove/story/__tests__/*.test.js",
+    "test:analysis": "node --test src/lib/analysis/__tests__/*.test.js",
+    "test:ventures": "node --test src/ventures/__tests__/*.test.js",
+    "test:avatar": "node --test src/avatar/kindredSelfTest.mjs",
+    "check": "npm run test && npm run test:avatar && vite build --outDir dist_check",
+    "build:avatars": "echo 'cast + wardrobe are authored in assets_blender/kindred_character_01.blend and exported to public/models/ from Blender'"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.2",

@@ -1,0 +1,15 @@
+{
+  "schema": "kindred.grove-upper-floors-assets.v1",
+  "status": "prototype",
+  "shops": [
+    { "id": "pixel-pantry", "floor": "level-2", "items": ["game-console", "controller", "headphones", "collectible-figure", "game-box"] },
+    { "id": "maker-meadow", "floor": "level-2", "items": ["yarn-ball", "paint-can", "toolbox", "sewing-machine", "craft-basket"] },
+    { "id": "seasonal-pop-up", "floor": "level-2", "items": ["gift-box", "lantern", "ornament", "display-tree", "seasonal-basket"] },
+    { "id": "book-burrow", "floor": "level-3", "items": ["book", "book-stack", "reading-chair", "bookmark-display", "floor-lamp"] },
+    { "id": "wellness-willow", "floor": "level-3", "items": ["yoga-mat", "candle", "wellness-bottle", "meditation-cushion", "towel-stack"] },
+    { "id": "food-hall", "floor": "level-3", "items": ["food-tray", "bowl", "drink-cup", "plate", "food-stall-counter"] },
+    { "id": "rooftop-garden", "floor": "level-3", "items": ["planter", "garden-tree", "park-bench", "garden-lantern", "flower-cluster"] }
+  ],
+  "generationPolicy": "all current assets are procedural Blender prototypes; no paid external generation submitted",
+  "runtimeExport": "blocked pending mall-wide Form review"
+}

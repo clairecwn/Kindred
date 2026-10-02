@@ -1,0 +1,42 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Avatar Lab</title>
+<style>body{margin:0;background:#f3e6d2;font:13px system-ui;color:#3a2a1a}
+#grid{display:flex;flex-wrap:wrap;gap:8px;padding:10px}
+.cell{background:#fbf0dd;border-radius:12px;padding:6px;text-align:center}</style></head>
+<body><div id="grid"></div>
+<script type="module">
+import * as THREE from "three";
+import { createAvatar, AVATAR_HEIGHT } from "/src/avatar/AvatarRig.js";
+import { SPECIES_LIST } from "/src/avatar/species.js";
+import { preloadAvatarModels } from "/src/avatar/modelCache.js";
+await preloadAvatarModels();
+const params = new URLSearchParams(location.search);
+const W = +(params.get("w")||260), H = +(params.get("h")||360);
+const wardrobe = params.get("wardrobe") ? JSON.parse(params.get("wardrobe")) : {};
+const angles = (params.get("angles")||"0.35").split(",").map(Number);
+const grid = document.getElementById("grid");
+const list = (params.get("species")||SPECIES_LIST.join(",")).split(",");
+let pending = 0;
+for (const sp of list) for (const a of angles) {
+  const cell = document.createElement("div"); cell.className="cell";
+  const holder = document.createElement("div"); holder.style.width=W+"px"; holder.style.height=H+"px";
+  cell.appendChild(holder);
+  const label = document.createElement("div"); label.textContent = sp+" @"+a; cell.appendChild(label);
+  grid.appendChild(cell);
+  const renderer = new THREE.WebGLRenderer({antialias:true, alpha:true});
+  renderer.setPixelRatio(2); renderer.setSize(W,H,false);
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.domElement.style.width="100%"; renderer.domElement.style.height="100%";
+  holder.appendChild(renderer.domElement);
+  const scene = new THREE.Scene();
+  const cam = new THREE.PerspectiveCamera(30, W/H, 0.1, 40);
+  cam.position.set(0, AVATAR_HEIGHT*0.62, AVATAR_HEIGHT*2.1); cam.lookAt(0, AVATAR_HEIGHT*0.55, 0);
+  scene.add(new THREE.AmbientLight(0xfff8f0,1.3));
+  const key=new THREE.DirectionalLight(0xfff2d8,2.0); key.position.set(2.2,4,3.4); scene.add(key);
+  const fill=new THREE.DirectionalLight(0xd0e0ff,0.8); fill.position.set(-2.6,1.4,2.6); scene.add(fill);
+  const av = createAvatar({species: sp, wardrobe});
+  av.rotation.y = a; scene.add(av);
+  av.userData.animation?.update(0.016);
+  renderer.render(scene,cam);
+}
+window.__ready = true;
+</script></body></html>

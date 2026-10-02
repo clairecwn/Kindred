@@ -1,3 +1,6 @@
+import { textVAD } from "../lib/analysis/text-features.js";
+import { vadToEmotionDirectional } from "../lib/analysis/emotion-space.js";
+
 export const EMOTIONS = {
   happy:    { label: "Happy",    color: "#d8a011", tone: "bright and open",     behavior: "smiling idle",        speed: 1.08 },
   excited:  { label: "Excited",  color: "#bc22db", tone: "high energy",         behavior: "energetic bounce",    speed: 1.38 },
@@ -10,20 +13,6 @@ export const EMOTIONS = {
   grateful: { label: "Grateful", color: "#da027c", tone: "appreciative",        behavior: "warm nod",            speed: 0.95 },
   neutral:  { label: "Neutral",  color: "#535253", tone: "even or unclear",     behavior: "neutral idle",        speed: 0.9  }
 };
-
-const LEXICON = {
-  happy: ["happy", "joy", "sunny", "great", "good", "delighted", "cheerful", "light", "smiling"],
-  excited: ["excited", "buzzing", "pumped", "thrilled", "energized", "electric", "spark", "ready"],
-  calm: ["calm", "peaceful", "settled", "safe", "quiet", "grounded", "gentle", "still"],
-  anxious: ["anxious", "worried", "cloudy", "confused", "troubled", "uncertain", "spiral", "nervous", "tense", "uneasy", "overthinking", "lost"],
-  sad: ["sad", "heavy", "down", "lonely", "hurt", "empty", "blue", "cry", "clouded", "low"],
-  tired: ["tired", "exhausted", "drained", "foggy", "sleepy", "burnt out", "burnout", "flat"],
-  angry: ["angry", "mad", "irritated", "annoyed", "furious", "resentful", "snappy", "frustrated"],
-  content: ["content", "okay", "fine", "balanced", "alright", "comfortable", "soft", "normal"],
-  grateful: ["grateful", "thankful", "lucky", "appreciate", "blessed", "held", "supported"]
-};
-
-const NEGATORS = ["not", "never", "hardly", "barely", "isn't", "wasn't", "dont", "don't"];
 
 const LANGUAGE_HINTS = [
   { language: "Spanish", pattern: /\b(hola|triste|feliz|ansioso|cansado|gracias|preocupado)\b/i },
@@ -39,39 +28,41 @@ export function detectLanguage(text) {
   return match?.language || "English";
 }
 
+/**
+ * inferEmotion — now a thin adapter over the deterministic model.
+ *
+ * This function used to carry its own emotion keyword lists, its own negator
+ * list and its own confidence formula (54 + 12·votes, capped at 96). That was
+ * the THIRD independent lexicon in the codebase, alongside journal-ai.js's and
+ * entry-adapter.js's, and all three could — and did — disagree about the same
+ * sentence. There is now one lexicon and one set of rules
+ * (src/lib/analysis/lexicon.js + text-features.js); this is the adapter that
+ * keeps the old call signature working.
+ *
+ * The return shape is unchanged: { emotion, confidence, language, behavior,
+ * reason }, with `vad` added.
+ */
 export function inferEmotion(text) {
-  const normalized = text.toLowerCase().replace(/[^\w\s']/g, " ");
-  const words = normalized.split(/\s+/).filter(Boolean);
-  const scores = Object.fromEntries(Object.keys(EMOTIONS).map((emotion) => [emotion, 0]));
-  const matches = [];
+  const reading = textVAD(text ?? "");
+  const { emotion } = vadToEmotionDirectional(reading);
+  // Confidence is the model's own evidence confidence on a 0-100 display
+  // scale, floored at 45 so the UI never shows a bare 0 for "no reading" —
+  // callers that need to know there was no evidence read `evidence`.
+  const confidence = Math.round(45 + 50 * reading.confidence);
 
-  for (const [emotion, terms] of Object.entries(LEXICON)) {
-    for (const term of terms) {
-      const re = new RegExp(`\\b${term.replace(/\s+/g, "\\s+")}\\b`, "i");
-      if (re.test(normalized)) {
-        const termIndex = words.findIndex((word) => term.split(" ")[0] === word);
-        const negated = termIndex > 0 && NEGATORS.includes(words[termIndex - 1]);
-        const weight = term.length > 7 ? 2 : 1;
-        scores[emotion] += negated ? -weight : weight;
-        matches.push(term);
-      }
-    }
-  }
-
-  if (/i feel|i am|i'm|today|because|but|and/.test(normalized)) {
-    scores.neutral += 0.15;
-  }
-
-  const winner = Object.entries(scores).sort((a, b) => b[1] - a[1])[0];
-  const emotion = winner && winner[1] > 0 ? winner[0] : "neutral";
-  const confidence = Math.min(96, Math.max(54, 54 + Math.round((winner?.[1] || 0) * 12)));
+  const named = reading.terms
+    .filter((t) => t.kind !== "dialect")
+    .slice(0, 3)
+    .map((t) => t.term);
 
   return {
     emotion,
     confidence,
-    language: detectLanguage(text),
-    behavior: EMOTIONS[emotion].behavior,
-    reason: matches.length ? `Matched ${matches.slice(0, 3).join(", ")}` : "No strong signal yet"
+    language: detectLanguage(text ?? ""),
+    behavior: EMOTIONS[emotion]?.behavior ?? EMOTIONS.neutral.behavior,
+    vad: { valence: reading.valence, arousal: reading.arousal, dominance: reading.dominance },
+    evidence: reading.evidence,
+    reason: named.length ? `Matched ${named.join(", ")}` : "No strong signal yet",
   };
 }
 

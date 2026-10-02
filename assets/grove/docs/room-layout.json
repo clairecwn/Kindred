@@ -1,0 +1,29 @@
+{
+  "schema": "kindred.grove-room-layout.v1",
+  "roomId": "grove-mall",
+  "units": "meters",
+  "floors": [
+    { "id": "ground", "elevation": 0, "height": 5, "role": "arrival-and-daily-needs", "shops": ["grove-grocer", "thread-and-thimble", "cafe-canopy", "home-nook"] },
+    { "id": "level-2", "elevation": 5, "height": 5, "role": "style-and-play", "shops": ["sole-search", "pixel-pantry", "maker-meadow", "seasonal-pop-up"] },
+    { "id": "level-3", "elevation": 10, "height": 5, "role": "community-and-events", "shops": ["book-burrow", "wellness-willow", "food-hall", "rooftop-garden"] }
+  ],
+  "shell": { "width": 60, "depth": 44, "floorThickness": 0.35, "wallThickness": 0.35, "atriumWidth": 20, "atriumDepth": 16 },
+  "landmarks": [
+    { "id": "central-atrium", "type": "open-void", "position": [0, 0], "size": [20, 16] },
+    { "id": "atrium-fountain", "type": "hero-feature", "position": [0, 0], "size": [5, 5] },
+    { "id": "north-stair", "type": "stair", "position": [0, -16], "size": [5, 8] },
+    { "id": "south-escalator", "type": "escalator", "position": [0, 16], "size": [4, 9] },
+    { "id": "east-lift", "type": "lift", "position": [25, 0], "size": [4, 4] }
+  ],
+  "shops": [
+    { "id": "grove-grocer", "floor": "ground", "zone": "northwest", "type": "grocery", "frontage": [12, 8], "entranceWidth": 3.2 },
+    { "id": "thread-and-thimble", "floor": "ground", "zone": "northeast", "type": "clothing", "frontage": [12, 8], "entranceWidth": 3.2 },
+    { "id": "cafe-canopy", "floor": "ground", "zone": "southwest", "type": "cafe", "frontage": [12, 8], "entranceWidth": 3.2 },
+    { "id": "home-nook", "floor": "ground", "zone": "southeast", "type": "homewares", "frontage": [12, 8], "entranceWidth": 3.2 }
+  ],
+  "openingSchedule": [
+    { "id": "main-arrival", "type": "door", "wall": "south", "width": 8, "height": 4.5, "destination": "central-atrium" },
+    { "id": "shop-fronts", "type": "door", "wall": "atrium-ring", "width": 3.2, "height": 3.2, "destination": "individual-shop-interiors" }
+  ],
+  "reviewViews": ["production", "wide", "overhead", "northwest-corner", "northeast-corner", "southwest-corner", "southeast-corner", "center-up", "ceiling-oblique-a", "ceiling-oblique-b"]
+}

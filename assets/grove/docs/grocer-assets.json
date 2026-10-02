@@ -1,0 +1,17 @@
+{
+  "schema": "kindred.grove-grocer-assets.v1",
+  "shopId": "grove-grocer",
+  "status": "prototype",
+  "items": [
+    { "id": "carrot", "category": "produce", "function": "fresh vegetable display", "dimensions": [0.12, 0.12, 0.5], "attachmentFace": "-Z", "semanticFront": "+Y", "reuseClass": "small-produce", "targetPolycount": 600 },
+    { "id": "tomato", "category": "produce", "function": "fresh vegetable display", "dimensions": [0.22, 0.22, 0.2], "attachmentFace": "-Z", "semanticFront": "+Y", "reuseClass": "small-produce", "targetPolycount": 500 },
+    { "id": "lettuce", "category": "produce", "function": "fresh vegetable display", "dimensions": [0.32, 0.32, 0.25], "attachmentFace": "-Z", "semanticFront": "+Y", "reuseClass": "small-produce", "targetPolycount": 700 },
+    { "id": "apple", "category": "produce", "function": "fresh fruit display", "dimensions": [0.2, 0.2, 0.24], "attachmentFace": "-Z", "semanticFront": "+Y", "reuseClass": "small-produce", "targetPolycount": 500 },
+    { "id": "milk-carton", "category": "chilled", "function": "packaged dairy display", "dimensions": [0.18, 0.12, 0.28], "attachmentFace": "-Z", "semanticFront": "+Y", "reuseClass": "packaged-goods", "targetPolycount": 900 },
+    { "id": "cereal-box", "category": "pantry", "function": "packaged food display", "dimensions": [0.2, 0.08, 0.3], "attachmentFace": "-Z", "semanticFront": "+Y", "reuseClass": "packaged-goods", "targetPolycount": 700 },
+    { "id": "cleaning-spray", "category": "household", "function": "household supply display", "dimensions": [0.12, 0.08, 0.28], "attachmentFace": "-Z", "semanticFront": "+Y", "reuseClass": "household-supplies", "targetPolycount": 900 },
+    { "id": "shopping-basket", "category": "fixture", "function": "carry basket interaction prop", "dimensions": [0.45, 0.3, 0.25], "attachmentFace": "-Z", "semanticFront": "+Y", "reuseClass": "carry-prop", "targetPolycount": 1200 },
+    { "id": "shopping-trolley", "category": "fixture", "function": "push trolley interaction prop", "dimensions": [0.8, 0.45, 0.95], "attachmentFace": "-Z", "semanticFront": "+Y", "reuseClass": "carry-prop", "targetPolycount": 2400 }
+  ],
+  "generationPolicy": "prototype items are procedural Blender meshes; no paid external generation submitted"
+}

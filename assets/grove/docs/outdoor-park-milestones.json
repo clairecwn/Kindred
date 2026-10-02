@@ -1,0 +1,53 @@
+{
+  "schema": "kindred.grove-outdoor-park-milestones.v1",
+  "areaId": "canopy-park",
+  "function": {
+    "status": "approved",
+    "approvedBy": "user",
+    "approval": "ok go on",
+    "evidence": ["mario-world-design-research.md", "outdoor-park-brief.json", "outdoor-park-layout.json"]
+  },
+  "form": {
+    "status": "user-approved-validator-blocked",
+    "approvedBy": "user",
+    "approval": "otherwise i approve the canapy park form pass",
+    "approvedAt": "2026-10-02",
+    "evidence": ["../../../src/grove/scene/worldBuilder.js", "../../../src/grove/scene/GroveScene.js"],
+    "changes": [
+      "open mall-to-park garden portal and continuous path threshold",
+      "radial discovery pavers",
+      "layered flower canopy, stem leaves, planter rim, and supported chimes",
+      "restrained canopy, chime, and firefly motion"
+      ,"visible three-storey Commons mall exterior behind the walk-in shop pavilions"
+      ,"naturalized asymmetrical planting beds, low mounds, shrubs, and rocks"
+      ,"single-preview transition between Canopy Park and the authored mall interior"
+      ,"physical park-to-mall vestibule with 2.7m doorway, passage depth, inside-threshold trigger, and matched return spawn"
+    ],
+    "checks": {
+      "primaryArrival": "passed-3.3m-clear-open-garden-portal",
+      "portalCollision": "passed-two-authored-post-colliders",
+      "heroClearance": "passed-discoveries-remain-outside-reserved-hero-radius",
+      "productionCameraRead": "passed",
+      "interactionSequence": "passed-after-form-refinement",
+      "mallInteriorTransition": "passed-enter-mall-level-controls-and-return-to-park",
+      "physicalParkEntrance": "implemented-awaiting-live-walkthrough",
+      "wholeOutdoorSceneSnapshot": { "drawCalls": 102, "triangles": 280664 },
+      "statusNote": "User approval is recorded after the coherence revision, but the formal Form validator remains blocked by the legacy non-Meshy evidence schema. No Runtime export or deployment is authorized."
+    }
+  },
+  "runtime": {
+    "status": "prototype",
+    "evidence": [
+      "../../../src/grove/scene/worldLayout.js",
+      "../../../src/grove/scene/worldBuilder.js",
+      "../../../src/grove/scene/GroveScene.js"
+    ],
+    "checks": {
+      "browserLoad": "passed",
+      "landmarkReadability": "passed-after-woodland-exclusion-and-flower-silhouette-revision",
+      "discoverySequence": "passed-in-live-preview-sun-mint-rose-and-final-bloom-response",
+      "wholeOutdoorSceneSnapshot": { "drawCalls": 90, "triangles": 251992 },
+      "note": "Snapshot covers the complete outdoor Grove scene, not the incremental park cost. Sustained FPS and isolated park cost remain Runtime-gate work."
+    }
+  }
+}

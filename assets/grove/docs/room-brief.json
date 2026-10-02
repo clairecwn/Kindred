@@ -1,0 +1,17 @@
+{
+  "schema": "kindred.grove-room-brief.v1",
+  "roomId": "grove-mall",
+  "title": "The Grove Mall",
+  "purpose": "A playful, walkable multi-story mall environment for exploration, shopping, social encounters, and item-based interactions.",
+  "visualLanguage": ["cozy clarity", "storybook color", "rounded playful architecture", "readable silhouettes", "mall-simulation legibility"],
+  "inspiration": ["Homescapes", "Nintendo Super Mario worlds", "mall simulation games"],
+  "units": "meters",
+  "playerEnvelope": { "height": 1.8, "radius": 0.35, "comfortableCorridorWidth": 3.0 },
+  "bounds": { "width": 60, "depth": 44, "floorHeight": 5.0, "floors": 3 },
+  "hero": { "name": "central atrium", "purpose": "orientation landmark and social heart", "reserve": "keep sightlines open around the fountain and vertical garden" },
+  "primaryArrival": { "width": 8.0, "height": 4.5, "destination": "central atrium", "type": "open-hallway" },
+  "circulation": { "type": "loop-with-spokes", "mainLoopWidth": 4.0, "verticalConnections": ["north-stair", "south-escalator", "east-lift"] },
+  "performanceBudget": { "targetFramerate": 60, "visibleHeroProps": 80, "drawDistanceMeters": 70, "runtimeTier": "stylized-low-poly" },
+  "scopeBoundary": { "characterAssets": "read-only", "avatarSourceFolders": ["assets_blender", "public/models/kindred_*.glb", "src/avatar"], "environmentSource": "assets/grove" },
+  "gates": { "function": "approved", "form": "approved", "runtime": "pending" }
+}

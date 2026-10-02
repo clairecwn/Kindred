@@ -1,0 +1,46 @@
+{
+  "schema": "game-room.room-final-report.v1",
+  "roomId": "grove-mall",
+  "gates": { "function": true, "form": true, "runtime": false },
+  "formChecks": {
+    "floorPlanParity": false,
+    "primaryArrival": true,
+    "symmetry": false,
+    "shell": true,
+    "manifold": false,
+    "booleans": false,
+    "collisions": false,
+    "support": false,
+    "attachmentOrientation": false,
+    "ceilingAttachmentOrientation": false,
+    "seatingOrientation": false,
+    "focalDistribution": true,
+    "heroClearance": true,
+    "colonnades": true,
+    "screenClearance": false,
+    "scale": true,
+    "camera": false,
+    "ceilingCoverage": false,
+    "environmentCoverage": false,
+    "provenance": true
+  },
+  "reviewRenders": {
+    "corners": ["../renders/grove_blockout_production.png"],
+    "ceiling": [],
+    "environment": {
+      "groundFloor": "../renders/grove_blockout_production.png",
+      "level2North": "../renders/level2_north_shops.png",
+      "level2South": "../renders/level2_south_shops.png",
+      "level3North": "../renders/level3_north_shops.png",
+      "level3South": "../renders/level3_south_shops.png"
+    }
+  },
+  "runtimeChecks": { "vlow": false, "textureTiers": false, "lightmap": false, "lightingManifest": false, "performance": false, "browserCapture": "", "structuralGlbValidation": true, "threeJsLoadValidation": true, "browserLoadValidation": true, "floorSwitchValidation": true, "commerceCatalogValidation": true, "projectTestSuite": "passed-261-of-261", "fixtureColliderCounts": [16, 10, 11], "visibleShopModulesPerFloor": 4, "offFloorShopRendering": "culled", "measuredPreview": { "drawCalls": 238, "triangles": 58788, "baselineDrawCalls": 403, "baselineTriangles": 97892 }, "exportManifest": "../exports/manifest.json", "errors": ["Full mesh-level collision/UV/lightmap review, sustained frame-rate measurement, and explicit Runtime approval remain pending."] },
+  "postmortem": {
+    "observations": ["The modular shop approach preserved separation from the character pipeline.", "Storefront-facing cameras must account for north-versus-south shop orientation.", "Prototype item readability is adequate for catalog coverage but not final-art approval."],
+    "corrections": ["Added shop-specific cameras after pairwise upper-floor views were obstructed.", "Kept individual merchandise objects separately named for later interaction and export.", "Added north and south runtime connector decks after the live upper-floor preview exposed incomplete atrium landings.", "Lowered the mall-only follow camera below the next floor slab after the live preview exposed clipped upper-storey sightlines.", "Generated 37 measured fixture blockers from named shop meshes.", "Culled detailed shop modules outside the active floor, reducing the measured preview from 403 to 238 draw calls.", "Added atrium-edge rails and hid inactive connector decks to make upper-floor circulation read more safely."],
+    "remainingRisks": ["The 37 fixture blockers are broad-phase AABBs, not a complete mesh-level collision audit.", "No final topology or UV audit.", "No ceiling review suite.", "Several props remain prototype-grade and need authored final silhouettes.", "No sustained hardware frame-rate validation; current evidence is limited to 238 draw calls and 58,788 rendered triangles in the local preview."],
+    "exportPass": ["Created one refined master Blender scene without touching the character pipeline.", "Exported architecture and twelve shops as thirteen modular GLB files.", "Validated GLB headers, declared lengths, JSON chunks, scene/mesh/material presence, SHA-256 digests, and loading through the project's Three.js GLTFLoader."]
+  },
+  "proposedLessons": []
+}

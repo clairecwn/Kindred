@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { readKindredSettings, saveKindredSettings } from "../lib/app-settings.js";
 
 // ── SVG icon set (no emoji, per design bible) ─────────────────────────────
 function IconAccessibility() {
@@ -159,6 +160,21 @@ export default function SettingsPanel({ player, onClose }) {
   const [timeOverride, setTimeOverride] = useState("auto");
   const [seasonOverride, setSeasonOverride] = useState("auto");
 
+  // ── Controls ──────────────────────────────────────────────────────────
+  // Persisted through the shared kindred settings store (see
+  // src/lib/app-settings.js) rather than local-only state, since Grove
+  // reads it back out on mount to decide whether to render its on-screen
+  // joystick at all. Off by default — keyboard (WASD/arrows) always works
+  // regardless of this setting.
+  const [groveJoystick, setGroveJoystickState] = useState(
+    () => readKindredSettings().groveJoystick,
+  );
+
+  function setGroveJoystick(on) {
+    setGroveJoystickState(on);
+    saveKindredSettings({ ...readKindredSettings(), groveJoystick: on });
+  }
+
   // ── Privacy ───────────────────────────────────────────────────────────
   const [sharePresence, setSharePresence]   = useState(true);
   const [showEmotion, setShowEmotion]       = useState(false);
@@ -300,6 +316,17 @@ export default function SettingsPanel({ player, onClose }) {
           desc="Gentle clicks, chimes, and world sounds"
           value={sfxVol}
           onChange={setSfxVol}
+        />
+      </Section>
+
+      {/* ── Controls ──────────────────────────────────────────────────── */}
+      <Section icon={<IconDisplay />} title="Controls">
+        <Toggle
+          id="grove-joystick"
+          label="On-screen joystick"
+          desc="Shows a touch joystick in the Grove. Keyboard movement always works either way."
+          checked={groveJoystick}
+          onChange={setGroveJoystick}
         />
       </Section>
 

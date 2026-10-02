@@ -1,0 +1,28 @@
+{
+  "schema": "game-room.milestone-reviews.v1",
+  "roomId": "grove-mall",
+  "function": {
+    "status": "approved",
+    "approvedBy": "user",
+    "approvedAt": "2026-09-30",
+    "evidence": ["room-brief.json", "room-layout.json", "../renders/grove_blockout_production.png"],
+    "strangestElement": "The south-side ground-floor storefront orientation initially made review cameras look through back walls.",
+    "notes": "User approved proceeding from the mall blockout into detailed shop prototypes. Camera orientation was corrected per shop family during production."
+  },
+  "form": {
+    "status": "approved",
+    "approvedBy": "user",
+    "approvedAt": "2026-10-01",
+    "evidence": ["../renders/grove_grocer_detail.png", "../renders/thread_and_thimble_detail.png", "../renders/cafe_canopy_detail.png", "../renders/sole_search_detail.png", "../renders/pixel_pantry_detail.png", "../renders/maker_meadow_detail.png", "../renders/seasonal_pop_up_detail.png", "../renders/book_burrow_detail.png", "../renders/wellness_willow_detail.png", "../renders/food_hall_detail.png", "../renders/rooftop_garden_detail.png"],
+    "strangestElement": "Some prototypes read as colored primitives rather than finished merchandise, and several shop-wide cameras still need compositional cleanup.",
+    "notes": "User explicitly approved the Grove Form direction and authorized the refinement/export pass. Remaining technical checks still block Runtime approval."
+  },
+  "runtime": {
+    "status": "pending",
+    "approvedBy": "",
+    "approvedAt": "",
+    "evidence": ["../exports/manifest.json", "runtime-contract.json", "../../../src/grove/interiors/GroveMallInterior.js", "../../../public/models/env/grove/manifest.json"],
+    "strangestElement": "The authored upper-floor side wings required explicit north and south connector decks to make atrium circulation safe in the two-dimensional player controller.",
+    "notes": "Local runtime integration, Three.js loading, all three level switches, 37 measured fixture blockers, active-floor shop culling, production build, and browser preview have passed. The culling pass reduced the observed preview from 403 to 238 draw calls. Mesh-level collision/UV/lightmap review, sustained frame-rate measurement, final-art refinement, and explicit human Runtime approval remain outstanding."
+  }
+}

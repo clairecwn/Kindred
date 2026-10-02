@@ -1,0 +1,11 @@
+{
+  "schema": "kindred.grove-asset-catalog.v1",
+  "status": "blockout",
+  "assetFamilies": [
+    { "id": "grocery", "shop": "grove-grocer", "items": ["carrot", "tomato", "lettuce", "apple", "milk-carton", "cereal-box", "cleaning-spray", "basket", "shopping-trolley"], "strategy": "individual-props-with-color-variants" },
+    { "id": "clothing", "shop": "thread-and-thimble", "items": ["shirt", "dress", "trousers", "jacket", "sneaker", "handbag", "hat", "scarf", "necklace", "mannequin"], "strategy": "individual-display-props-with-material-variants" },
+    { "id": "homewares", "shop": "home-nook", "items": ["lamp", "kettle", "mug", "cushion", "plant-pot", "vase", "storage-box", "folding-chair"], "strategy": "small-reusable-prop-kit" },
+    { "id": "cafe", "shop": "cafe-canopy", "items": ["coffee-cup", "pastry", "sandwich", "plate", "menu-board", "stool", "counter-display"], "strategy": "hero-food-items-plus-procedural-furniture" }
+  ],
+  "sharedRules": { "units": "meters", "frontAxis": "+Y", "floorAttachment": "-Z", "targetStyle": "soft-edged-stylized-low-poly", "individualAssetRequired": true }
+}
