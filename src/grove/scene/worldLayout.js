@@ -223,6 +223,7 @@ export const BUILDINGS = Object.freeze([
     sub: "The park entrance to all three levels.", accent: 0x759d79,
     center: { x: -14.1, z: 34.8 }, halfW: 2.7, halfD: 2.0, facing: Math.PI,
     entryTriggerDepth: 0.7,
+    entryRadius: 0.5,
     returnPoint: { x: -14.1, z: 31.0, heading: 0 },
     interior: "grove-mall",
   },

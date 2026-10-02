@@ -90,9 +90,14 @@ export default function App() {
   const [emotion, setEmotion]               = useDatabaseState("kindred.emotion", "calm");
   const [coins, setCoins]                   = useDatabaseState("kindred.coins", 1000);
   const [journalEntries, setJournalEntries] = useDatabaseState("kindred.journal", initialJournalEntries);
+  // One record, read by every screen through adaptLegacyDescriptor. Kai is the
+  // default; `character` is the only thing that decides who appears in Home,
+  // Kingdom, Grove and presence. `skinTone` is an index into SKIN_TONES, so a
+  // palette rename never invalidates a save, and null means "their own skin".
+  // No wardrobe key: everyone wears their base body for now.
   const [character, setCharacter]           = useDatabaseState("kindred.character", {
-    animal:"fox",skin:"honey",color:"honey",outfit:"hoodie",hat:"none",accessory:"scarf",
-    glasses:"none",shoes:"sneakers",pattern:"blush",furStyle:"soft",emote:"wave",animation:"idle"
+    character: "kai",
+    skinTone: null,
   });
   const [inventory, setInventory]   = useDatabaseState("kindred.inventory", []);
   const [friends, setFriends]       = useDatabaseState("kindred.friends", ["Mia"]);

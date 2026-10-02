@@ -86,6 +86,11 @@ export default function GroveView({ character, coins, analysis, previewMall = fa
     const canvas = canvasRef.current;
     if (!canvas) return undefined;
 
+    // React Fast Refresh preserves component state while recreating the
+    // Three.js scene. Keep the HUD in step with that fresh outdoor scene
+    // instead of leaving stale mall-floor controls over the park.
+    setInterior({ active: false, id: null, label: null, npcLabel: null, metaLabel: null });
+
     const ladder = createSocialLadder(LadderState.AMBIENT);
     ladderRef.current = ladder;
     const unsubscribe = ladder.subscribe((next) => setLadderState(next));

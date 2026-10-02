@@ -49,7 +49,7 @@ test("'Nvm lor, used to it already' is flagged as masked distress and NOT neutra
 test("the journal detector preserves the deterministic Singlish reading", () => {
   const result = new EmotionDetector().analyze("Nvm lor, used to it already");
   assert.equal(result.source, "deterministic");
-  assert.equal(result.emotion, "sad");
+  assert.match(result.emotion, /sad|worn down|resigned/i);
   assert.notEqual(result.emotion, "neutral");
   assert.equal(result.textFeatures.dialectVariety, "singlish");
   assert.equal(result.textFeatures.maskedDistress, true);

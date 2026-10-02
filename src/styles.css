@@ -4844,3 +4844,265 @@ input:focus, select:focus {
   0%, 100% { transform: rotate(-3deg); }
   50%      { transform: rotate(3deg); }
 }
+
+/* ── Dressing room (character select) ───────────────────────────────
+   Colour strategy, since this screen exists to make five warm, light,
+   saturated characters read clearly:
+
+   - HUE: the cast is overwhelmingly warm (peach to brown skin, warm hair,
+     orange and yellow outfits), so the room is its complement -- a cool
+     teal/petrol. Opposing hues separate at the silhouette without any
+     outline being drawn.
+   - VALUE: the characters are light, so the room sits a few steps darker.
+     The only bright area is the pool of light they stand in, which is also
+     what stops the floor from reading as a second subject.
+   - SATURATION: the room is desaturated. Saturated surfaces compete for
+     attention; muted ones hand it over. The most saturated things on screen
+     are Kai's tee and Bella's top, which is the point.
+   - TEMPERATURE: the key light on the avatar is warm (AvatarStage) and the
+     room is cool, so warm-on-cool does the separating.
+
+   The room never scrolls. It fills main-content exactly and keeps a bottom
+   gutter the height of the floating nav pills. */
+.dressing-room {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  --dr-nav-gutter: calc(96px + env(safe-area-inset-bottom, 0px));
+  --dr-deep:  #14383C;   /* darkest teal, corners and vignette */
+  --dr-wall:  #2C5F63;   /* wall mid-tone */
+  --dr-lit:   #4D8A8A;   /* wall where the light hits */
+  --dr-gold:  #E8B860;   /* brass rails, selection ring */
+  --dr-cream: #F6EEDF;   /* panel text and moulding */
+}
+
+/* ── The room ───────────────────────────────────────────────────── */
+/* Modelled, lit and rendered in Blender: assets_blender/kindred_dressing_room.blend
+   -> assets_blender/_preview/dressing_room.png -> public/images/dressing_room.jpg.
+   Real geometry gives the cabinetry its perspective, its contact shadows and
+   the falloff across the back wall, none of which a stack of CSS gradients
+   can do convincingly. The render is deliberately low-contrast and almost
+   featureless through the middle third, because that is where a character
+   stands. */
+.dr-room {
+  position: absolute;
+  inset: 0;
+  background: #1D474B url("/images/dressing_room.jpg") center 42% / cover no-repeat;
+}
+
+/* Warm spotlight cone. Warm light, cool room. */
+.dr-spotlight {
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  width: min(58%, 580px);
+  height: 86%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 240, 206, 0.46) 0%, rgba(255, 232, 186, 0.18) 48%, rgba(255, 232, 186, 0) 88%);
+  clip-path: polygon(40% 0%, 60% 0%, 100% 100%, 0% 100%);
+  filter: blur(8px);
+  mix-blend-mode: screen;
+}
+
+/* Corner falloff: pushes every bright pixel towards the middle third. */
+.dr-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 72% 78% at 50% 48%, rgba(0, 0, 0, 0) 52%, rgba(10, 32, 35, 0.55) 100%);
+}
+
+.dr-layout {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(104px, 140px) minmax(0, 1fr) minmax(92px, 118px);
+  gap: 10px;
+  padding: 14px 12px var(--dr-nav-gutter);
+  align-items: stretch;
+}
+
+/* ── Panels ─────────────────────────────────────────────────────── */
+.dr-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  gap: 6px;
+  padding: 8px 7px;
+  border-radius: 18px;
+  border: 2px solid rgba(232, 184, 96, 0.38);
+  background: linear-gradient(180deg, rgba(23, 66, 70, 0.88), rgba(16, 48, 52, 0.92));
+  backdrop-filter: blur(5px);
+  box-shadow:
+    inset 0 1px 0 rgba(174, 219, 214, 0.22),
+    0 10px 26px rgba(8, 28, 31, 0.42);
+}
+
+.dr-panel-title {
+  flex-shrink: 0;
+  text-align: center;
+  font-size: 0.6rem;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(246, 238, 223, 0.78);
+}
+
+/* Right column: skin and hair are two separate panels, not one list. */
+.dr-right {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+}
+
+.dr-panel--tones { flex: 0 0 auto; }
+
+/* ── Characters ─────────────────────────────────────────────────── */
+/* No scrolling: the five cards divide the rail's height between them and the
+   model inside each is sized from that share, so nobody is ever clipped. */
+.dr-cast-list {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dr-kin {
+  width: 100%;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 2px;
+  border-radius: 14px;
+  border: 2px solid rgba(135, 183, 181, 0.26);
+  background:
+    radial-gradient(ellipse 72% 40% at 50% 86%, rgba(126, 182, 178, 0.38), transparent 72%),
+    linear-gradient(180deg, #2E6368 0%, #1E4B50 100%);
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.16s, box-shadow 0.16s, border-color 0.16s, background 0.16s;
+}
+
+.dr-kin:hover { transform: translateY(-1px); border-color: rgba(232, 184, 96, 0.5); }
+
+.dr-kin.active {
+  border-color: var(--dr-gold);
+  background:
+    radial-gradient(ellipse 72% 42% at 50% 86%, rgba(255, 226, 168, 0.55), transparent 74%),
+    linear-gradient(180deg, #3A7A7C 0%, #27605F 100%);
+  box-shadow: 0 0 0 2px rgba(232, 184, 96, 0.32), 0 6px 14px rgba(8, 28, 31, 0.45);
+}
+
+.dr-kin-model { pointer-events: none; }
+
+.dr-kin-name {
+  width: 100%;
+  line-height: 15px;
+  padding-bottom: 2px;
+  font-size: 0.72rem;
+  font-weight: 900;
+  color: var(--dr-cream);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Colour swatches ────────────────────────────────────────────── */
+.dr-tone-grid {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: 7px;
+  justify-content: center;
+  padding-bottom: 2px;
+}
+
+.dr-tone {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--swatch-color);
+  border: 2px solid rgba(246, 238, 223, 0.55);
+  box-shadow: 0 2px 5px rgba(8, 28, 31, 0.45);
+  cursor: pointer;
+  transition: transform 0.16s, box-shadow 0.16s, border-color 0.16s;
+}
+
+.dr-tone:hover { transform: scale(1.12); }
+
+.dr-tone.active {
+  border-color: var(--dr-gold);
+  box-shadow: 0 0 0 3px rgba(232, 184, 96, 0.45);
+  transform: scale(1.14);
+}
+
+/* ── The podium ─────────────────────────────────────────────────── */
+.dr-stage {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dr-stage-name {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.45rem;
+  font-weight: 900;
+  letter-spacing: 0.6px;
+  color: var(--dr-cream);
+  text-shadow: 0 2px 10px rgba(8, 28, 31, 0.75);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Warm brass-rimmed dais: the one warm surface the figure touches. */
+.dr-podium {
+  position: absolute;
+  left: 50%;
+  bottom: 8px;
+  width: min(58%, 290px);
+  height: 88px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 30%, #FBEFD6 0%, #EFD6A8 48%, #C9A868 100%);
+  border: 3px solid rgba(232, 184, 96, 0.75);
+  box-shadow:
+    0 11px 0 rgba(146, 116, 64, 0.9),
+    0 20px 34px rgba(8, 28, 31, 0.5),
+    0 0 56px 18px rgba(255, 226, 162, 0.3);
+}
+
+.dr-avatar {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: 100%;
+  padding-bottom: 46px;
+  user-select: none;
+}
+
+@media (max-width: 760px) {
+  .dr-layout {
+    grid-template-columns: 90px minmax(0, 1fr) 86px;
+    gap: 6px;
+    padding: 10px 8px var(--dr-nav-gutter);
+  }
+  .dr-tone { width: 29px; height: 29px; }
+  .dr-stage-name { font-size: 1.15rem; }
+}

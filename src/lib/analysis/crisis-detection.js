@@ -117,7 +117,7 @@ export const CRISIS_RESPONSE = Object.freeze({
   resources: [
     { label: "Samaritans of Singapore (24/7)", contact: "1767" },
     { label: "988 Suicide & Crisis Lifeline (US, 24/7)", contact: "988" },
-    { label: "International Association for Suicide Prevention — find a local line", contact: "https://www.iasp.info/resources/Crisis_Centres/" },
+    { label: "International Association for Suicide Prevention, find a local line", contact: "https://www.iasp.info/resources/Crisis_Centres/" },
   ],
   isCrisisResponse: true,
 });

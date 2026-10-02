@@ -16,7 +16,7 @@ test("masked Singlish gets tentative reflection rather than neutral reassurance"
     textFeatures: { maskedDistress: true, agency: { adjustment: -0.18 } },
   });
   assert.equal(strategy.mode, "tentative-understatement-reflection");
-  assert.match(strategy.interpretation, /possibility—not a fact/);
+  assert.match(strategy.interpretation, /possibility, not a fact/);
   assert.match(strategy.copingCues.join(" "), /constrained/);
 });
 

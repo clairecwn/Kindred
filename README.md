@@ -55,6 +55,7 @@ clinical term and nothing here is a diagnosis.
 | --- | --- |
 | `emotion-space.js` | Emotion as VAD coordinates. Labels are for display, coordinates are for maths. |
 | `text-features.js` | Deterministic, no model call: hedging, minimisation, somatic idioms, self-discrepancy cues, absolutist words. |
+| `experience-profile.js` | Open-vocabulary experience profile: VAD, appraisal, attribution, social meaning, possible needs, hope and tensions. |
 | `dialect/` | Variety identification and a Singlish lexicon. |
 | `checkin-scoring.js` | Weighted graded scoring of the 7 items, with bands derived from the model. |
 | `state-filter.js` | Ornstein-Uhlenbeck continuous-time Kalman filter, so skipped days are handled exactly. |
@@ -208,13 +209,25 @@ exploration when it helps. A question is not compulsory. The model is told not
 to imitate Singlish, infer identity from language, diagnose, overstate hidden
 feelings, or jump from acknowledgement straight into solutions.
 
+The companion does not force the entry into one winning emotion from a finite
+bank. `experience-profile.js` preserves feeling language the user chose and
+combines continuous valence, activation and control with goal congruence,
+effort, certainty, self-evaluation, agency, social exposure, unfairness,
+connection, loss, achievement, relief, hope and ambivalence. Possible needs and
+supported tensions are hypotheses for response planning, not facts about the
+person. This makes “disappointed after effort,” “wronged by unfair treatment,”
+and “relieved but empty” distinct even when their average valence is similar.
+
 ### Follow-up conversation model
 
 `conversation-response.js` plans every “talk more” turn before Groq writes any
 prose. The journal entry is background rather than a script: the latest user
 turn leads, prior user turns provide continuity, and prior companion turns are
 used to prevent repetition and serial questioning. Duplicate boundary turns
-are removed before prompting.
+are removed before prompting. Up to 80 recent turns feed the deterministic
+thread summary; only the latest 18 are sent verbatim to Groq. This preserves a
+long conversation without letting an ever-growing prompt drown out the newest
+message.
 
 For user turn `i`, the context affect vector is an evidence-adjusted,
 exponentially decayed mean:
@@ -230,7 +243,10 @@ using content-token sets after stop-word removal. The planner combines `N_t`,
 `Δ_t`, the latest appraisal causes, conversational frames (for example
 self-criticism, evaluation pressure, unreliable support and competing goals),
 and the latest communicative intent. It then selects a reflection depth and a
-hard question budget. A user who just answered a question receives a
+response move, such as repairing a misreading, clarifying the companion's own
+wording, separating an event from self-judgment, reflecting two valid sides,
+noticing a shift, or offering a collaborative next step. It also sets a hard
+question budget. A user who just answered a question receives a
 reflection rather than another question; corrections trigger repair; direct
 advice requests are answered before exploration.
 
@@ -291,6 +307,14 @@ unavailable—the deterministic local response uses the same latest-turn anchor
 and cause frames. It never falls back to “tell me more” copy. These coefficients
 are transparent engineering priors, not learned clinical parameters; they
 should eventually be calibrated against consented user ratings and corrections.
+
+`companion-style.js` is the final user-visible boundary. It rejects canned
+empathy, therapy clichés, formulaic “it sounds like” openings and long dashes,
+including em dashes. Every Groq reply and deterministic fallback is normalized
+through this boundary. The stress suite follows a 20-turn evolving story,
+checks an 80-turn context window against a 140-message history, and covers
+setbacks, mixed motives, grief, unfairness, social exclusion, uncertainty,
+achievement, overload and self-judgment.
 
 For public deployments, Groq belongs behind the authenticated Supabase Edge
 Function in `supabase/functions/analyse`; `VITE_GROQ_API_KEY` remains a local
@@ -355,6 +379,19 @@ rules; it does not treat group-level findings as facts about an individual.
   classification beyond broad emotion labels. Kindred uses this as a design
   basis for interpretable cause-and-appraisal features.
   [Paper](https://aclanthology.org/2020.coling-main.11/)
+- Hoemann et al., *The construction of emotional meaning in language* (2025):
+  emotional meaning depends on attention, construal and appraisal across
+  stretches of language, not only emotion words. This motivates the
+  compositional experience profile and its event, agency, certainty and
+  goal-relevance dimensions.
+  [Study](https://doi.org/10.1038/s44271-025-00255-0)
+- Keltner, Sauter, Tracy & Cowen, *Emotional Expression: Advances in Basic
+  Emotion Theory* (2019): naturalistic emotional experience requires a much
+  higher-dimensional space than a small basic-emotion list, with related
+  states connected by gradients. Kindred therefore keeps VAD and appraisal
+  dimensions alongside open-vocabulary descriptions rather than expanding a
+  single fixed word bank.
+  [Review](https://pmc.ncbi.nlm.nih.gov/articles/PMC6675572/)
 - Anderson, Anderson, Dorr, DeNeve & Flanagan, *Temperature and aggression*
   (1995): uncomfortable heat increased hostile affect in controlled studies.
   Kindred therefore treats explicit oppressive heat as physical-discomfort
@@ -449,6 +486,11 @@ rules; it does not treat group-level findings as facts about an individual.
   Interviewing* (2019): reflective listening, open questions, autonomy and
   permission before information-sharing guide the no-unsolicited-advice and
   reflection-before-question rules. [Guide](https://motivationalinterviewing.org/sites/default/files/understanding_mi_aug_2019.pdf)
+- SAMHSA, *How to Talk to Someone About Help for Mental Health or Substance
+  Use* (2023): open questions, listening, strengths and asking how support can
+  help inform Kindred's reflective, autonomy-preserving interaction pattern.
+  This is communication guidance, not a claim that the app provides therapy.
+  [Guide](https://www.samhsa.gov/find-support/helping-someone/how-to-talk-to-someone-about-help)
 - Groq, *Prompt Basics* and *Structured Outputs*: explicit role, instructions,
   context and output contracts improve consistency; JSON Object Mode provides
   valid JSON for `llama-3.3-70b-versatile`. Kindred uses a lower temperature and

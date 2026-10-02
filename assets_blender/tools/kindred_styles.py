@@ -11,18 +11,45 @@ SHORT = dict(NCOL=96, NSCALP=22, NFALL=22, locks=7, lock_amp=0.042, lock_z=0.030
 TOUSLE = dict(NCOL=100, NSCALP=22, NFALL=22, locks=9, lock_amp=0.046, lock_z=0.036,
               scalp_rip=0.013, curl_amp=0.034, curl_len=0.26, twist=0.034,
               swell=0.08, taper=0.35, drift=0.05, nape=0.05, tip_taper=0.34, tip_span=0.09, volume=0.000, flow=0.045)
+
+# Alex. TOUSLE was SHORT with two extra locks, so next to Kai he was the same
+# haircut in a different colour - same flat cap, same side-swept fringe, same
+# silhouette at thumbnail size, and once they share a skin tone there is nothing
+# left to tell them apart. COIL is a different haircut, not a different setting:
+# thirteen tight locks instead of nine loose ones, a short curl length so the
+# relief reads as coils rather than strands, and a scalp ripple twice as deep so
+# the texture carries right over the crown. Harmonics run at 13/16/18 cycles
+# against NCOL=136, which is 7.5 samples on the shortest one - above the ~4 where
+# the lock ripple started aliasing into diagonal banding on Wren.
+COIL = dict(NCOL=132, NSCALP=24, NFALL=22, locks=11, lock_amp=0.058, lock_z=0.028,
+            scalp_rip=0.016, curl_amp=0.030, curl_len=0.36, twist=0.048,
+            swell=0.10, taper=0.32, drift=0.03, nape=0.04, tip_taper=0.32,
+            tip_span=0.08, volume=0.035, flow=0.030)
+# First attempt used curl_len 0.15, which puts a curl crest every 15% of the
+# fall. Measured against a fall of roughly four crests from crown to hem, that
+# is a stack of horizontal ridges, not coils - the relief has to run DOWN the
+# strand to read as hair. The angular term (locks/lock_amp) is what gives
+# vertical separation, so the count went up and the along-length term went back
+# to the short-hair value.
 JKW = dict(NCOL=100, NSCALP=22, NFALL=24, locks=7, lock_amp=0.048, lock_z=0.034,
            scalp_rip=0.013, curl_amp=0.036, curl_len=0.32, twist=0.032,
-           swell=0.09, taper=0.40, drift=0.06, nape=0.03, tip_taper=0.34, tip_span=0.10, volume=0.000, flow=0.060)
+           swell=0.09, taper=0.40, drift=0.06, nape=0.03, tip_taper=0.34, tip_span=0.10, volume=0.000, flow=0.060, sdrift=0.075)
 SKW = dict(NCOL=100, NSCALP=22, NFALL=24, locks=7, lock_amp=0.047, lock_z=0.032,
            scalp_rip=0.013, curl_amp=0.035, curl_len=0.32, twist=0.030,
-           swell=0.09, taper=0.40, drift=0.05, nape=0.03, tip_taper=0.34, tip_span=0.10, volume=0.000, flow=0.060)
+           swell=0.09, taper=0.40, drift=0.05, nape=0.03, tip_taper=0.34, tip_span=0.10, volume=0.000, flow=0.060, sdrift=0.075)
 WKW = dict(NCOL=112, NROW=76, NSCALP=22, NFALL=26, locks=7, lock_amp=0.040, lock_z=0.046,
            scalp_rip=0.013, curl_amp=0.128, curl_len=0.50, twist=0.140,
-           swell=0.07, taper=0.26, drift=0.12, nape=0.00, fdrift=0.07, flow=0.125, wave_at=0.08, curl_on=0.24, wave_phase=1.30, tip_taper=0.18, tip_span=0.10, volume=0.000)
+           swell=0.07, taper=0.26, drift=0.12, nape=0.00, fdrift=0.07, flow=0.125, wave_at=0.08, sdrift=0.175, curl_on=0.24, wave_phase=1.30, tip_taper=0.18, tip_span=0.10, volume=0.000)
 
 KAI_END = [(0,1.722),(25,1.706),(45,1.646),(60,1.520),(75,1.392),(90,1.280),(110,1.196),(140,1.152),(180,1.144)]
 TOBI_END = [(0,1.718),(25,1.704),(45,1.644),(62,1.508),(80,1.352),(100,1.240),(130,1.164),(160,1.143),(180,1.140)]
+# Alex's own hemline. Kai's hair comes down past the cheekbone on both sides and
+# ends in a bowl; Alex's is cut back above the jaw, which is most of what makes
+# one read as a crop and the other as a bowl. The back still reaches 1.186 - the
+# chin sits near 1.32 and there is no neck, so the hair IS the back of the head
+# below that and cutting into it would make him bald from behind, not shaved.
+ALEX_END = [(0,1.726),(22,1.712),(42,1.664),(58,1.586),(72,1.500),(88,1.420),
+            (104,1.352),(124,1.286),(146,1.224),(164,1.196),(180,1.186)]
 # A ponytail does NOT mean a short hem all round. The cap still has to cover the
 # whole skull to the nape, or the back of the head goes bald - these characters
 # have no neck, so the hair is the back of the head. What makes it read as "up"
@@ -57,6 +84,43 @@ def tobi_tufts():
     r = [0.044,0.034,0.018,0.003]
     parts = [fly([(s[i], r[i]) for i in range(4)]) for s in specs]
     base = parts[0]; join(base, parts[1:]); return base
+
+def tobi_quiff():
+    """The front mass that lifts off Alex's forehead and sweeps back.
+
+    This is what separates him from Kai in silhouette rather than in texture.
+    Kai's fringe lies forward and down across the brow, so his outline above the
+    eyes is a flat lid. Alex's hairline rises instead: three strands leave the
+    cap at the brow, climb about 0.14 above the crown and fall back over it, so
+    his outline peaks in front and his forehead is open. Read as a silhouette at
+    thumbnail size - which is all the character rail gets - a peak and a lid are
+    not confusable, and no amount of recolouring makes them so.
+
+    The strands start INSIDE the cap surface (y about -0.30 at z 1.80 is under
+    the hair, not in front of it) so the join is buried; a quiff that starts on
+    the surface reads as a horn stuck to the head.
+    """
+    strands = [
+        # centre: tallest, straight back
+        [((0.00,-0.300,1.792),0.082),((0.00,-0.300,1.874),0.086),((0.01,-0.262,1.948),0.080),
+         ((0.02,-0.186,2.000),0.064),((0.03,-0.092,2.024),0.044),((0.04,-0.004,2.020),0.022),
+         ((0.04, 0.052,2.008),0.005)],
+        # right: a touch lower and thrown outwards, so the mass is not a fin
+        [((0.185,-0.268,1.788),0.070),((0.206,-0.272,1.862),0.073),((0.228,-0.240,1.930),0.066),
+         ((0.246,-0.172,1.976),0.052),((0.258,-0.090,1.994),0.034),((0.264,-0.016,1.988),0.015),
+         ((0.266, 0.030,1.978),0.004)],
+        # left: lower again and shorter, so the front is asymmetric like hair is
+        [((-0.192,-0.262,1.784),0.066),((-0.214,-0.268,1.852),0.068),((-0.236,-0.238,1.914),0.060),
+         ((-0.252,-0.178,1.954),0.045),((-0.262,-0.108,1.968),0.028),((-0.266,-0.048,1.962),0.011),
+         ((-0.268,-0.012,1.956),0.003)],
+    ]
+    parts = [fly(st) for st in strands]
+    base = parts[0]; join(base, parts[1:]); return base
+# NOT in SPECS. Built and rendered: at this cap height the three strands only
+# just clear the crown, so they read as three lumps stuck on top rather than as
+# one swept mass. Kept because the geometry is right and a taller cap or a
+# shorter crown would use it; the silhouette difference now comes from the cap
+# itself (higher lift, hem cut back above the jaw) instead.
 
 def juno_extras():
     """ONE tail with strand relief cut into its surface, not three tubes.
@@ -106,10 +170,16 @@ SPECS = [
          bang=dict(n=2, amp=0.150, span=(4.0,64.0), phase=0.62, asym=0.034, sweep=0.26),
          flick=-0.22, flick_above=1.45, hat_squash=(1.70,1.852),
          bump_kw=dict(amp=0.003, freq=10.0, seed=1.0)),
-    dict(tag="Tobi_", k="tobi", ctrl=TOBI_END, kw=TOUSLE,
-         bang=dict(n=3, amp=0.118, span=(3.0,66.0), phase=0.30, asym=-0.026, sweep=-0.20),
-         flick=-0.24, flick_above=1.45, hat_squash=(1.70,1.852),
-         bump_kw=dict(amp=0.007, freq=7.0, seed=3.0)),
+    # lift 0.16 raises the whole cap, which is what makes a crop read as a crop
+    # rather than as a skullcap, and the small bang amplitude leaves the brow
+    # open instead of covering it the way Kai's fringe does. The hemline is
+    # unchanged: these characters have no neck, so the back of the hair IS the
+    # back of the head, and cutting it into a taper would make him bald from
+    # behind rather than making him look shaved.
+    dict(tag="Tobi_", k="tobi", ctrl=ALEX_END, kw=COIL,
+         bang=dict(n=2, amp=0.172, span=(6.0,58.0), phase=0.0, asym=-0.020, sweep=-0.10),
+         flick=-0.12, flick_above=1.45, lift=0.20, hat_squash=(1.70,1.852),
+         bump_kw=dict(amp=0.004, freq=9.0, seed=3.0)),
     dict(tag="Juno_", k="juno", ctrl=JUNO_END, kw=JKW, extras=[juno_extras],
          bang=dict(n=2, amp=0.116, span=(4.0,58.0), phase=0.95, asym=0.040, sweep=0.34),
          flick=-0.30, flick_above=1.45, hat_squash=(1.70,1.846)),

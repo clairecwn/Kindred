@@ -55,7 +55,7 @@ export class InteriorManager {
     if (this.activeId === null) {
       for (const spec of BUILDINGS) {
         const d = Math.hypot(x - spec.approachPoint.x, z - spec.approachPoint.z);
-        if (d <= ENTER_RADIUS) {
+        if (d <= (spec.entryRadius ?? ENTER_RADIUS)) {
           return this._enter(spec.id);
         }
       }

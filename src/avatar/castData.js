@@ -20,29 +20,38 @@ export const CAST = [
   {
     id: "kai", name: "Kai", model: "kindred_char01", presents: "masc",
     hair: "short side-swept", vibe: "steady, easygoing, the one who shows up",
-    palette: { skin: 0xEBC9A8, hair: 0x6B4A33, cloth: 0xD96E5E },
+    palette: { skin: 0xEBC9A8, hair: 0x6B4A33 },
   },
   {
-    id: "tobi", name: "Tobi", model: "kindred_tobi", presents: "masc",
-    hair: "messy black tousle", vibe: "playful troublemaker with a soft centre",
-    palette: { skin: 0xAD7A5C, hair: 0x1D191B, cloth: 0xD95C4F },
+    id: "alex", name: "Alex", model: "kindred_tobi", presents: "masc",
+    hair: "tall textured crop, high hairline", vibe: "playful troublemaker with a soft centre",
+    palette: { skin: 0xAD7A5C, hair: 0x1D191B },
   },
   {
-    id: "juno", name: "Juno", model: "kindred_juno", presents: "femme",
+    id: "bella", name: "Bella", model: "kindred_juno", presents: "femme",
     hair: "high ponytail with face-framing locks", vibe: "bright and bouncy, first one out the door",
-    palette: { skin: 0xE5B48C, hair: 0xD87E3E, cloth: 0xF4DA4C },
+    palette: { skin: 0xE5B48C, hair: 0xD87E3E },
   },
   {
-    id: "wren", name: "Wren", model: "kindred_wren", presents: "femme",
+    id: "tate", name: "Tate", model: "kindred_wren", presents: "femme",
     hair: "long, centre part, waves past the shoulders", vibe: "quiet and observant, listens more than talks",
-    palette: { skin: 0xF2D8C6, hair: 0x372E33, cloth: 0x6F7B99 },
+    palette: { skin: 0xF2D8C6, hair: 0x372E33 },
   },
   {
-    id: "sage", name: "Sage", model: "kindred_sage", presents: "femme",
-    hair: "side braid with a low bun", vibe: "warm and unhurried, makes the tea",
-    palette: { skin: 0x8B6049, hair: 0x4A352D, cloth: 0xA5BA93 },
+    id: "lara", name: "Lara", model: "kindred_sage", presents: "femme",
+    hair: "side braid", vibe: "warm and unhurried, makes the tea",
+    palette: { skin: 0x8B6049, hair: 0x4A352D },
   },
 ];
+
+/* No `cloth` in the palettes: each body already carries its own designed
+   outfit, in two tones (Kai's orange tee over blue shorts, and so on).
+   Seeding one cloth colour repaints the shirt and the pants to the same
+   value and flattens that. A player-chosen cloth tone still overrides it. */
+
+/* The `model` keys are the GLB filenames the Blender exporter writes and are
+   deliberately NOT renamed with the characters: the id is what the game and
+   every save refer to, the filename is an internal asset path. */
 
 export const CAST_IDS = CAST.map((c) => c.id);
 export const DEFAULT_CHARACTER = "kai";
@@ -110,6 +119,15 @@ export function sanitizeEquipped(characterId, equipped = {}) {
 export const SKIN_TONES = [0xF2D8C2, 0xE8C4A6, 0xD9A87E, 0xB9805A, 0x8C5A3C, 0x5E3B28];
 export const HAIR_TONES = [0x4A3428, 0x6B4A33, 0x8C6440, 0xC9A15C, 0x2E2A2E, 0x7E5A6B, 0x9AA7B0];
 export const CLOTH_TONES = [0x8B78B0, 0xEED8B4, 0x49668C, 0xD9827E, 0xE1A540, 0xA3987E, 0x73A36F, 0xD16D4D];
+
+/** Names for the swatch rows. Index-aligned with the tone arrays above; the
+ *  saved record stores the INDEX, so renaming a tone never invalidates a save. */
+export const SKIN_TONE_NAMES = ["Porcelain", "Sand", "Honey", "Caramel", "Chestnut", "Espresso"];
+export const HAIR_TONE_NAMES = ["Cocoa", "Chestnut", "Toffee", "Wheat", "Soft black", "Plum", "Ash"];
+export const CLOTH_TONE_NAMES = ["Lilac", "Oat", "Denim", "Rose", "Amber", "Clay", "Fern", "Ember"];
+
+/** Hex string for a swatch, e.g. "#e8c4a6". */
+export const hexCss = (n) => `#${n.toString(16).padStart(6, "0")}`;
 
 /** Material names in the GLBs, grouped by what a palette entry retints.
  *  Matched by prefix, because each character carries its own hair material

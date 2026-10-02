@@ -35,6 +35,10 @@ export {
   SKIN_TONES,
   HAIR_TONES,
   CLOTH_TONES,
+  SKIN_TONE_NAMES,
+  HAIR_TONE_NAMES,
+  CLOTH_TONE_NAMES,
+  hexCss,
   CLIPS,
   CLIP_LIST,
   FPS,
@@ -54,27 +58,3 @@ export {
   isLegacyDescriptor,
   toAvatarDescriptor,
 } from "./kindredAdapter.js";
-
-/* ---- compatibility shims -------------------------------------------
- * The cast replaced the old animal species, but CharacterView.jsx still
- * reads these names. They now describe cast members instead. Migrate the
- * screen at leisure and delete this block.
- */
-import { CAST as _CAST, CLOTH_TONES as _CLOTH } from "./castData.js";
-
-export const SPECIES_LIST = _CAST.map((c) => c.id);
-export const SPECIES_NAME = Object.fromEntries(_CAST.map((c) => [c.id, c.name]));
-export const PERSONALITY = Object.fromEntries(
-  _CAST.map((c) => [c.id, { name: c.name, vibe: c.vibe, hair: c.hair, presents: c.presents }]),
-);
-export function getPersonality(id) {
-  return PERSONALITY[id] ?? PERSONALITY[_CAST[0].id];
-}
-export const COLOURWAYS = _CLOTH.map((hex, i) => ({
-  id: `cw${i}`,
-  name: ["Lilac", "Oat", "Denim", "Rose", "Amber", "Clay", "Fern", "Ember"][i] ?? `Tone ${i}`,
-  main: hex,
-}));
-export function getColourway(id) {
-  return COLOURWAYS.find((c) => c.id === id) ?? COLOURWAYS[0];
-}
