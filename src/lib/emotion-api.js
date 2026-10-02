@@ -28,6 +28,8 @@ import { analyseText } from "./analysis/text-features.js";
 import { vadToEmotionDirectional } from "./analysis/emotion-space.js";
 import { deriveInterpretiveEmotion } from "./analysis/thought-appraisal.js";
 import { informalGlossary } from "./analysis/informal-pragmatics.js";
+import { buildExperienceProfile, formatExperienceProfile } from "./analysis/experience-profile.js";
+import { normaliseCompanionStyle } from "./analysis/companion-style.js";
 
 /** Map the model's [0,1] evidence confidence onto the 0-100 the UI expects. */
 function toPercent(confidence) {
@@ -48,6 +50,7 @@ export async function analyzeEmotionAI(text) {
   };
   const coarse = vadToEmotionDirectional(features.vad);
   const deterministic = deriveInterpretiveEmotion(features, coarse.emotion);
+  const experienceProfile = buildExperienceProfile(features, text);
   const hasEvidence = features.vadConfidence > 0;
 
   const base = hasEvidence
@@ -62,6 +65,7 @@ export async function analyzeEmotionAI(text) {
         emotionFamily: deterministic.family,
         appraisal: features.appraisal,
         informal: features.informal,
+        experienceProfile,
       }
     : null;
 
@@ -79,14 +83,14 @@ export async function analyzeEmotionAI(text) {
       .map((item) => `"${item.surface}": ${item.gloss} [${item.function}]`)
       .join("; ");
     const grounding = hasEvidence
-      ? `Deterministic source-of-truth reading: ${deterministic.emotion} (coarse family ${deterministic.family}); VAD (${features.vad.valence.toFixed(3)}, ${features.vad.arousal.toFixed(3)}, ${features.vad.dominance.toFixed(3)}); language-evidence confidence ${(features.vadConfidence * 100).toFixed(0)}%. Appraisal: ${JSON.stringify(features.appraisal?.dimensions ?? {})}. Explicit causes: ${(features.appraisal?.causes ?? []).map((cause) => cause.label).join(", ") || "none"}.`
+      ? `Deterministic source-of-truth reading: ${deterministic.emotion} (coarse family ${deterministic.family}); VAD (${features.vad.valence.toFixed(3)}, ${features.vad.arousal.toFixed(3)}, ${features.vad.dominance.toFixed(3)}); language-evidence confidence ${(features.vadConfidence * 100).toFixed(0)}%. Appraisal: ${JSON.stringify(features.appraisal?.dimensions ?? {})}. Explicit causes: ${(features.appraisal?.causes ?? []).map((cause) => cause.label).join(", ") || "none"}. Compositional experience profile: ${formatExperienceProfile(experienceProfile)}`
       : "The deterministic model found no reliable affect evidence; stay tentative rather than asserting neutral.";
 
     const raw = await groqChat({
       messages: [
         {
           role: "system",
-          content: `You provide a nuanced display phrase for a journal emotion that has already been measured by a deterministic model. Do not reverse the supplied valence or arousal direction, diagnose the person, or stereotype them from dialect. Understand culturally specific language and particles in context. Treat laughter, profanity, surprise and outcome shorthand as contextual pragmatic markers rather than fixed emotion labels. Reply with the emotion only — a word or short phrase, no punctuation or explanation.\n${grounding}${dialectGlossary ? `\nDialect glossary: ${dialectGlossary}` : ""}${pragmaticGlossary ? `\nInformal-language glossary: ${pragmaticGlossary}` : ""}`,
+          content: `You provide a concise display phrase for a journal experience that has already been measured by a deterministic model. This is open-vocabulary description, not selection from a fixed emotion bank. Preserve blends, appraisals and the user's own feeling language when supported. Do not reverse the supplied valence or arousal direction, diagnose the person, or stereotype them from dialect. Treat laughter, profanity, surprise and outcome shorthand as contextual pragmatic markers rather than fixed emotion labels. Never use an em dash or en dash. Reply with the phrase only, with no punctuation or explanation.\n${grounding}${dialectGlossary ? `\nDialect glossary: ${dialectGlossary}` : ""}${pragmaticGlossary ? `\nInformal-language glossary: ${pragmaticGlossary}` : ""}`,
         },
         {
           role: "user",
@@ -97,7 +101,7 @@ export async function analyzeEmotionAI(text) {
       maxTokens: 150,
     });
 
-    const emotion = raw.toLowerCase().split("\n")[0].trim();
+    const emotion = normaliseCompanionStyle(raw.toLowerCase().split("\n")[0]);
     if (!emotion) return base;
 
     // Supplementary only. The deterministic emotion and confidence above are

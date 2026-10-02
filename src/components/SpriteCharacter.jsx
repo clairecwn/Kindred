@@ -202,14 +202,16 @@ function makeAccessoryOverlay(character, headY) {
 
 // ── Lighting ──────────────────────────────────────────────────────────────
 function setupLighting(scene) {
-  scene.add(new THREE.AmbientLight(0xfff8f0, 1.4));
-  const key = new THREE.DirectionalLight(0xfff2d8, 2.2);
+  // Matched to AvatarStage: the old total of ~5.1 pushed every mid-tone
+  // albedo past 1.0, so the cast's painted outfits read as washed-out white.
+  scene.add(new THREE.AmbientLight(0xfff8f0, 0.62));
+  const key = new THREE.DirectionalLight(0xfff2d8, 0.95);
   key.position.set(2.5, 4.5, 4);
   scene.add(key);
-  const fill = new THREE.DirectionalLight(0xd0e0ff, 0.9);
+  const fill = new THREE.DirectionalLight(0xd0e0ff, 0.38);
   fill.position.set(-3, 1.5, 3);
   scene.add(fill);
-  const rim = new THREE.DirectionalLight(0xffcdb8, 0.6);
+  const rim = new THREE.DirectionalLight(0xffcdb8, 0.30);
   rim.position.set(0, 2, -4);
   scene.add(rim);
 }
@@ -415,6 +417,8 @@ export default function SpriteCharacter({
     applyPixelRatio();
     renderer.setSize(width, height);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.NeutralToneMapping;
+    renderer.toneMappingExposure = 1.0;
     renderer.domElement.style.display = "block";
     mount.appendChild(renderer.domElement);
 

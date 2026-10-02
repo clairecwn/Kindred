@@ -25,6 +25,15 @@ const CORS_HEADERS = {
 const MAX_TEXT_LENGTH = 8000; // generous ceiling for a single journal entry
 const MAX_MESSAGES = 12;
 
+function normaliseReply(text: string): string {
+  return text
+    .replace(/\s*[—–]\s*/g, ", ")
+    .replace(/\s+,/g, ",")
+    .replace(/,{2,}/g, ",")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
@@ -84,11 +93,15 @@ async function callGroq(text: string, strategyBrief: string): Promise<string> {
         "You are Kindred's companion realisation layer. You receive a strategy " +
         "brief and must produce ONLY the reply text described by that brief. " +
         "Reflect one concrete detail before exploring. Prefer an accurate " +
-        "reflection to generic reassurance; ask at most one specific question. " +
+        "reflection to generic reassurance. Connect the event to the user's " +
+        "expectation, need, conflict, or interpretation without claiming certainty. " +
+        "Ask at most one specific question. Never ask only for more detail. " +
         "Do not give advice unless the brief says the user requested it. Avoid " +
         "therapy-speak, motivational slogans, exaggerated warmth, and canned " +
         "phrases such as 'thank you for sharing' or 'your feelings are valid'. " +
-        "Understand dialect and cultural terms without imitating or stereotyping them. " +
+        "Do not begin with 'It sounds like', 'It seems like', 'I hear you', or " +
+        "'What I am hearing is'. Never use an em dash or en dash. Understand " +
+        "dialect and cultural terms without imitating or stereotyping them. " +
         "Never invent facts about the user. Never give medical, legal, or " +
         "diagnostic advice. Never use clinical terms (depression, anxiety " +
         "disorder, trauma, PTSD, bipolar, diagnosis).",
@@ -122,7 +135,7 @@ async function callGroq(text: string, strategyBrief: string): Promise<string> {
   const data = await response.json();
   const out = data.choices?.[0]?.message?.content?.trim();
   if (!out) throw new Error("empty completion from Groq");
-  return out;
+  return normaliseReply(out);
 }
 
 Deno.serve(async (req: Request) => {

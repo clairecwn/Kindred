@@ -8,6 +8,8 @@
  * autonomy, no unsolicited fixing).
  */
 
+import { hasArtificialStyleTell } from "./companion-style.js";
+
 const CLINICAL_OR_META = /\b(depress(?:ion|ed)?|anxiety disorder|diagnos(?:e|is)|ptsd|bipolar|trauma response|nervous system|vad|valence|arousal|dominance|deterministic|model|analysis)\b/i;
 const GENERIC_OPENERS = /^(thank you for sharing|i understand how you feel|your feelings are valid|what i(?:'m| am) hearing is|it sounds like you(?:'re| are) going through a lot)\b/i;
 const UNSOLICITED_ADVICE = /\b(you should|you need to|try to|have you tried|the best thing is|make sure you)\b/i;
@@ -54,7 +56,7 @@ export function selectCompanionStrategy(hints = {}, analysis = {}) {
   } else if (confidence > 0 && masked) {
     mode = "tentative-understatement-reflection";
     reaction = "Respond to the weight beneath the understated wording, but use tentative language.";
-    interpretation = "Name the likely resignation, strain, shame, or tiredness as a possibility—not a fact.";
+    interpretation = "Name the likely resignation, strain, shame, or tiredness as a possibility, not a fact.";
     exploration = "Offer one precise check-back such as whether the tentative reading fits.";
   } else if (vad.valence < -0.1 && vad.arousal > 0.1) {
     mode = "contain-and-clarify";
@@ -126,6 +128,8 @@ export function validateCompanionResponse(text, context = {}) {
   const words = value.split(/\s+/).filter(Boolean);
   const questionCount = (value.match(/\?/g) ?? []).length;
   if (!value) return { ok: false, reason: "empty" };
+  const styleTell = hasArtificialStyleTell(value);
+  if (styleTell) return { ok: false, reason: styleTell };
   if (words.length < 8 || words.length > 75) return { ok: false, reason: "length" };
   if (questionCount > 1) return { ok: false, reason: "too-many-questions" };
   if (/^\s*[-*•]|\n\s*[-*•]/m.test(value)) return { ok: false, reason: "list-format" };

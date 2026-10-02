@@ -156,7 +156,7 @@ export class GroveScene {
       onFadeChange: (opacity) => onFade?.(opacity),
       onEnter: (spec) => this._onInteriorChange({ active: true, id: spec.interior, label: spec.label, npcLabel: spec.npcLabel, metaLabel: spec.metaLabel }),
       onExit: () => {
-        this._onInteriorChange({ active: false, id: null, label: null, npcLabel: null });
+        this._onInteriorChange({ active: false, id: null, label: null, npcLabel: null, metaLabel: null });
         this._registerOutdoorInteractions();
       },
       onTalk: (npcId, npcLabel, context) => this._onNpcInteract(npcId, npcLabel, context),

@@ -37,6 +37,9 @@ const REACT_FOR = {
  *  - reactClip: clip name played on a reactKey change (default "Wave").
  *  - angle: fixed Y rotation in radians (ignored if turntable is true).
  *  - turntable: slowly auto-rotate the avatar for display.
+ *  - spinnable: let the player drag left/right to turn the avatar a full 360
+ *    degrees on its vertical axis (yaw only -- never pitch, so it cannot end
+ *    up upside down), with a short inertial glide after the pointer lifts.
  *  - size: number (square) or {width, height} in CSS px.
  *  - static: render exactly one frame and stop — no rAF loop at all. Use
  *    this for grids of many simultaneous thumbnails so they cost a draw
@@ -51,6 +54,7 @@ export default function AvatarStage({
   reactClip = "wave",
   angle = 0.35,
   turntable = false,
+  spinnable = false,
   size = 160,
   static: isStatic = false,
   background = "transparent",
@@ -59,6 +63,9 @@ export default function AvatarStage({
   const mountRef = useRef(null);
   const liveRef = useRef({ clip, angle, turntable });
   const runtimeRef = useRef(null);
+  // Drag-to-spin state. Yaw is kept here rather than in React state so a
+  // drag never re-renders: the rAF loop reads it straight off the ref.
+  const spinRef = useRef({ yaw: angle, vel: 0, dragging: false, lastX: 0, moved: false });
 
   const width = typeof size === "number" ? size : size.width;
   const height = typeof size === "number" ? size : size.height;
@@ -70,6 +77,7 @@ export default function AvatarStage({
   liveRef.current.clip = clip;
   liveRef.current.angle = angle;
   liveRef.current.turntable = turntable;
+  liveRef.current.spinnable = spinnable;
 
   // ── Mount: build renderer/scene/camera/avatar once per size+static ──────
   useEffect(() => {
@@ -81,6 +89,10 @@ export default function AvatarStage({
     renderer.setPixelRatio(Math.min((window.devicePixelRatio || 1) * getStageScale(), isStatic ? 2 : 2.5));
     renderer.setSize(width, height, false);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
+    // Neutral rolls highlights off without the warm desaturation ACES adds,
+    // so the cast keeps its painted hues instead of drifting towards cream.
+    renderer.toneMapping = THREE.NeutralToneMapping;
+    renderer.toneMappingExposure = 1.0;
     renderer.domElement.style.display = "block";
     renderer.domElement.style.width = "100%";
     renderer.domElement.style.height = "100%";
@@ -96,19 +108,23 @@ export default function AvatarStage({
     camera.position.set(0, AVATAR_HEIGHT * 0.62, AVATAR_HEIGHT * 2.13);
     camera.lookAt(0, AVATAR_HEIGHT * 0.55, 0);
 
-    scene.add(new THREE.AmbientLight(0xfff8f0, 1.35));
-    const key = new THREE.DirectionalLight(0xfff2d8, 2.0);
+    // Exposure budget. These four lights used to sum to ~4.75 of irradiance,
+    // which drove every mid-tone albedo past 1.0 and clipped it to white --
+    // Kai's orange tee and blue shorts both read as pale pastel. The total is
+    // now ~1.6 with a filmic roll-off on top, so the authored colours survive.
+    scene.add(new THREE.AmbientLight(0xfff8f0, 0.62));
+    const key = new THREE.DirectionalLight(0xfff2d8, 0.95);
     key.position.set(2.2, 4, 3.4);
     scene.add(key);
-    const fill = new THREE.DirectionalLight(0xd0e0ff, 0.85);
+    const fill = new THREE.DirectionalLight(0xd0e0ff, 0.38);
     fill.position.set(-2.6, 1.4, 2.6);
     scene.add(fill);
-    const rim = new THREE.DirectionalLight(0xffcdb8, 0.55);
+    const rim = new THREE.DirectionalLight(0xffcdb8, 0.30);
     rim.position.set(0, 2, -3.4);
     scene.add(rim);
 
     const avatar = createAvatar(toAvatarDescriptor(rawDescriptor));
-    avatar.rotation.y = liveRef.current.angle;
+    avatar.rotation.y = liveRef.current.spinnable ? spinRef.current.yaw : liveRef.current.angle;
     scene.add(avatar);
 
     const clock = new THREE.Clock();
@@ -125,7 +141,14 @@ export default function AvatarStage({
       if (document.hidden) return;
       const dt = Math.min(clock.getDelta(), 0.05);
       avatar.userData.animation?.update(dt);
-      if (liveRef.current.turntable) {
+      if (liveRef.current.spinnable) {
+        const sp = spinRef.current;
+        if (!sp.dragging && Math.abs(sp.vel) > 1e-4) {
+          sp.yaw += sp.vel;
+          sp.vel *= 0.92;            // glide to a stop, Brawl-Stars style
+        }
+        avatar.rotation.y = sp.yaw;
+      } else if (liveRef.current.turntable) {
         turntableT += dt;
         avatar.rotation.y = liveRef.current.angle + turntableT * 0.5;
       } else {
@@ -203,11 +226,48 @@ export default function AvatarStage({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reactKey]);
 
+  // ── Drag to spin ────────────────────────────────────────────────────────
+  // Yaw only, so the character never tips upside down or lies on its back --
+  // the same single-axis turntable a shop screen in Brawl Stars gives you.
+  // Vertical movement is ignored outright rather than clamped.
+  function onPointerDown(e) {
+    if (!spinnable) return;
+    const sp = spinRef.current;
+    sp.dragging = true;
+    sp.lastX = e.clientX;
+    sp.vel = 0;
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+  }
+  function onPointerMove(e) {
+    const sp = spinRef.current;
+    if (!spinnable || !sp.dragging) return;
+    const dx = e.clientX - sp.lastX;
+    sp.lastX = e.clientX;
+    const step = dx * 0.011;
+    sp.yaw += step;
+    sp.vel = step;
+    e.preventDefault();
+  }
+  function onPointerUp(e) {
+    const sp = spinRef.current;
+    if (!sp.dragging) return;
+    sp.dragging = false;
+    e.currentTarget.releasePointerCapture?.(e.pointerId);
+  }
+
   return (
     <div
       ref={mountRef}
       className={className}
-      style={{ width, height, background, flexShrink: 0, overflow: "hidden" }}
+      style={{
+        width, height, background, flexShrink: 0, overflow: "hidden",
+        touchAction: spinnable ? "none" : undefined,
+        cursor: spinnable ? "grab" : undefined,
+      }}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerUp}
       aria-hidden="true"
     />
   );

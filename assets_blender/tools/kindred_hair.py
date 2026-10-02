@@ -390,7 +390,7 @@ def build_hair(name, cap, Rc, Z_END, ZT, zeq, z_sep=1.360,
                nape=0.10, nape_at=0.09, nape_w=0.11,
                locks=7, lock_amp=0.060, lock_z=0.070, scalp_rip=0.016,
                curl_amp=0.080, curl_len=0.55, twist=0.060, curl_on=0.12,
-               skin_gap=0.006, soft=0.022, zfloor_max=None, volume=0.0, fdrift=0.0, flow=0.0, flow_span=0.55, wave_at=0.14, wave_phase=1.6,
+               skin_gap=0.006, soft=0.022, zfloor_max=None, volume=0.0, fdrift=0.0, flow=0.0, flow_span=0.55, wave_at=0.14, wave_phase=1.6, sdrift=0.0, sdrift_at=1.16,
                NSCALP=None, NFALL=None, rowpow=None):
     """Each column is one continuous curve from the crown to its own hem, sampled
     densely and then resampled by ARC LENGTH to a fixed row count.
@@ -541,7 +541,13 @@ def build_hair(name, cap, Rc, Z_END, ZT, zeq, z_sep=1.360,
                 wv = wavez(z)
                 m *= 1.0+curl_amp*wv
                 ae = a+twist*wv
+                # Long hair belongs BEHIND the shoulders, not draped over them.
+                # Below shoulder height the side locks drift back so the arm's own
+                # path is clear - which is how this is solved on a real character.
+                # The alternative, bending the arm out of the hair's way, detaches
+                # it from the shoulder and reads as a broken joint.
                 dy = drift*max(0.0, -math.cos(a))*(w**1.5)+fdrift*max(0.0, math.cos(a))*(w**1.5)
+                dy += sdrift*(math.sin(a)**2)*ss((sdrift_at-z)/0.20)
                 raw.append((r_sep*m*(fl(z)/fl(z_sep)), ae, z, dy))
 
         # arc length, then the tip taper measured BACK FROM THE TIP along the
@@ -1696,3 +1702,66 @@ def round_balls(tag, groups=("hand.L", "hand.R"), power=1.0):
     me.update()
     return out
 PH["round_balls"] = round_balls
+
+def clean_weights(tags=("", "Juno_", "Wren_", "Sage_", "Tobi_")):
+    """Stop one body part being skinned to another part's bone.
+
+    The body is 18 separate primitives, but the weights were painted as if it were
+    one skin, so 38 vertices of the HEAD carried up to 0.72 of arm weight and 22
+    vertices of the TORSO carried up to 0.33 - all of them at the shoulder corner,
+    z about 1.1. Lift an arm and those vertices are dragged with it: the torso
+    spikes into a triangle at the shoulder and the jaw pulls sideways. A lunge
+    does the same thing to the flank and the jaw line.
+
+    Each island may only be weighted to the bones its own part belongs to.
+    Everything else is removed and what is left is renormalised, so the shape of
+    the deformation inside each part is untouched."""
+    LIMB = {
+        "head":  ("head",),
+        "torso": ("chest", "spine", "hips", "neck"),
+        "hips":  ("hips", "spine"),
+        "arm":   ("shoulder.{S}", "upperarm.{S}", "forearm.{S}"),
+        "hand":  ("hand.{S}", "forearm.{S}"),
+        "fore":  ("forearm.{S}",),
+        "leg":   ("thigh.{S}", "shin.{S}", "hips"),
+        "foot":  ("foot.{S}",),
+    }
+    def kind(c, n):
+        x, z = c.x, c.z
+        if z > 1.30: return "head"
+        if z > 1.08 and abs(x) < 0.25: return "torso"
+        if abs(x) > 0.25 and z > 0.84: return "arm"
+        if abs(x) > 0.25 and z > 0.70: return "fore"
+        if abs(x) > 0.25: return "hand"
+        if z > 0.70: return "torso"
+        if z > 0.55: return "hips"
+        if z > 0.18: return "leg"
+        return "foot"
+    rep = {}
+    for tag in tags:
+        ob = bpy.data.objects[(tag+"Kindred_Body") if tag else "Kindred_Body"]
+        me = ob.data
+        gi = {g.name: g.index for g in ob.vertex_groups}
+        groups = {g.index: g for g in ob.vertex_groups}
+        stripped = 0
+        for g in _islands(me):
+            P = [me.vertices[i].co for i in g]
+            c = sum(P, Vector())/len(P)
+            k = kind(c, len(g))
+            S = "L" if c.x >= 0 else "R"
+            ok = {gi[n.replace("{S}", S)] for n in LIMB[k] if n.replace("{S}", S) in gi}
+            for i in g:
+                v = me.vertices[i]
+                keep = [(e.group, e.weight) for e in v.groups if e.group in ok and e.weight > 0.0005]
+                drop = [e.group for e in v.groups if e.group not in ok]
+                if not keep:
+                    keep = [(min(ok), 1.0)]
+                tot = sum(w for _, w in keep)
+                for gidx in drop:
+                    groups[gidx].remove([i]); stripped += 1
+                for gidx, w in keep:
+                    groups[gidx].add([i], w/tot, 'REPLACE')
+        me.update()
+        rep[tag or "kai"] = stripped
+    return rep
+PH["clean_weights"] = clean_weights

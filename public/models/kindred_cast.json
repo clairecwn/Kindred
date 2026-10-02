@@ -3,20 +3,75 @@
   "wardrobe": "/models/kindred_wardrobe.json",
   "note": "Every cast member shares the same 20-bone rig and the same 11 clips, so wardrobe items and animations are interchangeable. 'presents' gates the wardrobe; hair is built into each model.",
   "cast": [
-    { "id": "kai",  "name": "Kai",  "model": "/models/kindred_char01.glb", "presents": "masc",
-      "hair": "short side-swept", "vibe": "steady, easygoing, the one who shows up",
-      "build": "baseline", "palette": ["#D96E5E","#5B84C4","#7FC9A5"] },
-    { "id": "tobi", "name": "Tobi", "model": "/models/kindred_tobi.glb",  "presents": "masc",
-      "hair": "messy black tousle", "vibe": "playful troublemaker with a soft centre",
-      "build": "broad and sturdy, 0.97x", "palette": ["#D95C4F","#515E7E","#E5CD92"] },
-    { "id": "juno", "name": "Juno", "model": "/models/kindred_juno.glb",  "presents": "femme",
-      "hair": "high ponytail with face-framing locks", "vibe": "bright and bouncy, first one out the door",
-      "build": "short and compact, 0.94x", "palette": ["#F4DA4C","#4A988A","#D88F63"] },
-    { "id": "wren", "name": "Wren", "model": "/models/kindred_wren.glb",  "presents": "femme",
-      "hair": "long, centre part, waves past the shoulders", "vibe": "quiet and observant, listens more than talks",
-      "build": "tall and slight, 1.07x", "palette": ["#6F7B99","#4A4F61","#BEB8A9"] },
-    { "id": "sage", "name": "Sage", "model": "/models/kindred_sage.glb",  "presents": "femme",
-      "hair": "side braid with a low bun", "vibe": "warm and unhurried, makes the tea",
-      "build": "tall and soft, 1.04x", "palette": ["#A5BA93","#D6CAB4","#8B6D53"] }
+    {
+      "id": "kai",
+      "name": "Kai",
+      "model": "/models/kindred_char01.glb",
+      "presents": "masc",
+      "hair": "short side-swept",
+      "vibe": "steady, easygoing, the one who shows up",
+      "build": "baseline",
+      "palette": [
+        "#D96E5E",
+        "#5B84C4",
+        "#7FC9A5"
+      ]
+    },
+    {
+      "id": "alex",
+      "name": "Alex",
+      "model": "/models/kindred_tobi.glb",
+      "presents": "masc",
+      "hair": "tall textured crop, high hairline",
+      "vibe": "playful troublemaker with a soft centre",
+      "build": "broad and sturdy, 0.97x",
+      "palette": [
+        "#D95C4F",
+        "#515E7E",
+        "#E5CD92"
+      ]
+    },
+    {
+      "id": "bella",
+      "name": "Bella",
+      "model": "/models/kindred_juno.glb",
+      "presents": "femme",
+      "hair": "high ponytail with face-framing locks",
+      "vibe": "bright and bouncy, first one out the door",
+      "build": "short and compact, 0.94x",
+      "palette": [
+        "#F4DA4C",
+        "#4A988A",
+        "#D88F63"
+      ]
+    },
+    {
+      "id": "tate",
+      "name": "Tate",
+      "model": "/models/kindred_wren.glb",
+      "presents": "femme",
+      "hair": "long, centre part, waves past the shoulders",
+      "vibe": "quiet and observant, listens more than talks",
+      "build": "tall and slight, 1.07x",
+      "palette": [
+        "#6F7B99",
+        "#4A4F61",
+        "#BEB8A9"
+      ]
+    },
+    {
+      "id": "lara",
+      "name": "Lara",
+      "model": "/models/kindred_sage.glb",
+      "presents": "femme",
+      "hair": "side braid with a low bun",
+      "vibe": "warm and unhurried, makes the tea",
+      "build": "tall and soft, 1.04x",
+      "palette": [
+        "#A5BA93",
+        "#D6CAB4",
+        "#8B6D53"
+      ]
+    }
   ]
 }

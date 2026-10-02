@@ -96,22 +96,15 @@ export default function HomeView({
         </button>
       </div>
 
-      {/* ── Wardrobe + Characters ── */}
+      {/* ── Character: pick who you are and dress them, one place ── */}
       <div className="home-char-side-btns">
-        <button type="button" className="home-char-side-btn" onClick={() => setTab("wardrobe")} aria-label="Wardrobe">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M20.38 18H3.62a1 1 0 01-.84-1.54L12 4l9.22 12.46A1 1 0 0120.38 18z"/>
-            <circle cx="12" cy="4" r="2" fill="currentColor" opacity="0.4"/>
-          </svg>
-          <span>WARDROBE</span>
-        </button>
-        <button type="button" className="home-char-side-btn" onClick={() => setTab("wardrobe")} aria-label="Characters">
+        <button type="button" className="home-char-side-btn" onClick={() => setTab("wardrobe")} aria-label="Character">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="9" cy="7" r="4" fill="currentColor" opacity="0.25"/>
             <path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/>
             <path d="M16 3.13a4 4 0 010 7.75M21 21v-2a4 4 0 00-3-3.85"/>
           </svg>
-          <span>CHARACTERS</span>
+          <span>CHARACTER</span>
         </button>
       </div>
     </div>

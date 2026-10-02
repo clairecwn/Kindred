@@ -15,6 +15,8 @@
  * deltas are a fixed affine map followed by the caller's [-1,1] clamp.
  */
 
+import { buildExperienceProfile, composeExperienceDescription } from "./experience-profile.js";
+
 export const THOUGHT_APPRAISAL_VERSION = "appraisal-2026.10.3";
 
 const NORMALISATIONS = Object.freeze([
@@ -171,6 +173,7 @@ export function appraiseThoughts(text) {
 export function deriveInterpretiveEmotion(features, coarseEmotion = "neutral") {
   const d = features?.appraisal?.dimensions;
   if (!d) return { emotion: coarseEmotion, family: coarseEmotion, components: [coarseEmotion] };
+  const profile = buildExperienceProfile(features, features?.appraisal?.normalizedText ?? "");
 
   const components = [];
   const disappointed = d.outcomeDiscrepancy >= 0.4;
@@ -181,13 +184,13 @@ export function deriveInterpretiveEmotion(features, coarseEmotion = "neutral") {
   if (d.futureThreat >= 0.4 && d.anticipatedEffort >= 0.35) components.push("dreading the demands ahead");
   if (!components.length && d.physicalDiscomfort >= 0.5) components.push("irritable from physical discomfort");
   if (!components.length && d.taskAversiveness >= 0.5) components.push("fed up and reluctant to start");
-  if (!components.length) return { emotion: coarseEmotion, family: coarseEmotion, components: [coarseEmotion] };
+  if (!components.length) {
+    const described = composeExperienceDescription(profile);
+    if (described !== "hard to name") return { emotion: described, family: coarseEmotion, components: [described] };
+    return { emotion: coarseEmotion, family: coarseEmotion, components: [coarseEmotion] };
+  }
 
-  const emotion = components.length === 1
-    ? components[0]
-    : components.length === 2
-      ? `${components[0]} and ${components[1]}`
-      : `${components.slice(0, -1).join(", ")}, and ${components.at(-1)}`;
+  const emotion = composeExperienceDescription(profile, components);
   // A blocked result can be frustrating without being interpersonal anger.
   // Outcome discrepancy takes precedence so anger-specific scripts are not
   // selected merely because an activity went worse than the person hoped.

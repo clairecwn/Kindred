@@ -22,6 +22,8 @@ import {
   validateConversationReply,
 } from "./analysis/conversation-response.js";
 import { formatRetrievedMemories, retrieveConversationMemories } from "./analysis/conversation-memory.js";
+import { buildExperienceProfile, formatExperienceProfile } from "./analysis/experience-profile.js";
+import { normaliseCompanionStyle } from "./analysis/companion-style.js";
 
 // ── Subtext Detection Patterns ────────────────────────────────────────────────
 
@@ -117,6 +119,7 @@ export class EmotionDetector {
     const features  = analyseText(text);
     const projected = vadToEmotionDirectional(features.vad);
     const interpreted = deriveInterpretiveEmotion(features, projected.emotion);
+    const experienceProfile = buildExperienceProfile(features, text);
     const hasDeterministicEvidence = features.vadConfidence > 0;
 
     // The mathematical VAD model is authoritative whenever it has evidence.
@@ -152,6 +155,7 @@ export class EmotionDetector {
       vadConfidence:      features.vadConfidence,
       textFeatures:       features,
       emotionFamily:      resolved.emotionFamily ?? projected.emotion,
+      experienceProfile,
     };
   }
 
@@ -412,18 +416,20 @@ export class AIJournalist {
     // copy and NEVER reaches the model — no clinical term is ever generated.
     const crisisCheck = detectCrisisLanguage(text);
     if (crisisCheck.isCrisis) {
-      return { text: CRISIS_RESPONSE.text, source: "crisis-safety", emotion: "anxious", isCrisisResponse: true, resources: CRISIS_RESPONSE.resources };
+      return { text: normaliseCompanionStyle(CRISIS_RESPONSE.text), source: "crisis-safety", emotion: "anxious", isCrisisResponse: true, resources: CRISIS_RESPONSE.resources };
     }
     if (hasGroqKey()) {
       try {
-        return await this._groqResponse(text, analysis, pastEntries, playerName, hints);
+        const result = await this._groqResponse(text, analysis, pastEntries, playerName, hints);
+        return { ...result, text: normaliseCompanionStyle(result.text) };
       } catch (err) {
         console.warn("[Kindred] Groq fallback activated:", err.message);
       }
     } else {
       warnIfNoKey("journal responses");
     }
-    return this._templateResponse(text, analysis, pastEntries);
+    const result = this._templateResponse(text, analysis, pastEntries);
+    return { ...result, text: normaliseCompanionStyle(result.text) };
   }
 
   /**
@@ -519,6 +525,7 @@ These are pragmatic markers, not one-to-one emotion labels. Resolve laughter, pr
 
     const coarseEmotion = hints.analysis?.emotionLabel ?? vadToEmotionDirectional(vad).emotion;
     const interpretation = deriveInterpretiveEmotion(features, coarseEmotion);
+    const experienceProfile = buildExperienceProfile(features, features?.appraisal?.normalizedText ?? "");
     const emotion = analysis.emotion ?? interpretation.emotion;
     const emotionEvidence = [];
     const thoughtEvidence = [];
@@ -545,6 +552,8 @@ These are pragmatic markers, not one-to-one emotion labels. Resolve laughter, pr
 - Appraisal dimensions: ${features?.appraisal ? `anticipated effort ${features.appraisal.dimensions.anticipatedEffort.toFixed(2)}, constraint ${features.appraisal.dimensions.situationalConstraint.toFixed(2)}, future threat ${features.appraisal.dimensions.futureThreat.toFixed(2)}, task aversiveness ${features.appraisal.dimensions.taskAversiveness.toFixed(2)}, goal obstruction ${features.appraisal.dimensions.goalObstruction.toFixed(2)}, outcome discrepancy ${(features.appraisal.dimensions.outcomeDiscrepancy ?? 0).toFixed(2)}, effortful experience ${(features.appraisal.dimensions.effortfulExperience ?? 0).toFixed(2)}, future hope ${(features.appraisal.dimensions.futureHope ?? 0).toFixed(2)}, physical discomfort ${features.appraisal.dimensions.physicalDiscomfort.toFixed(2)}` : "none"}
 - Explicit cause frames: ${features?.appraisal?.causes?.length ? features.appraisal.causes.map((cause) => cause.label).join(", ") : "none found; do not invent one"}
 - Informal pragmatic markers: ${features?.informal?.markers?.length ? features.informal.markers.map((marker) => `${marker.matchedText}=${marker.function}`).join(", ") : "none"}
+EXPERIENCE PROFILE (continuous and compositional, not a fixed emotion class):
+${formatExperienceProfile(analysis.experienceProfile ?? experienceProfile)}
 Use this reading to ground the response. You may describe mixed feelings or nuance, but do not reverse its valence/arousal direction and do not diagnose the user.\n`;
   }
 
@@ -568,21 +577,21 @@ Use this reading to ground the response. You may describe mixed feelings or nuan
       "Moving through it matters.",
       "Something good is alive in you.",
     ];
-    const pickFallback = () => FALLBACKS[Math.floor(Math.random() * FALLBACKS.length)];
+    const pickFallback = () => normaliseCompanionStyle(FALLBACKS[Math.floor(Math.random() * FALLBACKS.length)]);
 
     if (!hasGroqKey()) {
       warnIfNoKey("check-in reactions");
       return pickFallback();
     }
     try {
-      return await groqChat({
+      return normaliseCompanionStyle(await groqChat({
         messages: [
           { role: "system", content: `You are a warm, empathetic companion responding to ${playerName}'s wellness check-in. Give ONE short, natural, human reaction (max 10 words). No quotes. No emojis. Respond directly to their answer with warmth.` },
           { role: "user", content: `Question: "${question}". They answered: "${answer}".` }
         ],
         temperature: 0.9,
         maxTokens: 40,
-      });
+      }));
     } catch (err) {
       console.warn("[Kindred] Quiz reaction fallback:", err.message);
       return pickFallback();
@@ -591,7 +600,7 @@ Use this reading to ground the response. You may describe mixed feelings or nuan
 
   async generateChatReply(userMessage, chatHistory = [], originalEntry = "", detectedEmotion = "", playerName = "friend", memoryEntries = []) {
     const plan = buildConversationResponsePlan({ originalEntry, userMessage, chatHistory, detectedEmotion, memoryEntries });
-    const fallback = () => localConversationReply(plan);
+    const fallback = () => normaliseCompanionStyle(localConversationReply(plan));
 
     if (!hasGroqKey()) {
       warnIfNoKey("journal chat");
@@ -614,7 +623,9 @@ Respond to what changed or became clearer in the LATEST user turn. First make a 
 
 If the user rejects an emotion or interpretation, that correction overrides every earlier assistant statement, stored display label, and inferred emotion. Apologise briefly, do not defend the prior label, and rebuild the meaning from the user's descriptions. A difficult or disappointing performance is not evidence of anger unless the user supplies anger-specific conflict, blame, violation, hurt, or disrespect.
 
-Avoid therapy-speak, motivational slogans, exaggerated warmth, clinical language, canned validation, and the user's name used unnaturally. Understand dialect without imitating it. Give advice only when the plan says it was requested. Keep the reply to 1-3 short sentences without bullets.
+Avoid therapy-speak, motivational slogans, exaggerated warmth, clinical language, canned validation, and the user's name used unnaturally. Understand dialect without imitating it. Give advice only when the plan says it was requested. Keep the reply to 1-3 short sentences without bullets. Never use an em dash or en dash. Use normal punctuation and natural sentence rhythm.
+
+Respond like a careful human conversation partner. Do not begin with "It sounds like", "It seems like", "I hear you", or "What I'm hearing is". Do not merely rename an emotion. Reflect the event, the person's interpretation of it, the need or expectation involved, and what became clearer in this turn. Exploration must be specific to their words, never "tell me more".
 
 Relevant past memories are user-authored context, not proof of a personality trait or permanent pattern. Use one only when it genuinely clarifies the current turn. Never announce that you searched memory, never say "you always", and never let an older entry outweigh what the user says now. Do not give an emotion verdict or contrast the user with alternative emotion labels. Help them examine the pressure, conflict, need, expectation, or meaning in what they said.
 
@@ -625,7 +636,8 @@ ${formatConversationResponsePlan(plan)}
 RELEVANT USER-AUTHORED MEMORY:
 ${formatRetrievedMemories(plan.memory)}` },
         { role: "assistant", content: `Journal context: "${originalEntry.slice(0, 400)}${originalEntry.length > 400 ? "..." : ""}"` },
-        ...plan.history.map((turn) => ({ role: turn.role === "ai" ? "assistant" : "user", content: turn.text })),
+        { role: "assistant", content: `Current-thread summary: ${JSON.stringify(plan.threadState)}` },
+        ...plan.promptHistory.map((turn) => ({ role: turn.role === "ai" ? "assistant" : "user", content: turn.text.slice(0, 700) })),
         { role: "user", content: userMessage },
       ];
       let reply = await groqChat({
@@ -633,6 +645,7 @@ ${formatRetrievedMemories(plan.memory)}` },
         temperature: 0.55,
         maxTokens: 150,
       });
+      reply = normaliseCompanionStyle(reply);
       let check = validateConversationReply(reply, plan);
       let fit = scoreConversationReply(reply, plan);
       if (!check.ok || fit.score < 0.5) {
@@ -645,6 +658,7 @@ ${formatRetrievedMemories(plan.memory)}` },
           temperature: 0.35,
           maxTokens: 150,
         });
+        reply = normaliseCompanionStyle(reply);
         check = validateConversationReply(reply, plan);
         fit = scoreConversationReply(reply, plan);
       }
@@ -659,7 +673,7 @@ ${formatRetrievedMemories(plan.memory)}` },
     const memory = retrieveConversationMemories(text, pastEntries);
     const relevantMemory = formatRetrievedMemories(memory);
 
-    const systemPrompt = `You are Kindred, a warm, culturally attentive journaling companion. A deterministic linguistic and mathematical model has already analysed the entry. Your job is to interpret its evidence in context and write a helpful response — not to replace its measurements.
+    const systemPrompt = `You are Kindred, a warm, culturally attentive journaling companion. A deterministic linguistic and mathematical model has already analysed the entry. Your job is to interpret its evidence in context and write a helpful response, not replace its measurements.
 
 You will encounter:
 - Colloquial language ("idk", "lol", "ugh", "tbh")
@@ -681,7 +695,7 @@ BOTH POSITIVE AND NEGATIVE equally:
 - A person saying "I finished that project and felt proud" is NOT neutral — it's pride
 - Don't bias toward negative emotions just because someone is venting
 
-You are NOT looking only for emotion words. Read the narrative like a thoughtful human while staying grounded in the supplied evidence. Never stereotype from locale or dialect, imitate the user's dialect performatively, diagnose them, give the user an emotion verdict, or claim certainty about thoughts they did not express.
+You are NOT looking only for emotion words. Read the narrative like a thoughtful human while staying grounded in the supplied evidence. Never stereotype from locale or dialect, imitate the user's dialect performatively, diagnose them, give the user an emotion verdict, or claim certainty about thoughts they did not express. Never use an em dash or en dash in the response.
 
 ${this._deterministicNote(hints, analysis)}${this._responseStrategyNote(hints, analysis)}${this._culturalNote(hints)}${this._trendNote(hints)}${this._dialectNote(hints)}${this._informalNote(hints, analysis)}`;
 
@@ -708,6 +722,8 @@ Instructions:
 - Ask at most one question. A question is not mandatory, and advice is forbidden unless the entry explicitly asks for it
 - Match the user's level of directness. Understand Singlish and cultural meaning, but do not caricature or overuse particles
 - Avoid canned phrases such as "thank you for sharing", "your feelings are valid", "I understand how you feel", "I'm here for you", and "healing journey"
+- Do not begin with "It sounds like", "It seems like", "I hear you", or "What I'm hearing is"
+- Never use an em dash or en dash
 - Avoid overdramatic metaphors, motivational slogans, clinical/therapy language, and claims of certainty about hidden feelings
 - Earlier memories below are optional context. Use them only when clearly relevant, never as proof of "how the user is", and never let them outweigh the current entry
 
@@ -737,9 +753,9 @@ Journal entry:
       });
 
       const parsed = parseJsonFromCompletion(raw);
-      const detectedEmotion = parsed.detectedEmotion?.trim();
+      const detectedEmotion = normaliseCompanionStyle(parsed.detectedEmotion?.trim());
       const emotionCause = parsed.emotionCause?.trim() ?? "";
-      const companionResponse = parsed.companionResponse?.trim();
+      const companionResponse = normaliseCompanionStyle(parsed.companionResponse?.trim());
 
       if (!detectedEmotion) throw new Error("No detectedEmotion in response");
       if (!companionResponse) throw new Error("No companionResponse in response");
@@ -826,7 +842,7 @@ Return ONLY valid JSON:
         responseFormat: { type: "json_object" },
       });
 
-      const emotion = parseJsonFromCompletion(raw).emotion?.trim();
+      const emotion = normaliseCompanionStyle(parseJsonFromCompletion(raw).emotion?.trim());
       console.info("[Kindred] Quiz Groq detected:", emotion);
       return emotion || null;
     } catch (err) {
@@ -839,7 +855,7 @@ Return ONLY valid JSON:
     const { emotion, emotionFamily, maskingDetected, trajectory } = analysis;
     const appraisalResponse = this._appraisalTemplate(text, analysis, pastEntries);
     if (appraisalResponse) {
-      return { text: appraisalResponse, source: "companion-appraisal", emotion };
+      return { text: normaliseCompanionStyle(appraisalResponse), source: "companion-appraisal", emotion };
     }
 
     let pool;
@@ -862,7 +878,7 @@ Return ONLY valid JSON:
       response += WIN_CELEBRATIONS[Math.floor(Math.random() * WIN_CELEBRATIONS.length)];
     }
 
-    return { text: response, source: "companion" };
+    return { text: normaliseCompanionStyle(response), source: "companion" };
   }
 
   _appraisalTemplate(text, analysis, pastEntries = []) {

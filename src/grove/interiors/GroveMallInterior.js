@@ -190,6 +190,111 @@ export async function buildGroveMallInterior({
     connectorGroup.add(posts);
   }
 
+  // Runtime atrium dressing bridges the authored modules into one coherent
+  // destination: a clear arrival ribbon, a fountain garden, inward-facing
+  // seats, planted upper landings, and warm lantern constellations. These
+  // remain deliberately lower-detail than each shop's merchandise so the
+  // shops stay the activity heroes.
+  const atriumCream = new THREE.MeshStandardMaterial({ color: 0xead9b8, roughness: 0.9, metalness: 0 });
+  const atriumGreen = new THREE.MeshStandardMaterial({ color: 0x6d9870, roughness: 0.86, metalness: 0 });
+  const atriumRose = new THREE.MeshStandardMaterial({ color: 0xd98791, roughness: 0.82, metalness: 0 });
+  const atriumGold = new THREE.MeshStandardMaterial({ color: 0xe6bd58, roughness: 0.66, metalness: 0.06, emissive: 0x4f3610, emissiveIntensity: 0.08 });
+  const atriumSoil = new THREE.MeshStandardMaterial({ color: 0x73543c, roughness: 1, metalness: 0 });
+
+  for (let floor = 0; floor < 3; floor++) {
+    const y = floor * FLOOR_HEIGHT;
+    const dressing = new THREE.Group();
+    dressing.name = `runtime-atrium-dressing-level-${floor + 1}`;
+    connectorScenesByFloor[floor].push(dressing);
+    content.add(dressing);
+
+    // A gold-edged circular motif repeats on every floor, making the
+    // atrium's vertical stack legible even when only one level is active.
+    const ring = new THREE.Mesh(new THREE.RingGeometry(3.35, 3.72, 40), atriumGold);
+    ring.rotation.x = -Math.PI / 2;
+    ring.position.set(0, y + 0.045, 0);
+    dressing.add(ring);
+
+    const landingPlanters = floor === 0
+      ? [[-7.2, -6.4], [7.2, -6.4], [-7.2, 6.4], [7.2, 6.4]]
+      : [[-8.0, -13.0], [8.0, -13.0], [-8.0, 13.0], [8.0, 13.0]];
+    const potGeometry = new THREE.CylinderGeometry(0.7, 0.82, 0.72, 12);
+    const pots = new THREE.InstancedMesh(potGeometry, atriumCream, landingPlanters.length);
+    const soilGeometry = new THREE.CylinderGeometry(0.64, 0.64, 0.08, 12);
+    const soils = new THREE.InstancedMesh(soilGeometry, atriumSoil, landingPlanters.length);
+    const canopyGeometry = new THREE.SphereGeometry(0.76, 12, 8);
+    const canopies = new THREE.InstancedMesh(canopyGeometry, atriumGreen, landingPlanters.length);
+    const matrix = new THREE.Matrix4();
+    landingPlanters.forEach(([x, z], index) => {
+      matrix.makeTranslation(x, y + 0.36, z);
+      pots.setMatrixAt(index, matrix);
+      matrix.makeTranslation(x, y + 0.74, z);
+      soils.setMatrixAt(index, matrix);
+      matrix.compose(
+        new THREE.Vector3(x, y + 1.38, z),
+        new THREE.Quaternion(),
+        new THREE.Vector3(1.05 + (index % 2) * 0.18, 0.78, 0.92),
+      );
+      canopies.setMatrixAt(index, matrix);
+      fixtureCollidersByFloor[floor].push({ kind: "circle", cx: x, cz: z, r: 0.86, label: "grove-mall-atrium-planter" });
+    });
+    pots.instanceMatrix.needsUpdate = true;
+    soils.instanceMatrix.needsUpdate = true;
+    canopies.instanceMatrix.needsUpdate = true;
+    dressing.add(pots, soils, canopies);
+
+    // Five pendant buds establish a vertical rhythm above each active
+    // level while keeping the middle of the atrium visually open.
+    const pendantGeometry = new THREE.ConeGeometry(0.22, 0.46, 10);
+    const pendants = new THREE.InstancedMesh(pendantGeometry, atriumGold, 5);
+    const cordGeometry = new THREE.CylinderGeometry(0.025, 0.025, 1.1, 6);
+    const cords = new THREE.InstancedMesh(cordGeometry, atriumGreen, 5);
+    [[0, 0], [-2.2, -1.6], [2.2, -1.6], [-2.2, 1.6], [2.2, 1.6]].forEach(([x, z], index) => {
+      matrix.makeTranslation(x, y + 4.15 - (index % 2) * 0.24, z);
+      pendants.setMatrixAt(index, matrix);
+      matrix.makeTranslation(x, y + 4.93 - (index % 2) * 0.24, z);
+      cords.setMatrixAt(index, matrix);
+    });
+    pendants.instanceMatrix.needsUpdate = true;
+    cords.instanceMatrix.needsUpdate = true;
+    dressing.add(cords, pendants);
+
+    if (floor === 0) {
+      // The arrival ribbon points directly from the entry spawn to the
+      // fountain, then splits gently toward the four shop quadrants.
+      const arrival = new THREE.Mesh(new THREE.PlaneGeometry(4.8, 13.5), atriumRose);
+      arrival.rotation.x = -Math.PI / 2;
+      arrival.position.set(0, y + 0.035, -12.8);
+      dressing.add(arrival);
+      for (const [x, z, rot] of [[-5.4, -3.7, 0.68], [5.4, -3.7, -0.68], [-5.4, 3.7, -0.68], [5.4, 3.7, 0.68]]) {
+        const branch = new THREE.Mesh(new THREE.PlaneGeometry(2.25, 6.6), atriumRose);
+        branch.rotation.x = -Math.PI / 2;
+        branch.rotation.z = rot;
+        branch.position.set(x, y + 0.036, z);
+        dressing.add(branch);
+      }
+
+      const benchGeometry = new THREE.BoxGeometry(2.7, 0.34, 0.68);
+      const benches = new THREE.InstancedMesh(benchGeometry, atriumGreen, 4);
+      [[0, -5.5, 0], [5.5, 0, Math.PI / 2], [0, 5.5, 0], [-5.5, 0, Math.PI / 2]].forEach(([x, z, rot], index) => {
+        const q = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, rot, 0));
+        matrix.compose(new THREE.Vector3(x, y + 0.48, z), q, new THREE.Vector3(1, 1, 1));
+        benches.setMatrixAt(index, matrix);
+        const hw = Math.abs(Math.cos(rot)) > 0.5 ? 1.35 : 0.34;
+        const hd = Math.abs(Math.cos(rot)) > 0.5 ? 0.34 : 1.35;
+        fixtureCollidersByFloor[0].push({ minX: x - hw, maxX: x + hw, minZ: z - hd, maxZ: z + hd, label: "grove-mall-atrium-bench" });
+      });
+      benches.instanceMatrix.needsUpdate = true;
+      dressing.add(benches);
+
+      // A small botanical crown reinforces the fountain as the arrival
+      // landmark without obscuring paths to any shop.
+      const crown = new THREE.Mesh(new THREE.IcosahedronGeometry(0.82, 1), atriumGold);
+      crown.position.set(0, y + 1.1, 0);
+      dressing.add(crown);
+    }
+  }
+
   const hemi = new THREE.HemisphereLight(0xfff0d8, 0x75634f, 1.35);
   const key = new THREE.DirectionalLight(0xffe1aa, 2.2);
   key.position.set(-18, 28, -24);

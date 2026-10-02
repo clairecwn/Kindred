@@ -13,6 +13,7 @@
       "destination": "The Grove Mall, Level 1",
       "passageDepthMeters": 4.0,
       "triggerPosition": [-14.1, 33.5],
+      "triggerRadiusMeters": 0.5,
       "returnPosition": [-14.1, 31.0],
       "collisionOpening": "two structural front-wall stubs and one lintel leave the doorway center unobstructed"
     }

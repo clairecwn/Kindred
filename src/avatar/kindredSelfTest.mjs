@@ -49,7 +49,7 @@ test("wardrobe garments are skinned to that same skeleton", () => {
 
 test("wardrobe is gated by presentation", () => {
   const mascBottoms = itemsFor("kai", "bottom").map((i) => i.id);
-  const femmeBottoms = itemsFor("wren", "bottom").map((i) => i.id);
+  const femmeBottoms = itemsFor("tate", "bottom").map((i) => i.id);
   assert.ok(!mascBottoms.includes("bottom_skirt"), "masc character offered a skirt");
   assert.ok(!itemsFor("kai", "top").map((i) => i.id).includes("dress"));
   assert.ok(femmeBottoms.includes("bottom_skirt"));
@@ -61,7 +61,7 @@ test("wardrobe is gated by presentation", () => {
 });
 
 test("a dress clears the bottom slot", () => {
-  const cleaned = sanitizeEquipped("wren", { top: "dress", bottom: "bottom_skirt" });
+  const cleaned = sanitizeEquipped("tate", { top: "dress", bottom: "bottom_skirt" });
   assert.equal(cleaned.top, "dress");
   assert.equal(cleaned.bottom, null);
 });
@@ -100,9 +100,9 @@ test("every character builds, equips and animates", () => {
 test("swapping character rebuilds in place, keeping the Group", () => {
   const avatar = createAvatar({ character: "kai" });
   const id = avatar.id;
-  applyDescriptor(avatar, { character: "sage" });
+  applyDescriptor(avatar, { character: "lara" });
   assert.equal(avatar.id, id, "Group identity changed on species swap");
-  assert.equal(avatar.userData.rig.characterId, "sage");
+  assert.equal(avatar.userData.rig.characterId, "lara");
   disposeAvatar(avatar);
 });
 

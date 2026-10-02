@@ -26,6 +26,7 @@ test("the park lobby triggers only after crossing its real doorway", () => {
   assert.ok(lobby);
   const { doorPoint, approachPoint } = doorPoints(lobby);
   assert.ok(approachPoint.z > doorPoint.z, "entry trigger should sit inside the south-facing doorway");
+  assert.ok(approachPoint.z - lobby.entryRadius > doorPoint.z, "the complete trigger radius should remain inside the doorway");
   assert.ok(lobby.returnPoint.z < doorPoint.z, "exit should return to the park side of the doorway");
   const blockedAtDoorCenter = buildColliders().some((collider) => collider.kind !== "walkable"
     && collider.kind !== "circle"
