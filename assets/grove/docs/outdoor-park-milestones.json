@@ -12,7 +12,12 @@
     "approvedBy": "user",
     "approval": "otherwise i approve the canapy park form pass",
     "approvedAt": "2026-10-02",
-    "evidence": ["../../../src/grove/scene/worldBuilder.js", "../../../src/grove/scene/GroveScene.js"],
+    "evidence": [
+      "../../../src/grove/scene/worldBuilder.js",
+      "../../../src/grove/scene/GroveScene.js",
+      "../blender/refine_park_arrival.py",
+      "../renders/grove_park_arrival_blender.png"
+    ],
     "changes": [
       "open mall-to-park garden portal and continuous path threshold",
       "radial discovery pavers",
@@ -22,6 +27,7 @@
       ,"naturalized asymmetrical planting beds, low mounds, shrubs, and rocks"
       ,"single-preview transition between Canopy Park and the authored mall interior"
       ,"physical park-to-mall vestibule with 2.7m doorway, passage depth, inside-threshold trigger, and matched return spawn"
+      ,"Blender-native park arrival with an Exact-Boolean 8m primary mall aperture, covered threshold, botanical surround, legible signage, park paths, benches, ripple basin, and Bloom Chimes landmark"
     ],
     "checks": {
       "primaryArrival": "passed-3.3m-clear-open-garden-portal",
@@ -31,6 +37,7 @@
       "interactionSequence": "passed-after-form-refinement",
       "mallInteriorTransition": "passed-enter-mall-level-controls-and-return-to-park",
       "physicalParkEntrance": "passed-live-threshold-entry-level-load-and-matched-park-side-return",
+      "blenderArrivalReview": "passed-render-review-after-opening-order-arch-silhouette-sign-facing-and-seating-orientation-corrections",
       "mallAtriumCoherence": "passed-live-on-levels-1-and-2-arrival-ribbon-fountain-garden-seating-planted-landings-and-pendant-rhythm",
       "wholeOutdoorSceneSnapshot": { "drawCalls": 102, "triangles": 280664 },
       "statusNote": "User approval is recorded after the coherence revision, but the formal Form validator remains blocked by the legacy non-Meshy evidence schema. No Runtime export or deployment is authorized."
