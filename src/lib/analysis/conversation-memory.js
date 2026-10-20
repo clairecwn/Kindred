@@ -104,7 +104,7 @@ export function retrieveConversationMemories(queryText, entries = [], options = 
   const queryFeatures = analyseText(queryText);
   const queryTokens = tokens(queryText);
   const queryCauses = causeTypes(queryFeatures);
-  const bank = buildConversationMemoryBank(entries);
+  const bank = Array.isArray(options.bank) ? options.bank : buildConversationMemoryBank(entries);
 
   const ranked = bank.map((memory, index) => {
     const topic = symmetricOverlap(queryTokens, tokens(memory.userText));

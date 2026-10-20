@@ -40,7 +40,7 @@ test("answering a companion question produces reflection rather than another que
     userMessage: "Mostly that I wasted the week and now everything is due together.",
   });
   assert.equal(plan.questionBudget, 0);
-  assert.match(plan.questionReason, /already been answering/);
+  assert.match(plan.questionReason, /substantive answer/);
   assert.equal((localConversationReply(plan).match(/\?/g) ?? []).length, 0);
 });
 
@@ -119,7 +119,7 @@ test("informal clarification request repairs vague companion language", () => {
   assert.equal(plan.intent, "clarification-request");
   assert.equal(plan.questionBudget, 0);
   const reply = localConversationReply(plan);
-  assert.match(reply, /phrased that too vaguely/i);
+  assert.match(reply, /sorry, i was vague/i);
   assert.doesNotMatch(reply, /tell me more|where does it go/i);
 });
 
@@ -166,4 +166,31 @@ test("new performance detail is integrated with the journal context", () => {
   assert.ok(plan.causes.some((cause) => cause.type === "effortfulExperience"));
   assert.match(reply, /session|perform|attempt/i);
   assert.doesNotMatch(reply, /tell me more|say more|angry/i);
+});
+
+test("mixed-result journal and repair sequence stay conversational", () => {
+  const originalEntry = "wah tdy damn hot sia sweating like mad hais. omg got back my computing mod test scores pretty good yayy but still uneasy about yesterday's test paper hais";
+  const initialPlan = buildConversationResponsePlan({ userMessage: originalEntry });
+  const initial = localInitialReflection(initialPlan);
+  assert.match(initial, /computing score|good news/i);
+  assert.match(initial, /yesterday's paper/i);
+  assert.doesNotMatch(initial, /physical discomfort|rest of it/i);
+
+  const history = [{ role: "ai", text: initial }];
+  const turns = [
+    ["wdym", "clarification-request", /vague|meant/i],
+    ["ya damn hot", "brief-disclosure", /heat|hot/i],
+    ["affecting the rest of what", "clarification-request", /rest of your day/i],
+    ["are u ai or deterministic", "direct-question", /i'm an ai/i],
+    ["do u understand me", "direct-question", /computing score|yesterday's paper/i],
+  ];
+  for (const [userMessage, intent, expected] of turns) {
+    const plan = buildConversationResponsePlan({ originalEntry, chatHistory: history, userMessage });
+    const reply = localConversationReply(plan);
+    assert.equal(plan.intent, intent);
+    assert.match(reply, expected);
+    assert.equal(validateConversationReply(reply, plan).ok, true, reply);
+    assert.doesNotMatch(reply, /forcing it into a neat label|produce a bigger explanation|trying to make sense of right now/i);
+    history.push({ role: "user", text: userMessage }, { role: "ai", text: reply });
+  }
 });

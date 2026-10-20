@@ -1,0 +1,20 @@
+{
+  "name": "Write Journal Entry stress test, 2026-10-08",
+  "journal": "tdy was damn blur sia idk why my brain like not installed properly... morning i wanted to make milo then somehow i go pour the powder into my water bottle instead of the cup?? then i stand there staring at it like wah congrats now i got milo bottle soup liddat... then when i finally left house right i thought i very smart take shortcut through the void deck but got one uncle washing the floor then the whole place damn slippery. i was trying to walk normal but lowk sliding like penguin sia... hais also got one cat just sitting there judging me like it pay rent there like that. honestly even the cat got more composure than me. aftn went to meet my friend for lunch and i confidently said i not hungry, end up i ate half her fries and still buy bubble tea after that. then the pearls stuck in the straw until i had to suck like fighting for my life, almost blacked out over koi sia damn embarrassing ahahhaa now i reach home alr and supposed to do readings but my bed looking at me like it miss me so much... i think i just lie down 10 min only la but knowing me confirm wake up in 3 business days haisss",
+  "turns": [
+    { "role": "ai", "text": "What’s pulling you toward the bed right now, just needing a break, or something else?" },
+    { "role": "user", "text": "im just feeling really tired plus its been a long day" },
+    { "role": "ai", "text": "Sounds like a whirlwind, Milo-in-a-bottle, slippery decks, and a stubborn bubble-tea straw left you drained. When during today did the fatigue feel most overwhelming for you?" },
+    { "role": "user", "text": "i think after i came home from all the crazy things happening lor" },
+    { "role": "ai", "text": "Sounds like the day really ran you ragged. How do you usually unwind when you get home after a chaotic day like this?" },
+    { "role": "user", "text": "sleep nap but so unproductive then sometimes when i wake up am groggy af" },
+    { "role": "ai", "text": "That nap probably hit you right when your brain was still trying to catch up from the morning mix-ups, which can leave you feeling extra foggy. It’s normal for the mind to stay in reset mode after a chaotic start, so the grogginess isn’t a sign you failed, just a signal that you need a gentler transition before diving back in." },
+    { "role": "user", "text": "hais" },
+    { "role": "ai", "text": "Sounds like the morning’s little mix-ups set off a chain reaction, leaving you stuck in a foggy loop. That Milo-soup moment and the slippery shortcut both add to the sense that nothing’s clicking, which can make the grogginess feel even heavier." },
+    { "role": "user", "text": "ye" },
+    { "role": "ai", "text": "Even though you told yourself you weren’t hungry, you still ended up taking half her fries. That little mismatch can feel oddly telling. What do you think nudged you to go for the fries despite the not hungry confidence?" }
+  ],
+  "expectedFocus": ["fatigue after a long day", "nap guilt and grogginess", "readings pressure"],
+  "incidental": ["fries", "cat", "bubble tea straw"],
+  "badAssistantTurnIndexes": [6, 8, 10]
+}

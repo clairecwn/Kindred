@@ -379,6 +379,9 @@ function shiftersBefore(tokens, p) {
     if (CLAUSE_BREAKERS.includes(w)) break;
     if (VAD_NEGATORS.includes(w)) { negated = true; cues.push({ type: "negator", word: w, index: tokens[k].index }); continue; }
     if (INTENSIFIERS[w] != null) { multiplier *= INTENSIFIERS[w]; cues.push({ type: "intensifier", word: w, factor: INTENSIFIERS[w], index: tokens[k].index }); }
+    // A nearer affect-bearing word consumes an earlier negator. This keeps
+    // "not bad, I improved" from incorrectly negating both affect terms.
+    if (lookupToken(w)) break;
   }
   const postfix = normaliseWord(tokens[p + 1]?.word ?? "");
   if (postfix === "af" || postfix === "asf") {

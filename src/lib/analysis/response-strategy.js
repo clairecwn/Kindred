@@ -143,6 +143,13 @@ export function validateCompanionResponse(text, context = {}) {
     return { ok: false, reason: "unsupported-emotion-script" };
   }
 
+  const explicitAngerEvidence = (context.features?.vadTerms ?? []).some((term) =>
+    /^(?:angri|mad|furious|rage|resent|disrespect|pek chek)$/i.test(term.term)
+  );
+  if (/\b(?:anger|angry|mad|furious|rage)\b/i.test(value) && !explicitAngerEvidence) {
+    return { ok: false, reason: "unsupported-anger-language" };
+  }
+
   const d = context.features?.appraisal?.dimensions;
   const strongTaskAversion =
     d?.goalObstruction >= 0.35 &&

@@ -10,6 +10,7 @@ import {
 } from "../conversation-response.js";
 import { hasArtificialStyleTell } from "../companion-style.js";
 import { normaliseCompanionStyle } from "../companion-style.js";
+import { AIJournalist, EmotionDetector } from "../../journal-ai.js";
 
 const USER_TURNS = [
   "Practice was rough and I did not play as well as I wanted, but I hope the next one is better.",
@@ -100,4 +101,33 @@ test("style boundary removes long dashes and detects canned companion language",
   assert.equal(normaliseCompanionStyle("That was hard — and it mattered – a lot."), "That was hard, and it mattered, a lot.");
   assert.equal(hasArtificialStyleTell("I'm here with you. Tell me more."), "canned-empathy");
   assert.equal(hasArtificialStyleTell("It sounds like you are overwhelmed."), "formulaic-opener");
+  assert.equal(hasArtificialStyleTell("That stays with me. Where does it go from here?"), "generic-interpretation");
+  assert.equal(hasArtificialStyleTell("That frustration is telling you something. Anger often shows up."), "generic-interpretation");
+});
+
+test("reported Singlish workload conversation stays contextual across entry, advice and clarification", async () => {
+  const entry = "wah tdy damn hot sia very shag but i think nudbad i improved in my soccer practice lol but need try harder not good enough";
+  const workload = "but like got so much ork idk what to do about it";
+  const journalist = new AIJournalist();
+  const analysis = new EmotionDetector().analyze(entry, []);
+  const initial = journalist._templateResponse(entry, analysis, []).text;
+  assert.match(initial, /progress|improv/i);
+  assert.match(initial, /physical strain|pressure to do better/i);
+  assert.doesNotMatch(initial, /anger|frustration is telling|not simply|[—–]/i);
+
+  const firstHistory = [{ role: "ai", text: initial }];
+  const workloadPlan = buildConversationResponsePlan({ originalEntry: entry, userMessage: workload, chatHistory: firstHistory });
+  assert.equal(workloadPlan.intent, "advice-request");
+  assert.ok(workloadPlan.causes.some((cause) => cause.type === "workload"));
+  assert.ok(workloadPlan.latestFeatures.appraisal.replacements.some((item) => item.surface === "ork" && item.normalized === "work"));
+  const advice = localConversationReply(workloadPlan);
+  assert.match(advice, /pile of work|deadline order|starting point/i);
+  assert.doesNotMatch(advice, /that stays with me|where does it go|tell me more|say more|[—–]/i);
+
+  const clarificationHistory = [...firstHistory, { role: "user", text: workload }, { role: "ai", text: advice }];
+  const clarificationPlan = buildConversationResponsePlan({ originalEntry: entry, userMessage: "wdym", chatHistory: clarificationHistory });
+  const clarification = localConversationReply(clarificationPlan);
+  assert.match(clarification, /two different problems|not knowing which task|more work than feels manageable/i);
+  assert.doesNotMatch(clarification, /tell me more|say more|where does it go|[—–]/i);
+  await assert.rejects(journalist.generateChatReply(workload, firstHistory, entry, analysis.emotion, "friend", []), /not configured/);
 });

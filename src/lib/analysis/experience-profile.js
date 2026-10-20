@@ -14,7 +14,7 @@ const clamp = (value, min = 0, max = 1) => Math.max(min, Math.min(max, value));
 const sat = (value) => value > 0 ? 1 - Math.exp(-value) : 0;
 
 const SIGNALS = Object.freeze({
-  selfEvaluation: /\b(?:my fault|i messed up|i failed|i (?:(?:am|'m|was) )?(?:just )?not good enough|i wasn'?t good enough|not my best|should have|should'?ve|let myself down|disappointed in myself|embarrassed|paiseh)\b/i,
+  selfEvaluation: /\b(?:my fault|i messed up|i failed|i (?:(?:am|'m|was) )?(?:just )?not good enough|i wasn'?t good enough|not good enough|not my best|should have|should'?ve|let myself down|disappointed in myself|embarrassed|paiseh)\b/i,
   otherAgency: /\b(?:they|he|she|my (?:friend|boss|teacher|parent|partner|teammate|classmate|colleague))\b.{0,70}\b(?:made|forced|ignored|blamed|changed|cancelled|canceled|lied|shouted|disrespected|excluded|ghosted)\b/i,
   unfairness: /\b(?:unfair|not fair|double standard|blamed for|taken advantage|used me|disrespect|no right to|why should i)\b/i,
   uncertainty: /\b(?:i don'?t know|idk|not sure|maybe|perhaps|might|confused|can'?t tell|cannot tell|hard to say|somehow|weirdly)\b/i,
@@ -23,7 +23,7 @@ const SIGNALS = Object.freeze({
   connection: /\b(?:supported|understood|included|welcomed|cared for|checked on me|had my back|not alone|together)\b/i,
   disconnection: /\b(?:ignored|left out|excluded|forgotten|not invited|ghosted|alone|lonely|nobody|no one understands|don'?t belong|do not belong)\b/i,
   loss: /\b(?:miss|missing|lost|gone|ended|over now|broke up|breakup|passed away|not coming back)\b/i,
-  achievement: /\b(?:proud|accomplished|achieved|finally finished|pulled it off|did it|made progress|small win)\b/i,
+  achievement: /\b(?:proud|accomplished|achieved|finally finished|pulled it off|did it|made progress|improved|getting better|small win)\b/i,
   relief: /\b(?:relieved|relief|weight off|glad .* over|can breathe|finally done|pressure is off)\b/i,
   hope: /\b(?:hope|hopefully|looking forward|maybe .* better|next time .* better|tomorrow .* better)\b/i,
   ambivalence: /\b(?:part of me|on one hand|torn|mixed feelings|but at the same time|want to .{0,45} but|glad .{0,45} but)\b/i,
@@ -169,5 +169,5 @@ export function composeExperienceDescription(profile, seedComponents = []) {
   else if (!parts.length && d.valence < -0.12 && d.activation <= 0.16) add("worn down by the situation");
   else if (!parts.length && d.valence > 0.12 && d.activation > 0.16) add("energised by what happened");
   else if (!parts.length && d.valence > 0.12) add("quietly positive about it");
-  return parts.slice(0, 4).join(", ").replace(/, ([^,]+)$/, parts.length === 2 ? " and $1" : ", and $1");
+  return parts.slice(0, 4).join(", ").replace(/, ([^,]+)$/, parts.length === 2 ? " and $1" : ", and $1") || "hard to name";
 }

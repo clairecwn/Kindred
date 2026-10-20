@@ -1,11 +1,15 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import SpriteCharacter from "./SpriteCharacter.jsx";
-import { analyzeEmotionAI } from "../lib/emotion-api.js";
-import { EmotionDetector, AIJournalist, JournalMemory } from "../lib/journal-ai.js";
+import { EmotionDetector, AIJournalist, reconcileEmotion } from "../lib/journal-ai.js";
 import { EMOTIONS } from "../utils/emotion.js";
 import { scoreCheckin, scoreToBand } from "../lib/analysis/checkin-scoring.js";
 import { analyseEntry, buildCompanionHints } from "../lib/analysis/entry-adapter.js";
 import { GATE_THRESHOLDS } from "../lib/analysis/cold-start.js";
+import { updateJournalConversation } from "../lib/analysis/journal-conversation-state.js";
+import { buildPersonalMemory, resolvePersonalMemory } from "../lib/analysis/personal-memory.js";
+import { useDatabaseState } from "../hooks/useDatabaseState.js";
+import { companionRetryDecision, companionFailureMessage } from "../lib/analysis/companion-retry.js";
+import { dailyAffect, weeklyAffect, displayEntryEmotion } from "../lib/analysis/journey-affect.js";
 
 // ── Quiz data ─────────────────────────────────────────────────────────────────
 const QUIZ = [
@@ -269,17 +273,6 @@ function formatEmotionLabel(e) {
   if (!raw) return EMOTIONS.neutral.label;
   if (EMOTIONS[raw]) return EMOTIONS[raw].label;
   return raw.replace(/[-_]+/g," ").replace(/\s+/g," ").replace(/\b\w/g,c=>c.toUpperCase());
-}
-
-// Always returns exactly one capitalised word — used for mood chips and Most Felt
-function toOneWord(e) {
-  if (!e) return "Neutral";
-  const es = getEmotionStyle(e);
-  // If getEmotionStyle matched a standard emotion, its label is already one word
-  if (Object.values(EMOTIONS).some(em => em.label === es.label)) return es.label;
-  // Unknown phrase — take just the first word
-  const first = String(e).trim().split(/[\s,&]+/)[0] || "Neutral";
-  return first.charAt(0).toUpperCase() + first.slice(1).toLowerCase();
 }
 
 function normalizeAiChat(entry) {
@@ -1314,8 +1307,13 @@ export default function WellnessView({
   const [confirmStage, setConfirmStage] = useState(null);
   const [pendingEntry, setPendingEntry] = useState(null);
   const [chatHistory, setChatHistory]   = useState([]);
+  const [pendingTurn, setPendingTurn] = useState(null);
+  const chatRequestInFlight = useRef(false);
+  const openingRetryTimer = useRef(null);
   const [chatInput, setChatInput]       = useState("");
   const [chatLoading, setChatLoading]   = useState(false);
+  const [chatError, setChatError]       = useState("");
+  const [savedPersonalMemory, setSavedPersonalMemory] = useDatabaseState("kindred.personalMemory", null);
   const [replyingTo, setReplyingTo]     = useState(null);
   const [hoveredMsg, setHoveredMsg]     = useState(null);
   const chatContainerRef = useRef(null);
@@ -1328,6 +1326,26 @@ export default function WellnessView({
     const main = document.querySelector(".main-content");
     if(main) main.scrollTop = 0;
   },[]);
+  useEffect(()=>()=>clearTimeout(openingRetryTimer.current),[]);
+  useEffect(()=>{
+    if(!pendingTurn?.autoRetryAt||chatLoading)return;
+    const timer=setTimeout(()=>completeChatTurn(pendingTurn),Math.max(0,pendingTurn.autoRetryAt-Date.now()));
+    return()=>clearTimeout(timer);
+  },[pendingTurn,chatLoading]);
+
+  useEffect(()=>{
+    if(!journalEntries.some(entry=>entry.text&&!String(entry.emotion??"").trim()))return;
+    setJournalEntries(entries=>entries.map(entry=>entry.text&&!String(entry.emotion??"").trim()
+      ? {...entry,emotion:reconcileEmotion(entry.aiInterpretation?.emotion,entry.text).emotion,emotionRepair:"empty-label-v1"}:entry));
+  },[journalEntries,setJournalEntries]);
+
+  // Rebuild from saved user-authored entries and turns. Removing an entry also
+  // removes its evidence from this compact cache on the next state update.
+  useEffect(()=>{
+    const next=buildPersonalMemory(journalEntries);
+    if(savedPersonalMemory?.fingerprint!==next.fingerprint)setSavedPersonalMemory(next);
+  },[journalEntries,savedPersonalMemory?.fingerprint,setSavedPersonalMemory]);
+  const personalMemoryFor=(entryId)=>resolvePersonalMemory(savedPersonalMemory,journalEntries.filter(entry=>entry.id!==entryId));
 
   const [quizStarted, setQuizStarted]   = useState(false);
   const [quizIdx, setQuizIdx]           = useState(0);
@@ -1350,9 +1368,11 @@ export default function WellnessView({
   const [checkinIdx, setCheckinIdx] = useState(0);
   const [openChatEntryId, setOpenChatEntryId] = useState(null);
 
-  const memory  = useMemo(()=>new JournalMemory(journalEntries),[journalEntries]);
-  const summary = useMemo(()=>memory.getWeekSummary(),[memory]);
   const currentEmotion = getEmotionStyle(emotion);
+  const todayAffect = useMemo(()=>dailyAffect(journalEntries,localDateKey()),[journalEntries]);
+  useEffect(()=>{
+    if(todayAffect?.emotion&&emotion!==todayAffect.emotion)setEmotion(todayAffect.emotion);
+  },[todayAffect?.emotion,emotion,setEmotion]);
   const journeyBookButtonStyle = {
     width:"170px",padding:"6px 0",borderRadius:10,fontFamily:"var(--font-game)",fontSize:"0.7rem",whiteSpace:"nowrap",
     color:"#582f25",background:"rgba(255,255,255,0.62)",border:"1.5px solid rgba(139,80,30,0.24)",
@@ -1368,70 +1388,80 @@ export default function WellnessView({
   const currentEntry  = activeEntries[activeIdx] ?? null;
 
   // ── Journal save ─────────────────────────────────────────────────────────────
-  async function analyzeEntry(e) {
-    if (e?.preventDefault) e.preventDefault();
-    const text=draft.trim();
-    if (analyzing) return;
-    if (!text) { alert("Please write something first."); return; }
-    setAnalyzing(true); setAiResult(null); setCompanion(null); setConfirmStage(null);
-    // Cultural calibration + text-feature hints (hedging, minimisation, somatic
-    // idioms, dialectical affect, cold-start gates) computed client-side, no
-    // LLM call, and folded into the companion's response so it reads distress
-    // idioms correctly and never claims a trend before the gates allow it.
-    let hints={}; try{ hints=buildCompanionHints(journalEntries,text); }catch(err){ console.warn("[Kindred] companion hints failed:",err); }
+  async function requestOpening(entry, failedAttempts=0) {
+    clearTimeout(openingRetryTimer.current);
+    setChatLoading(true); setChatError("");
     try {
-      const dr=detector.analyze(text,journalEntries);
-      const [hf,resp]=await Promise.all([analyzeEmotionAI(text),journalist.generateResponse(text,dr,journalEntries,player?.name,hints)]);
-      const m=mergeAnalysis(dr,hf);
-      const initialAiChat=resp?.text?[{role:"ai",text:resp.text}]:[];
-      const entry={id:crypto.randomUUID(),date:localDateKey(),text,emotion:m.emotion,confidence:m.confidence,source:hf?"analysed":"local",aiChat:initialAiChat,companionResponse:resp?.text??"",isCrisisResponse:!!resp?.isCrisisResponse,textFeatures:hints.textFeatures,analysis:hints.analysis,
-        aiInterpretation:resp?.llmEmotion?{emotion:resp.llmEmotion,cause:resp.emotionCause||"",source:resp.source,overruled:!!resp.emotionOverruled,influencedScore:false}:undefined};
-      setAiResult(m); setCompanion(resp); setPendingEntry(entry); setConfirmStage("confirm");
+      const response=await journalist.generateResponse(entry.text,detector.analyze(entry.text,journalEntries),journalEntries.filter(item=>item.id!==entry.id),player?.name,{personalMemory:personalMemoryFor(entry.id)});
+      if(!response?.text)throw new Error("Opening response is empty");
+      const messages=(response.messages?.length?response.messages:[response.text]).map(text=>({role:"ai",text}));
+      const completed=[{role:"user",text:entry.text,isJournal:true},...messages];
+      const updated=updateJournalConversation(entry,completed,journalEntries,response);
+      updated.companionResponse=response.text;
+      updated.isCrisisResponse=!!response.isCrisisResponse;
+      setPendingEntry(updated);setChatHistory(completed);
+      setAiResult(result=>({...result,emotion:updated.emotion}));setCompanion(response);
+      setJournalEntries(entries=>entries.map(item=>item.id===updated.id?updated:item));
     } catch(err) {
-      console.warn("[Kindred] analyzeEntry failed, saving locally:", err);
-      const dr=detector.analyze(text,journalEntries);
-      const resp=journalist._templateResponse?.(text,dr,journalEntries);
-      const entry={id:crypto.randomUUID(),date:localDateKey(),text,emotion:dr.emotion,confidence:dr.confidence??60,source:"local",aiChat:resp?.text?[{role:"ai",text:resp.text}]:[],companionResponse:resp?.text??"",textFeatures:hints.textFeatures,analysis:hints.analysis};
-      setJournalEntries(p=>[entry,...p]); setEmotion(dr.emotion); setDraft("");
-      if(setCoins) setCoins(c=>c+15);
-    } finally {
-      setAnalyzing(false);
-    }
+      console.warn("[Kindred] Opening unavailable:",err.message);
+      const decision=companionRetryDecision(err,failedAttempts+1);
+      if(decision.automatic){
+        setChatError(companionFailureMessage(err,'entry',true));
+        openingRetryTimer.current=setTimeout(()=>requestOpening(entry,failedAttempts+1),decision.delayMs);
+      }else setChatError(companionFailureMessage(err,'entry'));
+    } finally {setChatLoading(false);setAnalyzing(false);}
   }
-  function mergeAnalysis(dr,hf){
-    // `analyzeEmotionAI` always exposes the deterministic VAD reading at the
-    // top level; any LLM wording is nested under `llm`. Never let the older
-    // keyword fallback erase dialect/cultural evidence by calling it neutral.
-    if(hf?.evidence>0&&hf?.emotion){
-      return {...dr,emotion:hf.emotion,confidence:hf.confidence,source:hf.source,
-        vad:hf.vad,evidence:hf.evidence,llm:hf.llm};
-    }
-    return dr;
+  async function analyzeEntry(e) {
+    e?.preventDefault?.();
+    const text=draft.trim();
+    if(analyzing||chatLoading)return;
+    if(!text){alert("Please write something first.");return;}
+    setAnalyzing(true);
+    const reading=detector.analyze(text,journalEntries);
+    let hints={};try{hints=buildCompanionHints(journalEntries,text);}catch(err){console.warn("[Kindred] companion hints failed:",err);}
+    const initialChat=[{role:"user",text,isJournal:true}];
+    const entry={id:crypto.randomUUID(),date:localDateKey(),text,emotion:reading.emotion,confidence:reading.confidence,source:"local",aiChat:initialChat,companionResponse:"",textFeatures:hints.textFeatures,analysis:hints.analysis};
+    setJournalEntries(entries=>[entry,...entries]);setDraft("");
+    if(setCoins)setCoins(coins=>coins+15);
+    setAiResult(reading);setPendingEntry(entry);setChatHistory(initialChat);setCompanion(null);
+    setChatInput("");setReplyingTo(null);setChatError("");setPendingTurn(null);setConfirmStage("chat");
+    await requestOpening(entry);
   }
-  function getSavedChatHistory(){
-    const initialReply=String(companionResponse?.text||"").trim();
-    const saved=chatHistory.map(m=>({role:m.role,text:String(m.text||"")})).filter(m=>m.text.trim());
-    if(initialReply&&!saved.some(m=>m.role==="ai"&&m.text===initialReply))saved.unshift({role:"ai",text:initialReply});
-    return saved;
+  function finishConversation(){
+    if(chatLoading)return;
+    clearTimeout(openingRetryTimer.current);
+    setConfirmStage(null);setPendingEntry(null);setAiResult(null);setCompanion(null);
+    setChatHistory([]);setChatInput("");setReplyingTo(null);setChatError("");setPendingTurn(null);
   }
-  function mergeEntryChat(entry){
-    const chat=[...normalizeAiChat(entry)];
-    for(const m of getSavedChatHistory()){
-      if(!chat.some(existing=>existing.role===m.role&&existing.text===m.text))chat.push(m);
-    }
-    return chat;
+  async function completeChatTurn(turn){
+    if(chatRequestInFlight.current)return;
+    chatRequestInFlight.current=true;setChatLoading(true);setChatError("");
+    const {userMsg,priorHistory}=turn;
+    const msg=userMsg.text;
+    try {
+      const reply=await journalist.generateChatReply(msg,priorHistory,pendingEntry?.text??"",aiResult?.emotion??"",player?.name,journalEntries.filter(entry=>entry.id!==pendingEntry?.id),{returnDetails:true,replyTo:userMsg.replyTo,conversationState:pendingEntry?.conversationState,personalMemory:personalMemoryFor(pendingEntry?.id)});
+      const completed=[...priorHistory,userMsg,...reply.messages.map(text=>({role:"ai",text,replyToTurnId:userMsg.turnId}))];
+      setChatHistory(completed);setPendingTurn(null);
+      const updated=updateJournalConversation(pendingEntry,completed,journalEntries,reply);
+      setPendingEntry(updated); setAiResult(result=>({...result,emotion:updated.emotion}));
+      setJournalEntries(entries=>entries.map(entry=>entry.id===updated.id?updated:entry));
+    } catch (err) {
+      console.warn("[Kindred] Companion chat unavailable:",err);
+      const retryCount=(turn.retryCount??0)+1;
+      const decision=companionRetryDecision(err,retryCount);
+      setPendingTurn({...turn,retryCount,autoRetryAt:decision.automatic?Date.now()+decision.delayMs:null});
+      setChatError(companionFailureMessage(err,'message',decision.automatic));
+    } finally { chatRequestInFlight.current=false;setChatLoading(false); }
   }
-  function acceptEmotion(){if(!pendingEntry)return;const savedChat=mergeEntryChat(pendingEntry);const entry={...pendingEntry,aiChat:savedChat};setJournalEntries(p=>[entry,...p]);setEmotion(pendingEntry.emotion);setDraft("");setConfirmStage(null);setPendingEntry(null);setAiResult(null);setCompanion(null);setChatHistory([]);setChatInput("");if(setCoins)setCoins(c=>c+15);}
-  function selectAlternativeEmotion(alt){if(!pendingEntry)return;const savedChat=mergeEntryChat(pendingEntry);const c2={...pendingEntry,emotion:alt,source:"manual",aiChat:savedChat};setJournalEntries(p=>[c2,...p]);setEmotion(alt);setDraft("");setConfirmStage(null);setPendingEntry(null);setAiResult(null);setCompanion(null);setChatHistory([]);setChatInput("");if(setCoins)setCoins(c=>c+15);}
   async function sendChatMessage(){
-    const msg=chatInput.trim(); if(!msg||chatLoading) return;
-    const userMsg=replyingTo?{role:"user",text:msg,replyTo:replyingTo.text}:{role:"user",text:msg};
+    const msg=chatInput.trim(); if(!msg||chatLoading||pendingTurn||chatRequestInFlight.current) return;
+    setChatError("");
+    const userMsg=replyingTo?{role:"user",text:msg,replyTo:replyingTo.text,turnId:crypto.randomUUID()}:{role:"user",text:msg,turnId:crypto.randomUUID()};
     const newHistory=[...chatHistory,userMsg];
-    setChatHistory(newHistory); setChatInput(""); setReplyingTo(null); setChatLoading(true);
-    // Pass completed prior turns only. generateChatReply appends `msg` once as
-    // the current turn; including newHistory here used to duplicate it.
-    const reply=await journalist.generateChatReply(msg,chatHistory,pendingEntry?.text??"",aiResult?.emotion??"",player?.name,journalEntries);
-    setChatHistory(h=>[...h,{role:"ai",text:reply}]); setChatLoading(false);
+    const turn={userMsg,priorHistory:chatHistory};
+    setChatHistory(newHistory);setChatInput("");setReplyingTo(null);setPendingTurn(turn);
+    setJournalEntries(entries=>entries.map(entry=>entry.id===pendingEntry?.id?{...entry,aiChat:newHistory}:entry));
+    await completeChatTurn(turn);
   }
 
   // ── Quiz ─────────────────────────────────────────────────────────────────────
@@ -1511,29 +1541,23 @@ export default function WellnessView({
   const bandCopy = WELLBEING_BAND_COPY[bandKey] ?? WELLBEING_BAND_COPY.navigating;
   const wellbeingBand = { label: bandCopy.label, message: roughPatchAllowed ? bandCopy.message : bandCopy.roughMessage, emotion: bandCopy.emotion };
 
-  // Most-felt emotion across all entries (raw AI word → single-word via getEmotionStyle)
-  const dominantRawEmotion=useMemo(()=>{
-    if(!journalEntries.length) return null;
-    const counts={};
-    journalEntries.forEach(e=>{if(e.emotion)counts[e.emotion]=(counts[e.emotion]||0)+1;});
-    return Object.entries(counts).sort((a,b)=>b[1]-a[1])[0]?.[0]??null;
-  },[journalEntries]);
-
-  // 7-day mood chart — uses raw AI emotion → getEmotionStyle for label + colour
+  // Journal and check-in readings are averaged within each day. The week then
+  // averages days equally, irrespective of how many entries each day has.
   const moodWeek=useMemo(()=>{
     const today=new Date();
     return Array.from({length:7},(_,i)=>{
       const d=new Date(today);d.setDate(today.getDate()-(6-i));
       const ds=localDateKey(d);
-      const entry=journalEntries.find(e=>e.date===ds);
-      if(!entry) return{day:WEEKDAYS_SHORT[d.getDay()],ds,mood:null};
-      const es=getEmotionStyle(entry.emotion);
+      const daily=dailyAffect(journalEntries,ds);
+      if(!daily) return{day:WEEKDAYS_SHORT[d.getDay()],ds,mood:null};
+      const es=getEmotionStyle(daily.emotion);
       const hex=es.color.replace('#','');
       const r=parseInt(hex.slice(0,2),16),g=parseInt(hex.slice(2,4),16),b=parseInt(hex.slice(4,6),16);
       const lum=(0.2126*r+0.7152*g+0.0722*b)/255;
-      return{day:WEEKDAYS_SHORT[d.getDay()],ds,mood:{label:toOneWord(entry.emotion),color:es.color,border:es.color,text:lum>0.45?'#1a1a1a':'#fff'}};
+      return{day:WEEKDAYS_SHORT[d.getDay()],ds,mood:{label:es.label,color:es.color,border:es.color,text:lum>0.45?'#1a1a1a':'#fff'}};
     });
   },[journalEntries]);
+  const dominantRawEmotion=useMemo(()=>weeklyAffect(journalEntries,moodWeek.map(day=>day.ds))?.emotion??null,[journalEntries,moodWeek]);
 
   // ── Topbar ────────────────────────────────────────────────────────────────────
   const Topbar=(
@@ -1582,29 +1606,14 @@ export default function WellnessView({
 
           {/* ── White content box ── */}
           <div className="scroll-white-box">
-            {/*Option 1: AI confirm*/}
-            {confirmStage==="confirm"&&aiResult&&(
-              <div style={{display:"flex",flexDirection:"column",gap:10,flex:1,minHeight:0}}>
-                {companionResponse&&<p style={{fontSize:"0.76rem",lineHeight:1.6,color:"#3D2010",fontFamily:"'Poppins',Georgia,serif",margin:0,padding:"10px 12px",background:"rgba(212,136,42,0.08)",borderRadius:10,borderLeft:"3px solid #D4882A"}}>{companionResponse.text}</p>}
-                <div style={{fontFamily:"var(--font-game)",fontSize:"0.74rem",color:"#503111"}}>
-                  If you wanted to name the feeling, would <span style={{color:getEmotionStyle(aiResult.emotion).color,fontWeight:700}}>{EMOTIONS[aiResult.emotion]?.label??aiResult.emotion}</span> fit?
-                </div>
-                <div style={{display:"flex",flexDirection:"column",gap:6}}>
-                  <button className="scroll-btn-primary" onClick={acceptEmotion} style={{fontSize:"0.72rem",padding:"8px 14px",textAlign:"left"}}>Yes, that's right!</button>
-                  <button className="scroll-btn-secondary" onClick={()=>{setChatHistory([{role:"ai",text:companionResponse?.text??"I'm here. Tell me more."}]);setConfirmStage("chat");}} style={{fontSize:"0.72rem",padding:"8px 14px",textAlign:"left"}}>Talk to me more about this</button>
-                  <button className="scroll-btn-secondary" onClick={()=>setConfirmStage("pick")} style={{fontSize:"0.72rem",padding:"8px 14px",textAlign:"left"}}>No, but I would like to pick my own emotions</button>
-                </div>
-              </div>
-            )}
-
             {/* ── Option 2: Chat with companion ── */}
             {confirmStage==="chat"&&aiResult&&(
               <div style={{display:"flex",flexDirection:"column",flex:1,minHeight:0,gap:8}}>
                 <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexShrink:0}}>
                   <span style={{fontFamily:"var(--font-game)",fontSize:"0.7rem",color:"#503111"}}>Talking with your companion</span>
                   <div style={{display:"flex",gap:6,alignItems:"center"}}>
-                    <button className="scroll-btn-secondary" onClick={()=>setConfirmStage("pick")} style={{fontSize:"0.65rem",padding:"5px 10px"}}>Pick my own emotion</button>
-                    <button className="scroll-btn-primary" onClick={acceptEmotion} style={{fontSize:"0.65rem",padding:"5px 10px"}}>Save entry</button>
+                    <span style={{fontSize:"0.65rem",color:"#7B4A1A"}}>Entry saved</span>
+                    <button className="scroll-btn-primary" onClick={finishConversation} disabled={chatLoading} style={{fontSize:"0.65rem",padding:"5px 10px"}}>Done</button>
                   </div>
                 </div>
                 {/* Chat messages */}
@@ -1633,6 +1642,10 @@ export default function WellnessView({
                   ))}
                   {chatLoading&&<div style={{display:"flex",justifyContent:"flex-start"}}><div style={{padding:"8px 11px",borderRadius:"14px 14px 14px 4px",background:"rgba(212,136,42,0.1)",fontFamily:"var(--font-game)",fontSize:"0.7rem",color:"#8B5A20"}}>…</div></div>}
                 </div>
+                {chatError&&<div role="status" style={{fontSize:"0.72rem",color:"#8B3A20"}}>{chatError}
+                  {pendingTurn&&<button className="scroll-btn-primary" disabled={chatLoading} onClick={()=>completeChatTurn(pendingTurn)} style={{marginLeft:8}}>Retry reply</button>}
+                  {!pendingTurn&&!chatHistory.some(turn=>turn.role==="ai")&&<button className="scroll-btn-primary" disabled={chatLoading} onClick={()=>requestOpening(pendingEntry)} style={{marginLeft:8}}>Retry opening</button>}
+                </div>}
                 {/* Reply preview bar */}
                 {replyingTo&&(
                   <div style={{display:"flex",alignItems:"center",gap:6,background:"rgba(212,136,42,0.1)",borderRadius:8,padding:"5px 10px",flexShrink:0,borderLeft:"3px solid #D4882A"}}>
@@ -1645,39 +1658,13 @@ export default function WellnessView({
                 )}
                 {/* Input row */}
                 <div style={{display:"flex",gap:6,flexShrink:0,alignItems:"flex-end"}}>
-                  <textarea value={chatInput} onChange={e=>setChatInput(e.target.value)}
+                  <textarea value={chatInput} onChange={e=>setChatInput(e.target.value)} disabled={!!pendingTurn||chatLoading}
                     onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendChatMessage();}}}
                     placeholder={replyingTo?"Replying…":"Reply to your companion…"}
                     rows={2}
                     style={{flex:1,padding:"8px 12px",borderRadius:10,border:"1.5px solid rgba(139,80,30,0.25)",fontFamily:"'Times New Roman',Georgia,serif",fontSize:"0.82rem",color:"#3D2010",background:"rgba(255,255,255,0.7)",outline:"none",resize:"none",overflowY:"auto",maxHeight:"96px",lineHeight:"1.4",wordBreak:"break-word"}}/>
-                  <button className="scroll-btn-primary" onClick={sendChatMessage} disabled={!chatInput.trim()||chatLoading} style={{padding:"8px 14px",fontSize:"0.72rem",opacity:chatInput.trim()&&!chatLoading?1:0.5,flexShrink:0}}>Send</button>
+                  <button className="scroll-btn-primary" onClick={sendChatMessage} disabled={!chatInput.trim()||chatLoading||!!pendingTurn} style={{padding:"8px 14px",fontSize:"0.72rem",opacity:chatInput.trim()&&!chatLoading&&!pendingTurn?1:0.5,flexShrink:0}}>Send</button>
                 </div>
-              </div>
-            )}
-
-            {/* ── Option 3: Pick emotion ── */}
-            {confirmStage==="pick"&&(
-              <div style={{display:"flex",flexDirection:"column",flex:1,minHeight:0,overflow:"hidden"}}>
-                <div style={{fontFamily:"var(--font-game)",fontSize:"0.95rem",color:"#503111",marginBottom:6}}>How would you describe it?</div>
-                <div style={{display:"grid",gridTemplateColumns:"repeat(5,minmax(0,1fr))",gap:6,padding:"1px"}}>
-                  {Object.entries(EMOTIONS).map(([key,em])=>(
-                    <button key={key} className="emotion-pick-btn" onClick={()=>selectAlternativeEmotion(key)} aria-label={`Choose ${em.label}`}
-                      style={{
-                        "--emotion-color": em.color,
-                        background:`linear-gradient(180deg, ${em.color}1c, ${em.color}32)`,
-                        border:`2px solid ${em.color}`,
-                        boxShadow:`0 3px 0 ${em.color}66, 0 6px 14px ${em.color}24`,
-                      }}>
-                      <div className="emotion-face-wrap">
-                        <CartoonEmotionFace emotion={key} color={em.color}/>
-                      </div>
-                      <span style={{fontFamily:"var(--font-game)",fontSize:"0.58rem",color:em.color,fontWeight:700,letterSpacing:"0.02em"}}>
-                        {em.label}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-                <button className="scroll-btn-secondary" style={{marginTop:9,fontSize:"0.7rem",padding:"6px 12px",flexShrink:0}} onClick={()=>setConfirmStage("confirm")}>← Back</button>
               </div>
             )}
 
@@ -1803,14 +1790,8 @@ export default function WellnessView({
               </div>
               {dominantRawEmotion&&(
                 <div className="journey-stat-box">
-                  <div className="journey-stat-num" style={{color:getEmotionStyle(dominantRawEmotion).color}}>{toOneWord(dominantRawEmotion)}</div>
+                  <div className="journey-stat-num" style={{color:getEmotionStyle(dominantRawEmotion).color}}>{getEmotionStyle(dominantRawEmotion).label}</div>
                   <div className="journey-stat-label">Most Felt</div>
-                </div>
-              )}
-              {showWellbeing&&(
-                <div className="journey-stat-box">
-                  <div className="journey-stat-num">{Math.round(latestAnalysis.latentState?.theta ?? latestAnalysis.todayScore?.graded ?? 0)}</div>
-                  <div className="journey-stat-label">Wellbeing Index{typeof latestAnalysis.confidence==="number"?` (±${Math.round((1-latestAnalysis.confidence)*10.5)})`:""}</div>
                 </div>
               )}
             </div>
@@ -1929,13 +1910,13 @@ export default function WellnessView({
                       </div>
                       <div style={{borderTop:"1.5px solid rgba(139,80,30,0.20)",paddingTop:6,marginTop:1,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
                         <div style={{fontFamily:"var(--font-game)",fontSize:"0.7rem",color:"#8B5A20"}}>Overall Wellbeing:</div>
-                        <div style={{fontFamily:"var(--font-game)",fontSize:"0.7rem",color:getEmotionStyle(currentEntry.emotion).color,fontWeight:599}}>{getEmotionStyle(currentEntry.emotion).label}</div>
+                        <div style={{fontFamily:"var(--font-game)",fontSize:"0.7rem",color:getEmotionStyle(displayEntryEmotion(currentEntry)).color,fontWeight:599}}>{getEmotionStyle(displayEntryEmotion(currentEntry)).label}</div>
                       </div>
                     </div>
                   ):rightTab==="checkin"?(
                     <div style={{flex:1,minHeight:0,display:"flex",flexDirection:"column",justifyContent:"center",alignItems:"center",gap:6}}>
                       <p style={{fontFamily:"var(--font-game)",fontSize:"1rem",color:"#8B5A20",fontStyle:"italic",margin:0}}>Daily check-in completed.</p>
-                      <div style={{fontFamily:"var(--font-game)",fontSize:"0.62rem",color:getEmotionStyle(currentEntry.emotion).color,fontWeight:700}}>Wellbeing: {getEmotionStyle(currentEntry.emotion).label}</div>
+                      <div style={{fontFamily:"var(--font-game)",fontSize:"0.62rem",color:getEmotionStyle(displayEntryEmotion(currentEntry)).color,fontWeight:700}}>Feeling: {getEmotionStyle(displayEntryEmotion(currentEntry)).label}</div>
                     </div>
                   ):(
                     (()=>{const entryChat=normalizeAiChat(currentEntry);const chatOpen=openChatEntryId===currentEntry.id;return chatOpen?(
@@ -1966,7 +1947,7 @@ export default function WellnessView({
                         <div style={{borderTop:"1px solid rgba(139,80,30,0.14)",marginTop:1,paddingTop:7,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"space-between",gap:6}}>
                           <div style={{fontFamily:"var(--font-game)",fontSize:"0.62rem",fontWeight:700}}>
                             <span style={{color:"#8B5A20"}}>Felt: </span>
-                            <span style={{color:getEmotionStyle(currentEntry.emotion).color}}>{formatEmotionLabel(currentEntry.emotion)}</span>
+                            <span style={{color:getEmotionStyle(displayEntryEmotion(currentEntry)).color}}>{getEmotionStyle(displayEntryEmotion(currentEntry)).label}</span>
                           </div>
                           <button type="button" onClick={()=>setOpenChatEntryId(currentEntry.id)} style={{...journeyBookButtonStyle,width:"auto",fontSize:"0.62rem",padding:"3px 8px",marginTop:0,flexShrink:0}}>
                             See past convo

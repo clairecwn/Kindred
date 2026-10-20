@@ -11,6 +11,7 @@ export const EMOTIONS = {
   angry:    { label: "Angry",    color: "#f51414", tone: "frustrated or tense", behavior: "tight stance",        speed: 1    },
   content:  { label: "Content",  color: "#127938", tone: "quietly okay",        behavior: "relaxed smile",       speed: 0.92 },
   grateful: { label: "Grateful", color: "#da027c", tone: "appreciative",        behavior: "warm nod",            speed: 0.95 },
+  mixed:    { label: "Mixed",    color: "#8974a8", tone: "more than one feeling", behavior: "neutral idle",        speed: 0.9  },
   neutral:  { label: "Neutral",  color: "#535253", tone: "even or unclear",     behavior: "neutral idle",        speed: 0.9  }
 };
 

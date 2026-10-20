@@ -131,6 +131,15 @@ test("negation does not reach across a clause boundary", () => {
   assert.ok(crossed.valence < plain.valence / 4, `negation leaked across the clause boundary (${crossed.valence})`);
 });
 
+test("a negator is consumed by the nearest affect term", () => {
+  const result = analyseText("It was not bad, I improved today");
+  const bad = result.vadTerms.find((term) => term.term === "bad");
+  const improved = result.vadTerms.find((term) => term.term === "improv");
+  assert.equal(bad?.negated, true);
+  assert.equal(improved?.negated, false);
+  assert.ok((improved?.v ?? 0) > 0);
+});
+
 test("intensifiers scale magnitude, downtoners reduce it", () => {
   const plain = textVAD("I am exhausted.").valence;
   const intense = textVAD("I am extremely exhausted.").valence;

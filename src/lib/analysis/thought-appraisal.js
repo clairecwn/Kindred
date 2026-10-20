@@ -35,6 +35,58 @@ const NORMALISATIONS = Object.freeze([
   [/\bprac\b/gi, "practice"],
 ]);
 
+// High-value appraisal words receive conservative one-edit typo recovery.
+// This is token-level and reusable across entries, not a stored sentence or
+// example. Short targets only accept a missing/extra/transposed character so
+// ordinary words such as "word" are not silently rewritten as "work".
+const APPRAISAL_TERMS = Object.freeze([
+  "work", "homework", "assignment", "assignments", "deadline", "deadlines",
+  "practice", "training", "project", "projects", "school", "study", "revision",
+  "rest", "sleep", "improve", "improved", "perform", "weather", "humid",
+]);
+
+function oneEditKind(surface, target) {
+  if (surface === target || Math.abs(surface.length - target.length) > 1) return null;
+  if (surface.length === target.length) {
+    const differences = [];
+    for (let index = 0; index < surface.length; index += 1) {
+      if (surface[index] !== target[index]) differences.push(index);
+    }
+    if (differences.length === 1) return "substitution";
+    if (differences.length === 2) {
+      const [a, b] = differences;
+      if (b === a + 1 && surface[a] === target[b] && surface[b] === target[a]) return "transposition";
+    }
+    return null;
+  }
+  const [shorter, longer] = surface.length < target.length ? [surface, target] : [target, surface];
+  let i = 0;
+  let j = 0;
+  let skips = 0;
+  while (i < shorter.length && j < longer.length) {
+    if (shorter[i] === longer[j]) {
+      i += 1;
+      j += 1;
+    } else {
+      skips += 1;
+      j += 1;
+      if (skips > 1) return null;
+    }
+  }
+  return "insertion-or-deletion";
+}
+
+function correctAppraisalTypos(text, replacements) {
+  return text.replace(/\b[a-z]{3,14}\b/g, (surface) => {
+    const candidates = APPRAISAL_TERMS
+      .map((target) => ({ target, kind: oneEditKind(surface, target) }))
+      .filter(({ target, kind }) => kind && (target.length > 4 || kind !== "substitution"));
+    if (candidates.length !== 1) return surface;
+    replacements.push({ surface, normalized: candidates[0].target, type: "one-edit-typo" });
+    return candidates[0].target;
+  });
+}
+
 const CUE_GROUPS = Object.freeze({
   transitionLoss: [
     { re: /\b(?:holiday|holidays|break|weekend|leave|vacation|time off|rest)\s+(?:is\s+|are\s+)?(?:gonna\s+|going\s+to\s+|will\s+)?(?:end|ending|over|finish|finishing)(?:\s+liao|\s+already|\s+soon)?\b/i, w: 1.0, label: "a restorative period ending", responsePhrase: "the restorative time ending" },
@@ -93,6 +145,7 @@ function normaliseInformalText(text) {
       return replacement;
     });
   }
+  normalized = correctAppraisalTypos(normalized, replacements);
   return { normalized: normalized.replace(/\s+/g, " ").trim(), replacements };
 }
 
