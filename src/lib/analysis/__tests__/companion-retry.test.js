@@ -4,7 +4,7 @@ import { companionRetryDecision, companionFailureMessage } from '../companion-re
 
 test('transient failures retry the same saved turn automatically, with a cap', () => {
   assert.deepEqual(companionRetryDecision({ code: 'transient' }, 1), { automatic: true, delayMs: 900 });
-  assert.deepEqual(companionRetryDecision({ code: 'quality_rejected' }, 1), { automatic: true, delayMs: 350 });
+  assert.deepEqual(companionRetryDecision({ code: 'quality_rejected' }, 1), { automatic: false, delayMs: 0 });
   assert.equal(companionRetryDecision({ code: 'transient' }, 3).automatic, false);
 });
 

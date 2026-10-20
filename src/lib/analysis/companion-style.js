@@ -88,7 +88,7 @@ export function styleAlignmentPenalty(text, voice = {}) {
     || /[!?]{2,}/.test(value);
   const counsellorFrame = /\b(?:you(?:'re| are) feeling|you(?:'re| are) noticing|you(?:'ve| have) been through a lot|it makes sense that|it'?s understandable|what would make|how does that feel|when you think back|what(?:'s| is) one small|let .{0,45} be your reset|a moment to (?:breathe|pause)|you can already picture)\b/i.test(value)
     || /^(?:that|this|it) sounds (?:like|really|so)\b/i.test(value);
-  const interviewFrame = /\b(?:out of (?:all|everything).{0,100}which|which (?:moment|part|thing).{0,70}(?:hardest|worst|most)|what(?:'s| is) (?:the )?one (?:thing|part).{0,70}(?:most|hardest))\b/i.test(value);
+  const interviewFrame = /\b(?:out of (?:all|everything).{0,100}which|which (?:moment|part|thing).{0,70}(?:hardest|worst|most)|what(?:'s| is) (?:the )?one (?:thing|part).{0,70}(?:most|hardest)|(?:what|which) (?:part|moment|thing|bit).{0,85}(?:heaviest|hardest|worst|biggest|most (?:important|overwhelming|upsetting)))\b/i.test(value);
   const unobservedParticle = (value.toLowerCase().match(/\b(?:sia|lah|lor|leh|mah|lorh)\b/g) ?? [])
     .some(marker => !(voice.particles ?? []).includes(marker));
   if (wordCount < 12) return counsellorFrame || interviewFrame || unobservedParticle ? .55 : 0;

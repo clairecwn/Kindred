@@ -38,6 +38,31 @@ test('a proposed activity is not treated as an experience already completed', ()
     'recaps-journal-instead-of-answering');
 });
 
+test('the opening cannot hand a multi-part journal back as a heaviest-part interview', () => {
+  const plan = buildConversationResponsePlan({ originalEntry: journal, userMessage: journal });
+  plan.debriefState = { action: 'VALIDATE', focusIds: ['work'], topics: [{ id: 'work', incidental: false }] };
+  plan.questionBudget = 1;
+  assert.equal(validateConversationReply("i get that feeling when everything piles up, but what part of today actually feels the heaviest on your mind right now?", plan).reason,
+    'outsources-journal-priority-to-user');
+});
+
+test('a selected dialogue focus is not rejected by the older all-thread coverage gate', () => {
+  const plan = buildConversationResponsePlan({ originalEntry: journal, userMessage: 'the studying part lor' });
+  plan.discourseModel = { academicLeisureConflict: true, currentThreadIds: ['academic', 'leisure'],
+    activeThreads: [
+      { id: 'academic', responseTerms: ['study'] },
+      { id: 'leisure', responseTerms: ['holiday'] },
+    ] };
+  plan.debriefState = { action: 'REFLECT', focusIds: ['academic'], topics: [
+    { id: 'academic', summary: 'study pressure', incidental: false },
+    { id: 'leisure', summary: 'holiday plans', incidental: false },
+  ] };
+  plan.questionBudget = 0;
+  plan.continuationRequired = false;
+  assert.notEqual(validateConversationReply('ya, the study pressure is still on your mind.', plan).reason,
+    'dropped-active-thread');
+});
+
 test('timing correction and repeated choice repair instead of reopening the same question', () => {
   const history = [...firstHistory, { role: 'user', text: 'doomscroll on tiktok lor' },
     { role: 'ai', text: "how's it feeling after the scroll?" }];

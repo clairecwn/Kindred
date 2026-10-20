@@ -530,18 +530,14 @@ Use this reading to ground the response. You may describe mixed feelings or nuan
       } catch (error) {
         console.warn("[Kindred] Semantic planning unavailable; using local context:", error.message);
         plan.debriefState = fallbackDebriefState(plan, options.conversationState);
-        plan.questionBudget = plan.debriefState.action === 'VALIDATE' ? 1 : 0;
-        plan.continuationRequired = plan.questionBudget === 1;
-        plan.agenda = { ...plan.agenda, focusId: plan.debriefState.focusIds[0],
-          focusIds: plan.debriefState.focusIds, focusSummary: plan.debriefState.topics[0].summary,
-          focusEvidence: plan.debriefState.topics[0].evidence[0].quote };
       }
       if (!plan.semantic && plan.debriefState) {
+        const focusedTopics = plan.debriefState.topics.filter(topic => plan.debriefState.focusIds.includes(topic.id));
         plan.questionBudget = 0;
         plan.continuationRequired = false;
         plan.agenda = { ...plan.agenda, focusId: plan.debriefState.focusIds[0],
-          focusIds: plan.debriefState.focusIds, focusSummary: plan.debriefState.topics[0].summary,
-          focusEvidence: plan.debriefState.topics[0].evidence?.[0]?.quote ?? '' };
+          focusIds: plan.debriefState.focusIds, focusSummary: focusedTopics.map(topic => topic.summary).join('; '),
+          focusEvidence: focusedTopics.flatMap(topic => topic.evidence?.map(item => item.quote) ?? []).join('; ') };
       }
       if (plan.semantic) {
         plan.debriefState = updateDebriefState(plan.semantic, options.conversationState, userMessage, plan.history,

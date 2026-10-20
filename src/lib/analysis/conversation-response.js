@@ -538,7 +538,8 @@ export function validateConversationReply(text, plan) {
   // the user to rank a menu of incidents hands that work back to them and
   // tends to miss the feeling or obligation that ties the entry together.
   if (questions && !plan.history.some(turn => turn.role === 'ai')
-    && /\bout of (?:all|everything)\b.{0,105}\bwhich\b.{0,70}\b(?:moment|part|thing|incident|bit)\b|\bwhich\b.{0,70}\b(?:moment|incident)\b.{0,65}\b(?:hardest|worst|most|biggest|hit|bothered|affected)\b/i.test(value)) {
+    && (/\bout of (?:all|everything)\b.{0,105}\bwhich\b.{0,70}\b(?:moment|part|thing|incident|bit)\b|\bwhich\b.{0,70}\b(?:moment|incident)\b.{0,65}\b(?:hardest|worst|most|biggest|hit|bothered|affected)\b/i.test(value)
+      || (plan.debriefState && /\b(?:what|which)\s+(?:part|moment|thing|bit)\b.{0,85}\b(?:feel(?:s|t)?\s+(?:the\s+)?|is\s+(?:the\s+)?)?(?:heaviest|hardest|worst|biggest|most\s+(?:important|overwhelming|upsetting))\b/i.test(value)))) {
     return { ok: false, reason: 'outsources-journal-priority-to-user' };
   }
   // A question about getting back to an obligation can be a productivity
@@ -705,7 +706,9 @@ export function validateConversationReply(text, plan) {
   }
   const currentThreadIds = new Set(plan.discourseModel?.currentThreadIds ?? []);
   const repairTurn = ["grouping-correction", "correction", "clarification-request"].includes(plan.intent);
-  const requiresConflictCoverage = !plan.semantic && plan.discourseModel?.academicLeisureConflict
+  // The turn-level policy may deliberately focus on one side of a conflict.
+  // Only the older entry-only path lacks a selected focus and needs this gate.
+  const requiresConflictCoverage = !plan.semantic && !plan.debriefState && plan.discourseModel?.academicLeisureConflict
     && (repairTurn || (currentThreadIds.has("academic") && currentThreadIds.has("leisure")));
   if (requiresConflictCoverage) {
     const coverage = discourseThreadCoverage(value, plan.discourseModel, 2);

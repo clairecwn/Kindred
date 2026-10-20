@@ -6,12 +6,12 @@ export function companionRetryDecision(error, failedAttempts = 1) {
     return { automatic: false, delayMs: 0 };
   }
   const retryable = error?.code === 'rate_limited' || error?.code === 'transient'
-    || error?.code === 'quality_rejected' || error?.status === 429
+    || error?.status === 429
     || error?.status >= 500 || error?.name === 'AbortError' || error instanceof TypeError;
   if (!retryable) return { automatic: false, delayMs: 0 };
   const requested = Number(error?.retryAfterMs);
   const delayMs = Number.isFinite(requested) && requested > 0 ? requested
-    : error?.code === 'quality_rejected' ? 350 : 900 * 2 ** (count - 1);
+    : 900 * 2 ** (count - 1);
   return { automatic: delayMs <= 30_000, delayMs: Math.min(30_000, Math.max(250, delayMs)) };
 }
 
