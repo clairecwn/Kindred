@@ -1,150 +1,274 @@
 # Kindred
 
-Kindred is a journaling and wellbeing game. A journal entry opens a companion chat; My Journey shows tentative emotion summaries; Home, Kingdom, Grove, and Ventures turn reflection into private and shared activities. The companion aims to help people talk through what happened in their own voice, including entries with several concerns at once.
+Kindred is a cozy life-sim game about finding your words. Players build their own island, explore a lively town with shops and games, keep a private journal with a companion who helps them talk through their day, and find real activities to try nearby.
 
-Built with React, Vite, Three.js, Leaflet, and optional Supabase storage. The companion currently calls Groq from the browser in local development, with an optional Gemini fallback. Its analysis and conversation rules live in this repository; the language model writes the final wording.
+It is designed, in the long run, for children aged about 7 to 12, especially quieter kids who find joining in hard. The game is meant to be fun first. Underneath, it gives players low-pressure chances to name what they feel, practise saying it, play alongside other people, and carry that into real life:
 
-## Run locally
+```text
+reflect  →  rehearse  →  play alongside  →  collaborate  →  connect in real life
+```
+
+Players set their own pace and can always step back. The app never forces them to stop playing, and it counts as a success when it becomes one helpful tool among friends, family and school, never a replacement for them.
+
+> **Status:** working prototype. Kindred is not yet ready for children: age assurance, guardian controls, moderation and server-side model access must be finished first (see [Limits and safety](#limits-and-safety)).
+
+## Contents
+
+- [The game](#the-game)
+- [Design principles](#design-principles)
+- [Getting started](#getting-started)
+- [Repository layout](#repository-layout)
+- [Where things live](#where-things-live)
+- [Art pipeline](#art-pipeline)
+- [Journal companion](#journal-companion)
+- [Limits and safety](#limits-and-safety)
+- [Documentation](#documentation)
+- [License](#license)
+- [References](#references)
+
+## The game
+
+| Area | What players do |
+| --- | --- |
+| **Home** | The map room: continue the story, pick a route for today, jump to any world. |
+| **Reflect** | Write or talk about the day. A companion responds like a friend, and My Journey shows how the days and weeks have felt. |
+| **Kingdom** | Build and decorate a personal island that starts almost empty. Plants grow over real days and never wither. |
+| **Grove** | A bright mall and park on an island in the sea: twelve shops, cooperative games, and other players at whatever distance feels comfortable. |
+| **Ventures** | Free and low-cost real activities in Singapore to try with family, and later organised, parent-approved group events. |
+
+Parts of this are still being built; the [blueprint](docs/product/KINDRED-VISION-AND-GAMEPLAY-BLUEPRINT.md) tracks what is planned. A storyline ties the areas together. The Grove's festival clock has twelve jammed doors, one per shop. Players open them by working out what the town's residents actually need, and each door wakes up a shop, a game and a piece of the mystery.
+
+## Design principles
+
+- **A game first.** Fun comes first; wellbeing comes from what players do in it.
+- **Nothing is gated on feelings.** Story progress comes from finishing quests and games, never from sharing private thoughts.
+- **Solo is always enough.** Every chapter can be finished alone; playing with others adds extra scenes and rewards.
+- **No pressure loops.** No streaks, gacha, loot boxes, countdown timers, player rankings or guilt about time away.
+- **Safety before social.** Free chat only between approved friends; strangers can only use preset emotes and phrases.
+- **Honest about limits.** Emotion readings are prompts for conversation, not diagnoses.
+
+## Getting started
+
+Requires Node.js 20 or later.
 
 ```bash
 npm install
-cp .env.example .env
-# Add VITE_GROQ_API_KEY to .env, then restart Vite after any .env change.
-npm run dev
+cp .env.example .env     # add VITE_GROQ_API_KEY, then restart Vite after any .env change
+npm run dev     
 ```
 
-Supabase URL and anon key are optional for local use. Without them, saves use browser storage on one device. A `VITE_` model key is visible in the browser bundle: use it only for local testing. The authenticated Edge Function in `backend/supabase/functions/analyse/` is the server-side starting point for a public deployment; the current companion transport in `frontend/src/lib/groq.js` has not been moved behind it.
+Supabase is optional for local use; without it, saves stay in the browser on one device. A `VITE_` key is visible in the browser bundle, so use one only for local testing.
 
-```bash
-npm run test:analysis  # journal, emotion, memory, and conversation policy
-npm test               # all application tests
-npm run check          # tests, avatar checks, and production build
-```
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Start the development server |
+| `npm run build` | Production build to `dist/` |
+| `npm test` | All application tests |
+| `npm run test:analysis` | Journal, emotion, memory and conversation policy tests |
+| `npm run test:avatar` | Character model checks |
+| `npm run check` | Tests, avatar checks and a production build |
+| `npm run db:start` / `db:stop` | Run Supabase locally |
+| `npm run db:push` | Apply migrations |
+| `npm run functions:deploy` | Deploy Edge Functions |
+
+Run every command from the repository root.
 
 ## Repository layout
 
 ```text
 Kindred/
-├── frontend/          Web app (React + Vite + three.js)
+├── frontend/              Web app (React, Vite, three.js)
 │   ├── index.html
-│   ├── src/           App code, organised by feature (grove, kingdom, home, ventures, avatar, lib)
-│   └── public/        Static files served as-is: exported models (models/), images, icons
+│   ├── src/               App code, grouped by feature
+│   └── public/            Static files served as-is, including exported 3D models
 ├── backend/
-│   └── supabase/      Database migrations, row-level security, Edge Functions, config
-├── assets/            Source art (Blender files and the scripts that build and export them)
-│   ├── characters/    The five playable characters and the dressing room
-│   ├── grove/         Grove mall and park
-│   ├── kingdom/       Kingdom island
-│   └── items/         Buyable item models shared by Grove and Kingdom
+│   └── supabase/          Migrations, row-level security, Edge Functions, config
+├── assets/                Source art: Blender files and the scripts that build them
+│   ├── characters/        The five playable characters and the dressing room
+│   ├── grove/             Grove mall and park
+│   ├── kingdom/           Kingdom island
+│   └── items/             Buyable item models shared by Grove and Kingdom
 ├── tools/
-│   ├── blender/       Older Blender build scripts
+│   ├── blender/           Older Blender build scripts
 │   ├── blender-mcp-addon/
-│   └── scripts/       Node utilities (journal model comparison)
+│   └── scripts/           Node utilities
 ├── docs/
-│   ├── product/       Vision and gameplay blueprint
-│   ├── story/         Kindred Storyline (story, cast, scripts)
-│   └── companion/     Journal companion design notes and research
-├── package.json       One package for the whole repo; run npm scripts from here
-└── vite.config.js     Points Vite at frontend/ and builds to dist/
+│   ├── product/           Vision and gameplay blueprint
+│   └── companion/         Journal companion design notes and research
+├── package.json           One package for the whole repo
+└── vite.config.js         Points Vite at frontend/ and builds to dist/
 ```
-
-Blender exports write straight into `frontend/public/models/`. The Grove, Kingdom and item `.blend` files link to each other with absolute paths under `assets/`, so do not move those folders. Supabase commands take `--workdir backend` (see the `db:*` npm scripts).
 
 ## Where things live
 
 | Area | Code | Purpose |
 | --- | --- | --- |
-| Journal and Journey | `frontend/src/components/WellnessView.jsx` | Saves entries, opens chat, and displays day and week emotion summaries. |
-| Companion | `frontend/src/lib/journal-ai.js` | Builds each turn, calls the assessor and writer, revises rejected drafts. |
-| Analysis | `frontend/src/lib/analysis/` | Text and appraisal features, topic state, memory, voice, reply checks, and longitudinal signals. |
-| Model transport | `frontend/src/lib/groq.js` | Timeouts, bounded retries, fallback models and optional Gemini route. |
-| Home and Kingdom | `frontend/src/home/`, `frontend/src/kingdom/`, `frontend/src/avatar/` | Private world and shared avatar system. |
-| Grove | `frontend/src/grove/` | Shared 3D world, interaction, economy, and story. |
-| Ventures | `frontend/src/ventures/` | Activity matching and map supply. |
-| Persistence | `frontend/src/hooks/useDatabaseState.js`, `backend/supabase/` | Local fallback, account storage, migrations, and RLS. |
+| App shell | `frontend/src/App.jsx` | Tabs, session and shared state |
+| Home | `frontend/src/home/`, `frontend/src/components/HomeView.jsx` | Map room and launch point |
+| Reflect and My Journey | `frontend/src/components/WellnessView.jsx` | Journal entries, companion chat, day and week summaries |
+| Companion | `frontend/src/lib/journal-ai.js` | Builds each turn, calls the assessor and writer, revises rejected drafts |
+| Analysis | `frontend/src/lib/analysis/` | Text and appraisal features, topic state, memory, voice, reply checks, crisis detection |
+| Model transport | `frontend/src/lib/groq.js` | Timeouts, bounded retries, fallback models and an optional Gemini route |
+| Kingdom | `frontend/src/kingdom/` | Island scene, placement grid, ownership, creatures, water |
+| Grove | `frontend/src/grove/` | 3D mall and park, movement and camera, interiors, economy, story, presence |
+| Characters | `frontend/src/avatar/`, `frontend/src/components/CharacterView.jsx` | The five playable characters and the character screen |
+| Ventures | `frontend/src/ventures/` | Activity matching, safety filters and map supply |
+| Persistence | `frontend/src/hooks/useDatabaseState.js`, `backend/supabase/` | Local fallback, account storage, migrations and row-level security |
+| Server analysis | `backend/supabase/functions/analyse/` | Authenticated Edge Function; the starting point for moving model calls off the client |
 
-## Companion architecture
+## Art pipeline
+
+Every world, character and item is modelled in Blender, then exported as glTF into `frontend/public/models/`, where the game loads it.
+
+1. Edit the source file in `assets/` (for example `assets/kingdom/blender/kingdom_island.blend`).
+2. Run that area's export pass; it writes models and layout data straight into `frontend/public/models/`.
+3. Run `npm test`; the Kingdom, Grove and item tests check the exported data.
+
+The Grove, Kingdom and item `.blend` files link to each other by absolute paths under `assets/`, so keep those folders where they are.
+
+## Journal companion
+
+The companion is built to make someone feel heard and help them talk through what happened, in their own voice, including entries that cover several things at once. It runs as a pipeline:
 
 ```text
-Journal + latest user chat + earlier user chat + relevant past entries
-  → deterministic text/appraisal and VAD features
-  → semantic assessor: grounded topics, links, unresolved questions, affect
-  → debrief policy: focus + dialogue action + question budget
-  → writer: a short reply in the user's observed register
+journal entry + latest message + earlier messages + relevant past entries
+  → deterministic text, appraisal and affect features
+  → semantic assessor: grounded topics, links, open questions, affect
+  → dialogue policy: focus, dialogue action, question budget
+  → writer: a short reply in the user's own register
   → reply critic: grounding, repetition, question purpose, advice, style
-  → saved chat turn + updated conversation affect and memory
+  → saved turn, updated affect and memory
 ```
 
-The assessor must cite exact user text for each topic. Older memories can support a current concern but cannot create one; previous assistant guesses never become user evidence. The topic ledger persists across turns, so answering one question does not erase other parts of the entry. The policy chooses from `VALIDATE`, `REFLECT`, `EXPLORE`, `DEEPEN`, `SHIFT`, `SUMMARISE`, `REPAIR`, and `SOFT_CLOSE`. A soft close is a landing: a new user concern reopens the conversation. Topic shifts have a closing thought and a bridge.
+The assessor must quote the user's exact words for every topic. Older memories can support a current concern but cannot create one, and the companion's own past guesses never count as evidence about the user. Topics persist across turns, so answering one question does not erase the rest of the entry.
 
-The language model is an assessor and writer, not a trained Kindred model. We have not fine-tuned its weights. The equations below are transparent routing heuristics, not calibrated probabilities of a person's emotions or needs.
+The policy picks one dialogue action per turn: `VALIDATE`, `REFLECT`, `EXPLORE`, `DEEPEN`, `SHIFT`, `SUMMARISE`, `REPAIR` or `SOFT_CLOSE`. A soft close is a landing, not an ending: a new concern reopens the conversation.
 
-### Topic and question selection
+The language model is used as an assessor and writer; it is not fine-tuned. The formulas below are transparent routing heuristics with hand-set weights. They are not calibrated probabilities of what a person feels or needs.
 
-For each topic, `dialogue-policy.js` updates salience `S`, emotional intensity `I`, unresolvedness `U`, engagement `E`, new information `N`, exploration depth `D`, recency `R`, and closure readiness `C` on every turn. Its priority is:
+### Topic priority
 
-```text
-P = 1.50S + 1.25I + 1.15U + 0.80E + 0.55N + 0.35(1-D)
-  + 1.10R + 0.45 previous-focus + 0.30 explicit-link
-  - 1.20C - 1.80 incidental - task-narrowing penalty
-```
+Each turn, `dialogue-policy.js` scores every topic $i$ from features in $[0, 1]$: salience $S_i$, emotional intensity $I_i$, unresolvedness $U_i$, engagement $E_i$, new information $N_i$, exploration depth $D_i$, recency $R_i$ and closure readiness $C_i$.
 
-Settled and declined topics receive further penalties. A softmax turns priorities into relative weights for the current agenda; those weights are **not** probabilities that a topic is the user's true priority. Recent explicit direction wins, while continuity and a switch margin prevent random jumps. Linked concerns can be discussed together. An untouched meaningful thread can become the next focus before the chat lands.
+$$
+\begin{aligned}
+P_i ={} & 1.50\,S_i + 1.25\,I_i + 1.15\,U_i + 0.80\,E_i + 0.55\,N_i + 0.35\,(1 - D_i) + 1.10\,R_i \\
+& + 0.45\,F_i + 0.30\,L_i + \alpha_t\,A_i \\
+& - 1.20\,C_i - 1.80\,\mathbb{1}_{\text{incidental}} - \nu_i - 5\,\mathbb{1}_{\text{declined}}
+\end{aligned}
+$$
 
-Unvisited meaningful threads carry `coverageDebt = (S + I) × U × (1-D) × (1-0.5C)`. After two low-information turns on one thread, the policy can shift to a high-debt thread with a closing thought and an evidence-backed bridge. One brief agreement alone does not trigger a shift.
+- $F_i \in \{0, 1\}$ marks the previous focus.
+- $L_i \in \{0, 1\}$ marks an explicit link to another topic.
+- $A_i \in [0, 1]$ is how closely the topic matches the journal line the user opened with. Its weight is $\alpha_t = 0.6$ before the companion's first reply and $0.3$ after.
+- $\nu_i = 1.7$ when a task topic has used up its question budget and the user has not asked for planning help; otherwise $0$.
 
-A possible follow-up must identify an exact grounding quote, a specific unknown, and a purpose. `conversation-guidance.js` scores information gain `G`, relevance `R`, user effort `E`, repetition `P`, task coaching `T`, low-value coping/task/mood-lift/filler purpose `C`, missing information gap `M`, and question-word repetition `V`:
+Priorities become relative weights through a softmax with temperature $\tau = 0.8$:
 
-```text
-Q = 0.90G + 0.80R - 0.65E - 1.10P - 1.40T - 1.40C - 1.10M - V
-ask only if Q ≥ 0.85 and the dialogue action permits a question
-```
+$$
+w_i = \frac{\exp\!\big((P_i - P_{\max}) / \tau\big)}{\sum_j \exp\!\big((P_j - P_{\max}) / \tau\big)}
+$$
 
-A relevant topic alone does not justify a question. After policy selects a focus, its grounded information gap goes to the writer with the question budget. The critic also rejects repeated, already answered, generic comfort, and unrequested productivity prompts. When a question would add little, the companion can offer a concrete thought with room to reply.
+These weights rank the current agenda. They are **not** the probability that a topic is the user's real priority. Recent explicit direction from the user wins, and a switching margin stops the focus from jumping around.
 
-### Affect, language, and memory
+Threads that matter but have not been explored carry a coverage debt:
 
-`text-features.js` reads lexical, appraisal, informal-language, and dialect cues as bounded evidence. Repeated evidence saturates as `sat(x) = 1 - exp(-x)`, so repetition cannot grow a score without limit. Affect is held as valence, arousal, and dominance (VAD); mixed feelings and their causes remain separate in the experience profile. `conversation-affect.js` updates from **user** turns only:
+$$
+B_i = (S_i + I_i)\,U_i\,(1 - D_i)\,(1 - 0.5\,C_i)
+$$
 
-```text
-gain = min(0.78, 0.22 + 0.64 × reading_confidence)
-VAD_new = (1-gain) × VAD_old + gain × VAD_user_turn
-```
+After two low-information turns on one thread, the policy can shift to the thread with the highest debt, with a closing thought and a bridge grounded in the user's words. One brief "yeah" alone does not trigger a shift.
 
-A first supported reading initializes the state. A bare acknowledgement or turn with no affect evidence leaves it unchanged. In My Journey, `journey-affect.js` averages entry vectors within each day, then averages the days with entries in the displayed week. This gives each day one vote regardless of entry count; opposing readings can display *Mixed* instead of *Neutral*.
+### When to ask a question
 
-`conversation-memory.js` ranks past **user-authored** journal and chat text by topic similarity, appraisal-cause overlap, VAD similarity, and recency:
+A follow-up question needs an exact quote to ground it, a specific unknown, and a purpose. `conversation-guidance.js` scores each candidate question $q$:
 
-```text
-memory relevance = 0.50 topic + 0.22 cause + 0.13 affect + 0.15 recency
-recency = exp(-ln(2) × age_days / 45)
-```
+$$
+Q_q = 0.90\,G_q + 0.80\,R_q - 0.65\,E_q - 1.10\,P_q - 1.40\,T_q - 1.40\,K_q - 1.10\,M_q - V_q
+$$
 
-A topical or causal match is required; similar mood alone cannot recall an unrelated entry. `personal-memory.js` keeps source quotes for explicit self-reports, named people, user-defined terms, communication preferences, and a compact writing profile. Its cache rebuilds when source entries change. Current words and corrections outrank historical context.
+| Symbol | Meaning |
+| --- | --- |
+| $G_q$, $R_q$, $E_q \in \{0, 0.5, 1\}$ | Information gain, relevance, effort for the user |
+| $P_q \in [0, 1]$ | Repeats something already asked or answered |
+| $T_q \in \{0, 1\}$ | Task coaching the user did not ask for |
+| $K_q \in \{0, 1\}$ | Low-value purpose: coping tips, mood lifting, tasks or filler |
+| $M_q \in \{0, 1\}$ | No information gap named |
+| $V_q = \min(v_{\max},\ 0.12\,k)$ | Variety penalty; $k$ is how often the same angle appeared in the last three questions, $v_{\max} = 0.12$ if $R_q = 1$, else $0.30$ |
 
-`conversation-guidance.js` measures the user's register from their entry and recent **user** turns: casing, shorthand, sentence rhythm, expressive spelling, punctuation, laughter, and observed casual or regional terms. Short answers receive little weight, so “ok” does not reset the voice. The writer gets a few user-authored style examples. `companion-style.js` checks for polished therapist language, token slang pasted onto formal prose, and slang the user did not use. It matches writing habits without inferring age, identity, or a fixed personality.
+The companion asks only if $Q_q \ge 0.85$ and the chosen dialogue action allows a question. Otherwise it offers a concrete thought and leaves room to reply.
 
-For detailed design and test rationale, see [`docs/conversation-voice-and-questions.md`](docs/conversation-voice-and-questions.md), [`docs/research/dialogue-policy-redesign.md`](docs/research/dialogue-policy-redesign.md), and [`docs/journey-affect.md`](docs/journey-affect.md).
+### Affect
+
+Affect is held as a vector $\mathbf{v} = (v, a, d)$ of valence, arousal and dominance (Russell's circumplex, extended). Repeated cues saturate, so repetition cannot inflate a score without limit:
+
+$$
+\operatorname{sat}(x) = \begin{cases} 1 - e^{-x} & x > 0 \\ 0 & \text{otherwise} \end{cases}
+$$
+
+`conversation-affect.js` updates from the user's own turns only. With $\hat{\mathbf{v}}_t$ the reading of turn $t$ and $c_t \in [0, 1]$ its confidence:
+
+$$
+g_t = \min\!\big(0.78,\ 0.22 + 0.64\,c_t\big), \qquad
+\mathbf{v}_t = (1 - g_t)\,\mathbf{v}_{t-1} + g_t\,\hat{\mathbf{v}}_t
+$$
+
+The first supported reading sets $\mathbf{v}_1 = \hat{\mathbf{v}}_1$. A bare acknowledgement, or a turn with no affect evidence, leaves the state unchanged.
+
+My Journey (`journey-affect.js`) averages entries within each day, then averages the days in the week, so every day gets one vote however many entries it has. For a week with entry days $\mathcal{D}$, where day $d$ has $n_d$ entries:
+
+$$
+\bar{\mathbf{v}}_d = \frac{1}{n_d} \sum_{k=1}^{n_d} \mathbf{v}_{d,k}, \qquad
+\bar{\mathbf{v}}_{\text{week}} = \frac{1}{|\mathcal{D}|} \sum_{d \in \mathcal{D}} \bar{\mathbf{v}}_d
+$$
+
+Opposing readings can show as *Mixed* instead of averaging out to *Neutral*.
+
+### Memory
+
+`conversation-memory.js` ranks past text the user wrote by topic similarity $\sigma^{\text{topic}}_m$, shared causes $\sigma^{\text{cause}}_m$, affect similarity $\sigma^{\text{affect}}_m$ and recency $r_m$, where $\Delta t_m$ is the entry's age in days (a 45-day half-life):
+
+$$
+\text{rel}_m = 0.50\,\sigma^{\text{topic}}_m + 0.22\,\sigma^{\text{cause}}_m + 0.13\,\sigma^{\text{affect}}_m + 0.15\,r_m,
+\qquad r_m = 2^{-\Delta t_m / 45}
+$$
+
+A topic or cause match is required, so a similar mood alone never pulls up an unrelated entry. `personal-memory.js` keeps source quotes for things the user states about themselves, people they name, their own terms and their communication preferences. What the user says now always outranks history.
+
+### Voice
+
+The writer matches how the user writes: casing, shorthand, sentence rhythm, punctuation, laughter, and casual or regional words they have actually used. Short replies carry little weight, so a single "ok" does not reset the voice. `companion-style.js` rejects therapist-style phrasing, slang the user never used, and slang pasted onto formal prose. It matches writing habits without guessing age, identity or personality.
 
 ## Limits and safety
 
-These text signals are hypotheses for conversation, not diagnosis. Missing context, sarcasm, dialect variation, and model mistakes can change the reading. The tests cover known failure patterns, including topic fixation, repeated questions, unsupported interpretations, style drift, and productivity prompts after someone says they are worn out; they do not prove that every live model reply will feel natural. The crisis route runs before ordinary companion generation. Public deployment still needs server-side model transport and clear disclosure of how journal text is sent to providers.
+- Text signals are hypotheses for conversation, not diagnoses. Missing context, sarcasm, dialect and model mistakes can all change a reading.
+- The tests cover known failure patterns, including topic fixation, repeated questions, unsupported interpretations, style drift, and productivity prompts after someone says they are worn out. They cannot prove every live reply will feel natural.
+- Crisis detection runs before any ordinary companion reply.
+- **Before a public or child-facing release:**
+  - model calls must move behind the server function, and players must be told clearly how journal text is sent to model providers;
+  - age assurance, guardian linking, moderation, and server-enforced social permissions must be in place.
+
+## Documentation
+
+- [Vision and gameplay blueprint](docs/product/KINDRED-VISION-AND-GAMEPLAY-BLUEPRINT.md): audience, game loop, social and safety design, architecture and delivery plan.
+- [Conversation voice and questions](docs/companion/conversation-voice-and-questions.md)
+- [Dialogue policy redesign](docs/companion/research/dialogue-policy-redesign.md)
+- [My Journey affect](docs/companion/journey-affect.md)
+- Grove and Kingdom build notes: `assets/grove/docs/`, `assets/kingdom/docs/`
 
 ## License
 
-MIT. See `LICENSE`.
+MIT. See [`LICENSE`](LICENSE).
 
 ## References
 
-The research informed design choices; the coefficients above are Kindred's own uncalibrated heuristics.
+This research informed the design. The coefficients above are Kindred's own, uncalibrated heuristics.
 
-- [A Taxonomy of Empathetic Questions in Social Dialogs](https://aclanthology.org/2022.acl-long.211/) — question purpose and communicative function.
-- [It Doesn't Hurt to Ask: Question-Asking Increases Liking](https://dash.harvard.edu/entities/publication/73120379-2eb6-6bd4-e053-0100007fdf3b) — responsive follow-up questions in human conversation.
-- [A Taxonomy of Empathetic Response Intents in Human Social Conversations](https://aclanthology.org/2020.coling-main.429/) — varying response moves beyond paraphrase.
-- [Towards Effective Long Conversation Generation with Dynamic Topic Tracking and Recommendation](https://aclanthology.org/2024.inlg-main.43/) — tracking when a conversation evolves or shifts.
-- [Language Style Matching in Large Language Models](https://aclanthology.org/2025.sigdial-1.50/) — evidence that style alignment needs explicit attention.
-- [Lexical Entrainment for Conversational Systems](https://aclanthology.org/2023.findings-emnlp.22/) — language adaptation in dialogue.
-- [EmpatheticDialogues project](https://github.com/facebookresearch/EmpatheticDialogues) — research corpus and baseline for grounded social replies.
-- [OpenAI's public Model Spec](https://openai.com/index/sharing-the-latest-model-spec/) and [Claude prompting guidance](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/prompt-templates-and-variables) — public guidance on adaptable style and examples; neither publishes its complete conversation-control internals.
-- [Russell's circumplex model of affect](https://doi.org/10.1037/h0077714) — continuous affect representation.
-- [GitHub's README guidance](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes) and [Google's README style guide](https://github.com/google/styleguide/blob/gh-pages/docguide/READMEs.md) — README structure.
+- Svikhnushina et al. (2022), [A Taxonomy of Empathetic Questions in Social Dialogs](https://aclanthology.org/2022.acl-long.211/): question purpose and function.
+- Huang et al. (2017), [It Doesn't Hurt to Ask: Question-Asking Increases Liking](https://dash.harvard.edu/entities/publication/73120379-2eb6-6bd4-e053-0100007fdf3b): responsive follow-up questions.
+- Welivita and Pu (2020), [A Taxonomy of Empathetic Response Intents in Human Social Conversations](https://aclanthology.org/2020.coling-main.429/): response moves beyond paraphrase.
+- [Dynamic Topic Tracking and Recommendation for Long Conversations](https://aclanthology.org/2024.inlg-main.43/) (INLG 2024): noticing when a conversation shifts.
+- [Language Style Matching in Large Language Models](https://aclanthology.org/2025.sigdial-1.50/) (SIGDIAL 2025): style alignment needs explicit attention.
+- [Lexical Entrainment for Conversational Systems](https://aclanthology.org/2023.findings-emnlp.22/) (Findings of EMNLP 2023): adapting language in dialogue.
+- Rashkin et al. (2019), [EmpatheticDialogues](https://github.com/facebookresearch/EmpatheticDialogues): corpus and baseline for grounded replies.
+- Russell (1980), [A circumplex model of affect](https://doi.org/10.1037/h0077714): continuous affect representation.
