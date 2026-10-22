@@ -3,7 +3,7 @@ build_wardrobe_glb.py — real 3D clothing for the Kindred cast.
 
 Every garment is a SEPARATE mesh weighted to the SAME 22-bone armature the
 characters use (rig.py), exported together into
-public/models/kindred_wardrobe.glb. The runtime clones a garment and
+frontend/public/models/kindred_wardrobe.glb. The runtime clones a garment and
 rebinds it, by bone name, onto whichever character is wearing it, so one
 garment fits the whole cast and moves with the body instead of floating.
 

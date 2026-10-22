@@ -1,0 +1,463 @@
+{
+  "schema": "kindred.grove-procedural-form-validation.v1",
+  "roomId": "grove-mall",
+  "source": "/Users/clairewn/Downloads/Kindred/assets/grove/blender/grove_master_refined.blend",
+  "policy": "locally-authored-procedural-blender-no-paid-generation",
+  "status": "passed",
+  "collectionMeshCounts": {
+    "GROVE_ATRIUM_REFINEMENT": 81,
+    "GROVE_STOREFRONT_REFINEMENT": 108,
+    "GROVE_VERTICAL_CIRCULATION_REFINEMENT": 46,
+    "GROVE_GROCER_INTERIOR_REFINEMENT": 153,
+    "THREAD_THIMBLE_INTERIOR_REFINEMENT": 98,
+    "HOME_NOOK_INTERIOR_REFINEMENT": 88,
+    "CAFE_CANOPY_INTERIOR_REFINEMENT": 90,
+    "SOLE_SEARCH_INTERIOR_REFINEMENT": 83,
+    "PIXEL_PANTRY_INTERIOR_REFINEMENT": 132,
+    "MAKER_MEADOW_INTERIOR_REFINEMENT": 72,
+    "SEASONAL_POP_UP_INTERIOR_REFINEMENT": 109,
+    "BOOK_BURROW_INTERIOR_REFINEMENT": 160,
+    "ALLTIMEFITNESS_INTERIOR_REFINEMENT": 96,
+    "FOOD_HALL_INTERIOR_REFINEMENT": 101,
+    "ROOFTOP_GARDEN_INTERIOR_REFINEMENT": 116
+  },
+  "scene": {
+    "meshObjects": 2889,
+    "triangles": 481360,
+    "triangleBudget": 600000
+  },
+  "supportToleranceMeters": 0.005,
+  "supportChecks": [
+    {
+      "object": "Folded_Towel_0_0",
+      "bottomZ": 11.2,
+      "supportZ": 11.2,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Folded_Towel_1_0",
+      "bottomZ": 11.2,
+      "supportZ": 11.2,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Folded_Towel_2_0",
+      "bottomZ": 11.2,
+      "supportZ": 11.2,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Folded_Towel_0_1",
+      "bottomZ": 11.32,
+      "supportZ": 11.319999999999999,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Folded_Towel_1_1",
+      "bottomZ": 11.32,
+      "supportZ": 11.319999999999999,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Folded_Towel_2_1",
+      "bottomZ": 11.32,
+      "supportZ": 11.319999999999999,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Folded_Towel_0_2",
+      "bottomZ": 11.44,
+      "supportZ": 11.44,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Folded_Towel_1_2",
+      "bottomZ": 11.44,
+      "supportZ": 11.44,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Folded_Towel_2_2",
+      "bottomZ": 11.44,
+      "supportZ": 11.44,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Aroma_Candle_0",
+      "bottomZ": 11.2,
+      "supportZ": 11.2,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Aroma_Candle_1",
+      "bottomZ": 11.2,
+      "supportZ": 11.2,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Aroma_Candle_2",
+      "bottomZ": 11.2,
+      "supportZ": 11.2,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Aroma_Candle_3",
+      "bottomZ": 11.2,
+      "supportZ": 11.2,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Water_Dispenser",
+      "bottomZ": 10.95,
+      "supportZ": 10.95,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Water_Cup_0",
+      "bottomZ": 10.95,
+      "supportZ": 10.95,
+      "gapMeters": 0.0
+    },
+    {
+      "object": "Water_Cup_1",
+      "bottomZ": 10.95,
+      "supportZ": 10.95,
+      "gapMeters": 0.0
+    },
+    {
+      "object": "Cafe_Counter_Top",
+      "bottomZ": 1.03,
+      "supportZ": 1.03,
+      "gapMeters": 0.0
+    },
+    {
+      "object": "Pastry_Case_Base",
+      "bottomZ": 1.15,
+      "supportZ": 1.15,
+      "gapMeters": 0.0
+    },
+    {
+      "object": "Espresso_Machine",
+      "bottomZ": 1.15,
+      "supportZ": 1.15,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Pickup_Cup_0",
+      "bottomZ": 1.15,
+      "supportZ": 1.15,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Berry_Tart_0",
+      "bottomZ": 1.73,
+      "supportZ": 1.73,
+      "gapMeters": 0.0
+    },
+    {
+      "object": "Cafe_Sandwich_0",
+      "bottomZ": 2.12,
+      "supportZ": 2.12,
+      "gapMeters": 0.0
+    },
+    {
+      "object": "Pickup_Cup_1",
+      "bottomZ": 1.15,
+      "supportZ": 1.15,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Berry_Tart_1",
+      "bottomZ": 1.73,
+      "supportZ": 1.73,
+      "gapMeters": 0.0
+    },
+    {
+      "object": "Cafe_Sandwich_1",
+      "bottomZ": 2.12,
+      "supportZ": 2.12,
+      "gapMeters": 0.0
+    },
+    {
+      "object": "Pickup_Cup_2",
+      "bottomZ": 1.15,
+      "supportZ": 1.15,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Berry_Tart_2",
+      "bottomZ": 1.73,
+      "supportZ": 1.73,
+      "gapMeters": 0.0
+    },
+    {
+      "object": "Cafe_Sandwich_2",
+      "bottomZ": 2.12,
+      "supportZ": 2.12,
+      "gapMeters": 0.0
+    },
+    {
+      "object": "Butter_Croissant_0",
+      "bottomZ": 1.34,
+      "supportZ": 1.34,
+      "gapMeters": 0.0
+    },
+    {
+      "object": "Butter_Croissant_1",
+      "bottomZ": 1.34,
+      "supportZ": 1.34,
+      "gapMeters": 0.0
+    },
+    {
+      "object": "Butter_Croissant_2",
+      "bottomZ": 1.34,
+      "supportZ": 1.34,
+      "gapMeters": 0.0
+    },
+    {
+      "object": "Butter_Croissant_3",
+      "bottomZ": 1.34,
+      "supportZ": 1.34,
+      "gapMeters": 0.0
+    },
+    {
+      "object": "Noodle_Dumpling",
+      "bottomZ": 11.54,
+      "supportZ": 11.54,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Garden_Wrap",
+      "bottomZ": 11.54,
+      "supportZ": 11.54,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Bake_Cake",
+      "bottomZ": 11.54,
+      "supportZ": 11.54,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Bake_Pastry_0",
+      "bottomZ": 11.54,
+      "supportZ": 11.54,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Food_Communal_Tray_0",
+      "bottomZ": 10.94,
+      "supportZ": 10.94,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Food_Communal_Bowl_0",
+      "bottomZ": 11.03,
+      "supportZ": 11.03,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Food_Communal_Cup_0",
+      "bottomZ": 11.03,
+      "supportZ": 11.03,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Bake_Pastry_1",
+      "bottomZ": 11.54,
+      "supportZ": 11.54,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Food_Communal_Tray_1",
+      "bottomZ": 10.94,
+      "supportZ": 10.94,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Food_Communal_Bowl_1",
+      "bottomZ": 11.03,
+      "supportZ": 11.03,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Food_Communal_Cup_1",
+      "bottomZ": 11.03,
+      "supportZ": 11.03,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Bake_Pastry_2",
+      "bottomZ": 11.54,
+      "supportZ": 11.54,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Food_Communal_Tray_2",
+      "bottomZ": 10.94,
+      "supportZ": 10.94,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Food_Communal_Bowl_2",
+      "bottomZ": 11.03,
+      "supportZ": 11.03,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Food_Communal_Cup_2",
+      "bottomZ": 11.03,
+      "supportZ": 11.03,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Seed_Packet_0_0",
+      "bottomZ": 10.68,
+      "supportZ": 10.68,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Seed_Packet_0_1",
+      "bottomZ": 10.68,
+      "supportZ": 10.68,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Seed_Packet_0_2",
+      "bottomZ": 10.68,
+      "supportZ": 10.68,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Seed_Packet_0_3",
+      "bottomZ": 10.68,
+      "supportZ": 10.68,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Seed_Packet_0_4",
+      "bottomZ": 10.68,
+      "supportZ": 10.68,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Seed_Packet_1_0",
+      "bottomZ": 11.48,
+      "supportZ": 11.48,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Seed_Packet_1_1",
+      "bottomZ": 11.48,
+      "supportZ": 11.48,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Seed_Packet_1_2",
+      "bottomZ": 11.48,
+      "supportZ": 11.48,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Seed_Packet_1_3",
+      "bottomZ": 11.48,
+      "supportZ": 11.48,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Seed_Packet_1_4",
+      "bottomZ": 11.48,
+      "supportZ": 11.48,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Seed_Packet_2_0",
+      "bottomZ": 12.28,
+      "supportZ": 12.28,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Seed_Packet_2_1",
+      "bottomZ": 12.28,
+      "supportZ": 12.28,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Seed_Packet_2_2",
+      "bottomZ": 12.28,
+      "supportZ": 12.28,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Seed_Packet_2_3",
+      "bottomZ": 12.28,
+      "supportZ": 12.28,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Seed_Packet_2_4",
+      "bottomZ": 12.28,
+      "supportZ": 12.28,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Plant_Pot_0",
+      "bottomZ": 13.08,
+      "supportZ": 13.08,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Potting_Pot_0",
+      "bottomZ": 11.49,
+      "supportZ": 11.49,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Plant_Pot_1",
+      "bottomZ": 13.08,
+      "supportZ": 13.08,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Potting_Pot_1",
+      "bottomZ": 11.49,
+      "supportZ": 11.49,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Plant_Pot_2",
+      "bottomZ": 13.08,
+      "supportZ": 13.08,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Potting_Pot_2",
+      "bottomZ": 11.49,
+      "supportZ": 11.49,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Potting_Soil_Tray",
+      "bottomZ": 11.49,
+      "supportZ": 11.49,
+      "gapMeters": -0.0
+    },
+    {
+      "object": "Potting_Trowel_Blade",
+      "bottomZ": 11.59,
+      "supportZ": 11.59,
+      "gapMeters": 0.0
+    }
+  ],
+  "reviewFiles": [
+    "renders/form-suite/grove_corner_southwest.png",
+    "renders/form-suite/grove_corner_southeast.png",
+    "renders/form-suite/grove_corner_northeast.png",
+    "renders/form-suite/grove_corner_northwest.png",
+    "renders/form-suite/grove_ceiling_center_up.png",
+    "renders/form-suite/grove_ceiling_oblique_south.png",
+    "renders/form-suite/grove_ceiling_oblique_north.png"
+  ],
+  "invalidBounds": [],
+  "errors": []
+}

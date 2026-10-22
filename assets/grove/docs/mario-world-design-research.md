@@ -21,6 +21,19 @@ This note records high-level design principles from Nintendo's own public materi
 5. Preserve quiet seating, broad paths, no failure state, no time pressure, and no competitive reward.
 6. Give later outdoor zones their own single interaction thesis rather than repeating the petal hunt.
 
+## Stylized-realism development target
+
+The visual target is Nintendo-grade authored clarity rather than photographic realism. Geometry should be rounded and deliberately shaped, materials should remain clean and readable, and close-range details should reinforce what an area is for. The Grove will progress through these layers:
+
+1. **Readable macro forms:** mall silhouette, open entrance, park loop, atrium anchor, and shop identities must read before decoration.
+2. **Believable construction:** visible thresholds, wall depth, supported lights, seated benches, rooted trees, path edging, and objects that visibly touch their supports.
+3. **Organic variation:** overlapping tree crowns, branch hierarchy, terrain mounds, planted drifts, controlled asymmetry, and varied scale without noisy randomness.
+4. **Reactive detail:** foliage movement, shop displays, water, lights, and environmental props should respond clearly when approached or activated.
+5. **Discoverable micro-stories:** each destination gets one optional surprise that is hinted through silhouette, light, motion, or an unusual arrangement.
+6. **Production finish:** authored textures, restrained roughness variation, contact shadows, ambient animation, sound timing, collision review, and target-device performance testing.
+
+This pass begins layers two and three in Canopy Park. Later passes should refine storefront merchandise and indoor material/lighting quality before increasing overall prop density.
+
 ## Sources
 
 - Nintendo, *Ask the Developer Vol. 11, Super Mario Bros. Wonder – Chapter 1*: https://www.nintendo.com/au/news-and-articles/ask-the-developer-vol-11-super-mario-bros-wonder-chapter-1/

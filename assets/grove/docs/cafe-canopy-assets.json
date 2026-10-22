@@ -1,7 +1,16 @@
 {
   "schema": "kindred.grove-cafe-canopy-assets.v1",
   "shopId": "cafe-canopy",
-  "status": "prototype",
+  "status": "form-refined-prototype",
+  "refinementEvidence": {
+    "blenderSource": "../blender/grove_master_refined.blend",
+    "builder": "../blender/refine_cafe_canopy_interior.py",
+    "reviewRender": "../renders/cafe_canopy_refined_blender.png",
+    "staffAisleRender": "../renders/cafe_canopy_staff_aisle_blender.png",
+    "walkInRoute": "3.2 m direct arrival route with lateral service queue",
+    "staffClearance": "1.55 m continuous aisle with two NPC work positions behind the service counter",
+    "departments": ["service counter", "pastry display", "espresso station", "pickup", "queue", "seating"]
+  },
   "items": [
     { "id": "coffee-cup", "category": "drinkware", "function": "served beverage prop", "reuseClass": "food-item" },
     { "id": "croissant", "category": "pastry", "function": "bakery display prop", "reuseClass": "food-item" },
@@ -12,5 +21,6 @@
     { "id": "counter-display", "category": "fixture", "function": "pastry presentation fixture", "reuseClass": "shop-fixture" },
     { "id": "cafe-stool", "category": "furniture", "function": "customer seating", "reuseClass": "seating" }
   ],
-  "generationPolicy": "prototype items are procedural Blender meshes; no paid external generation submitted"
+  "generationPolicy": "form-refined items are procedural Blender meshes; no paid external generation submitted",
+  "notes": "Café Canopy now has a visible service counter, open pastry case, individually modeled croissants, tarts, sandwiches and drinks, an espresso station, side queue, two supported seating islands, and a dedicated staff aisle. Shelf and tabletop contact heights were corrected after user review. Runtime export remains separately gated."
 }

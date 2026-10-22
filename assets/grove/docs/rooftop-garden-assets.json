@@ -1,0 +1,25 @@
+{
+  "schema": "kindred.grove-rooftop-garden-assets.v1",
+  "shopId": "rooftop-garden",
+  "floor": "level-3",
+  "status": "form-refined-prototype",
+  "refinementEvidence": {
+    "blenderSource": "../blender/grove_master_refined.blend",
+    "builder": "../blender/refine_rooftop_garden_interior.py",
+    "reviewRender": "../renders/rooftop_garden_refined_blender.png",
+    "staffAisleRender": "../renders/rooftop_garden_staff_aisle_blender.png",
+    "walkInRoute": "open central route between planted terrace and retail wall",
+    "staffClearance": "1.28 m aisle behind potting and checkout counter",
+    "departments": ["raised planting bed", "seed packets", "potted plants", "potting counter", "garden tools", "social bench", "lanterns"]
+  },
+  "items": [
+    { "id": "seed-packet", "category": "garden-retail", "function": "supported shelf merchandise", "reuseClass": "garden-product" },
+    { "id": "potted-plant", "category": "garden-retail", "function": "supported living merchandise", "reuseClass": "garden-product" },
+    { "id": "flower-cluster", "category": "planting", "function": "individual color landmark", "reuseClass": "vegetation" },
+    { "id": "potting-pot", "category": "workshop", "function": "supported potting prop", "reuseClass": "garden-product" },
+    { "id": "trowel", "category": "garden-tool", "function": "supported workbench prop", "reuseClass": "tool" },
+    { "id": "garden-lantern", "category": "lighting", "function": "social nook accent", "reuseClass": "light-fixture" }
+  ],
+  "generationPolicy": "form-refined items are procedural Blender meshes; no paid external generation submitted",
+  "notes": "The conservatory layout keeps its central arrival route clear, gives every retail and workbench item a measured support surface, and reserves a dedicated staff aisle. Runtime export remains separately gated."
+}

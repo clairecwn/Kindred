@@ -3,6 +3,7 @@ node_modules
 
 # Build output
 dist
+dist_check
 
 # Environment secrets
 .env
@@ -20,6 +21,7 @@ tmp/
 _to_delete/
 **/_to_delete/
 _blender_preview/
+backend/supabase/.temp/
 **/_preview/
 .DS_Store
 *.blend1

@@ -1,0 +1,17 @@
+{
+  "roomId": "kingdom-island",
+  "production": "Locally authored geometry; no external asset generation or spend",
+  "attachmentConvention": "Blender Z-up; base contacts declared support; furniture fronts face -Y",
+  "families": [
+    {"id":"cottage","role":"home landmark and furniture interior","dimensionsMeters":[9.6,9,6.5],"attachment":"foundation bottom","class":"hero architecture","rejectIf":["doorway blocked","wall gaps","character cannot fit"]},
+    {"id":"tree","role":"shade and perimeter framing","dimensionsMeters":[3,3,4.6],"attachment":"trunk bottom","class":"reusable","rejectIf":["trunk floating","branches detached","blocks primary arrival"]},
+    {"id":"crop-bed","role":"editable crop patch","dimensionsMeters":[1.9,1.4,0.26],"attachment":"bed bottom","class":"reusable","rejectIf":["aisle below 1.6m","crop floats above soil"]},
+    {"id":"carrot","role":"readable first crop","dimensionsMeters":[0.35,0.35,0.6],"attachment":"root in soil","class":"reusable crop","rejectIf":["leaves detached","root floating"]},
+    {"id":"cabbage","role":"leaf crop example","dimensionsMeters":[0.65,0.65,0.4],"attachment":"base in soil","class":"reusable crop","rejectIf":["separate leaves appear unsupported"]},
+    {"id":"pumpkin","role":"large crop example","dimensionsMeters":[0.7,0.7,0.6],"attachment":"base on soil","class":"reusable crop","rejectIf":["stem detached","overlaps neighbouring crop"]},
+    {"id":"flower-bed","role":"garden customisation","dimensionsMeters":[2.7,1.5,0.26],"attachment":"bed bottom","class":"reusable","rejectIf":["stems float","flowers obscure walking route"]},
+    {"id":"garden-bench","role":"example movable furniture and seating scale","dimensionsMeters":[2.2,0.8,1.12],"attachment":"four feet","front":"-Y toward garden approach","class":"movable example","rejectIf":["feet float","seat does not fit character proportions"]},
+    {"id":"stable","role":"open animal shelter and expansion area","dimensionsMeters":[5.9,4.9,4.35],"attachment":"floor bottom","class":"architecture","rejectIf":["front bay blocked","roof unsupported"]},
+    {"id":"dock","role":"arrival landmark","dimensionsMeters":[3.3,5.7,3.4],"attachment":"piles extend below sea","class":"architecture","rejectIf":["deck disconnected from arrival path","ropes unsupported"]}
+  ]
+}

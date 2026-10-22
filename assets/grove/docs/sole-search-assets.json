@@ -2,7 +2,14 @@
   "schema": "kindred.grove-sole-search-assets.v1",
   "shopId": "sole-search",
   "floor": "level-2",
-  "status": "prototype",
+  "status": "form-refined-prototype",
+  "refinementEvidence": {
+    "blenderSource": "../blender/grove_master_refined.blend",
+    "builder": "../blender/refine_sole_search_interior.py",
+    "reviewRender": "../renders/sole_search_refined_blender.png",
+    "walkInRoute": "3.2 m central arrival lane on Level 2",
+    "departments": ["hero footwear", "wall shoe library", "boots", "shoe boxes", "fitting bench", "sock accessories", "checkout"]
+  },
   "items": [
     { "id": "chunky-sneaker", "category": "footwear", "function": "hero casual shoe display", "reuseClass": "footwear" },
     { "id": "ankle-boot", "category": "footwear", "function": "seasonal shoe display", "reuseClass": "footwear" },
@@ -12,5 +19,6 @@
     { "id": "shoe-bench", "category": "furniture", "function": "customer fitting seat", "reuseClass": "seating" },
     { "id": "display-pedestal", "category": "fixture", "function": "hero footwear presentation", "reuseClass": "shop-fixture" }
   ],
-  "generationPolicy": "prototype items are procedural Blender meshes guided by the Thread + Thimble reference; no paid external generation submitted"
+  "generationPolicy": "form-refined items are procedural Blender meshes guided by the Thread + Thimble reference; no paid external generation submitted",
+  "notes": "Every shoe, box, sock roll and try-on item is placed from a measured support height so it touches its shelf, pedestal, table or bench. Runtime export remains separately gated."
 }

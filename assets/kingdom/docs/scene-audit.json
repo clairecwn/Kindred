@@ -1,0 +1,116 @@
+{
+  "scene": "kingdom_island.blend",
+  "environment_triangles": 337002,
+  "character_source": "frontend/public/models/kindred_char01.glb",
+  "character_dimensions_m": [
+    1.249,
+    1.158,
+    2.0
+  ],
+  "house_door_clearance_m": [
+    3.12,
+    2.8
+  ],
+  "main_path_width_m": 2.6,
+  "farm_aisle_minimum_m": 1.6,
+  "reference_scale": 1,
+  "runtime_integrated": false,
+  "grove_modified": false,
+  "collections": {
+    "KINGDOM_BACKDROP": 244,
+    "KINGDOM_CHARACTER_REFERENCE": 9,
+    "KINGDOM_DECOR": 15,
+    "KINGDOM_DOCK": 27,
+    "KINGDOM_FARM": 344,
+    "KINGDOM_GARDEN": 351,
+    "KINGDOM_HOUSE": 334,
+    "KINGDOM_LIGHTING": 7,
+    "KINGDOM_PATHS": 1,
+    "KINGDOM_PLACEMENT_ZONES": 5,
+    "KINGDOM_STABLE": 168,
+    "KINGDOM_TERRAIN": 8,
+    "KINGDOM_TREES": 228
+  },
+  "character_reference_notes": "Current Kai GLB, idle pose, original scale; alternate hat hair and unrelated Icosphere helper are hidden in this reference only.",
+  "door_headroom_m": 0.8,
+  "review_corrections": [
+    "Unified overlapping path surfaces",
+    "Pond water raised to bank",
+    "Stable blue roof unified",
+    "Distant trees separated from hills",
+    "House gables and ceiling sealed"
+  ],
+  "character_foot_height_m": 2.035,
+  "character_support": "Arrival path top; evaluated feet aligned after excluding helper mesh",
+  "house_aperture_15_rays_clear": true,
+  "character_ground_contact_error_m": 0.0,
+  "placement_regions": [
+    {
+      "id": "home",
+      "center": [
+        -3,
+        6.75,
+        2.24
+      ],
+      "size": [
+        9.97,
+        9.75,
+        0.05
+      ]
+    },
+    {
+      "id": "front-lawn",
+      "center": [
+        2,
+        -8,
+        2
+      ],
+      "size": [
+        5,
+        6,
+        0.05
+      ]
+    },
+    {
+      "id": "garden",
+      "center": [
+        -11,
+        -5,
+        2
+      ],
+      "size": [
+        8,
+        9,
+        0.05
+      ]
+    },
+    {
+      "id": "farm",
+      "center": [
+        11.75,
+        5,
+        2
+      ],
+      "size": [
+        6,
+        8,
+        0.05
+      ]
+    },
+    {
+      "id": "stable-yard",
+      "center": [
+        12.5,
+        -10,
+        2
+      ],
+      "size": [
+        5.5,
+        3.5,
+        0.05
+      ]
+    }
+  ],
+  "environment_budget_passed": true,
+  "home_expansion_audit": "home-expansion-audit.json"
+}

@@ -1,0 +1,89 @@
+{
+ "note": "written by assets/kingdom/blender/passes/k35_props.py",
+ "props": {
+  "Campfire": {
+   "bones": 3,
+   "file": "props/campfire.glb",
+   "fire": true,
+   "flame": "Flame",
+   "loop": "Burn",
+   "secs": 2.0,
+   "stands_for": "KK_Campfire",
+   "triangles": 2086
+  },
+  "Flame": {
+   "billboard": true,
+   "bones": 49,
+   "file": "props/flame.glb",
+   "fire": false,
+   "loop": "Burn",
+   "secs": 2.0,
+   "stands_for": null,
+   "triangles": 4860
+  },
+  "Garland": {
+   "bones": 8,
+   "file": "props/garland.glb",
+   "fire": false,
+   "loop": "Breeze",
+   "secs": 3.0,
+   "stands_for": "KD_Lamp_Garland",
+   "triangles": 2654
+  },
+  "Hammock": {
+   "bones": 2,
+   "file": "props/hammock.glb",
+   "fire": false,
+   "loop": "Sway",
+   "secs": 4.0,
+   "stands_for": "KD_Seat_Hammock",
+   "triangles": 1460
+  },
+  "Lampdouble": {
+   "bones": 3,
+   "file": "props/lampdouble.glb",
+   "fire": false,
+   "loop": "Breeze",
+   "secs": 3.0,
+   "stands_for": "KD_Lamp_Double",
+   "triangles": 2054
+  },
+  "Lily": {
+   "bones": 4,
+   "file": "props/lily.glb",
+   "fire": false,
+   "loop": "Bob",
+   "secs": 3.0,
+   "stands_for": "KD_Pond_Lily",
+   "triangles": 372
+  },
+  "Reeds": {
+   "bones": 18,
+   "file": "props/reeds.glb",
+   "fire": false,
+   "loop": "Sway",
+   "secs": 4.0,
+   "stands_for": "KD_Pond_Reeds",
+   "triangles": 670
+  },
+  "Swing": {
+   "bones": 2,
+   "file": "props/swing.glb",
+   "fire": false,
+   "loop": "Swing",
+   "secs": 3.0,
+   "stands_for": "KD_Seat_Swing",
+   "triangles": 1816
+  },
+  "Tent": {
+   "bones": 4,
+   "file": "props/tent.glb",
+   "fire": false,
+   "loop": "Breeze",
+   "secs": 2.0,
+   "stands_for": "KK_Tent",
+   "triangles": 1272
+  }
+ },
+ "version": 1
+}

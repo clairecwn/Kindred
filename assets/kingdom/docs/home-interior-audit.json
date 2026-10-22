@@ -1,0 +1,29 @@
+{
+  "revision": "interior-finish-v1",
+  "coordinateSystem": "Blender Z-up metres",
+  "measured_floor_support_heights_m": [
+    2.2605,
+    2.2605,
+    2.2605,
+    2.2605,
+    2.2605,
+    2.2605,
+    2.2605,
+    2.2605,
+    2.2605
+  ],
+  "runtime_floor_support_m": 2.2605,
+  "route_envelope_width_m": 1.3,
+  "route_top_z_m": 4.26,
+  "route_rays": 20,
+  "route_hits": [],
+  "method": "Evaluated world-space mesh BVH, all visible house meshes; sampled rays, not continuous capsule navigation",
+  "rear_windows": 2,
+  "rear_window_aperture_m": [
+    1.8,
+    1.6
+  ],
+  "rear_window_shell_rays_clear": 18,
+  "runtime_traversal_verified": false,
+  "notes": "Clearance samples do not prove animated swept-volume collision, runtime camera visibility, or window watertightness."
+}

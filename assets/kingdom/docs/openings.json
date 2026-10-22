@@ -1,0 +1,15 @@
+{
+  "schema": "game-room.opening-schedule.v1",
+  "roomId": "kingdom-island",
+  "primaryArrival": {"openingId": "dock-arrival", "exception": "Outdoor island arrival is an open 2.7m dock; expanded house wall aperture is 3.12m wide, with an open door leaf reducing usable width slightly."},
+  "openings": [
+    {"id": "dock-arrival", "type": "door", "wall": "none-open-arrival", "width": 2.7, "height": 10, "destination": "arrival path and cottage", "threshold": 2.0, "depth": 5.4},
+    {"id": "main_door", "type": "door", "wall": "House_front_wall", "width": 3.12, "height": 2.8, "destination": "house interior", "threshold": 2.24, "depth": 0.45, "method": "applied Exact Boolean, enlarged with shell"},
+    {"id": "front_window_-2.7", "type": "window", "wall": "House_front_wall", "width": 1.95, "height": 1.6, "sill": 3.24, "depth": 0.45, "destination": "front garden", "method": "applied Exact Boolean"},
+    {"id": "front_window_2.7", "type": "window", "wall": "House_front_wall", "width": 1.95, "height": 1.6, "sill": 3.24, "depth": 0.45, "destination": "front lawn", "method": "applied Exact Boolean"},
+    {"id": "side_window_west", "type": "window", "wall": "House_front_wall", "width": 2.7, "height": 1.6, "sill": 3.24, "depth": 0.39, "destination": "garden", "method": "applied Exact Boolean in unified shell"},
+    {"id": "side_window_east", "type": "window", "wall": "House_front_wall", "width": 2.7, "height": 1.6, "sill": 3.24, "depth": 0.39, "destination": "orchard", "method": "applied Exact Boolean in unified shell"},
+    {"id": "rear_window_west", "type": "window", "wall": "House_front_wall", "width": 1.8, "height": 1.6, "sill": 3.24, "depth": 0.45, "destination": "rear garden and water", "method": "applied Exact Boolean in unified shell"},
+    {"id": "rear_window_east", "type": "window", "wall": "House_front_wall", "width": 1.8, "height": 1.6, "sill": 3.24, "depth": 0.45, "destination": "rear garden and water", "method": "applied Exact Boolean in unified shell"}
+  ]
+}

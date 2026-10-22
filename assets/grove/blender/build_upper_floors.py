@@ -89,7 +89,7 @@ for i,x in enumerate((-22,-18)): cube(f"Reading_Chair_{i+1}",(x,-12.3,10.65),(1.
 cube("Book_Table",(-20,-12.4,10.55),(2.2,1.2,.8),cream,books,.10)
 for i,z in enumerate((11.05,11.22,11.39)): cube(f"Book_Stack_{i+1}",(-20,-12.4,z),(1.0,.72,.14),coral if i==0 else blue if i==1 else mint,bookp,.03)
 
-well,wellp=shell("wellness_willow","WELLNESS WILLOW",20,-14,10,green)
+well,wellp=shell("wellness_willow","ALLTIMEFITNESS",20,-14,10,green)
 for i,x in enumerate((17,19,21,23)): cube(f"Yoga_Mat_{i+1}",(x,-14,10.16),(1.25,3.2,.12),[lavender,mint,coral,blue][i],wellp,.06)
 cube("Wellness_Counter",(20,-16.2,10.65),(6.5,1.0,1.1),wood,well,.08)
 for i,x in enumerate((18.2,19.0,19.8,20.6,21.4)): cyl(f"Wellness_Bottle_{i+1}",(x,-16.2,11.45),.09,.34,mint if i%2==0 else lavender,wellp,16); cyl(f"Bottle_Cap_{i+1}",(x,-16.2,11.65),.055,.08,gold,wellp,12)

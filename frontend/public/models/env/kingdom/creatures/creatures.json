@@ -1,0 +1,154 @@
+{
+ "creatures": {
+  "Bird": {
+   "bones": 13,
+   "build": "clay",
+   "clips": {
+    "Fly": 0.4,
+    "Hop": 0.5,
+    "Idle": 3.0
+   },
+   "file": "creatures/bird.glb",
+   "height": 0.31,
+   "speed": 0.5,
+   "stands_for": [
+    "KL_Bird",
+    "KL_Bird_Fly"
+   ],
+   "triangles": 4208
+  },
+  "Butterfly": {
+   "bones": 3,
+   "build": "parts",
+   "clips": {
+    "Fly": 0.24,
+    "Rest": 3.0
+   },
+   "file": "creatures/butterfly.glb",
+   "height": 0.11,
+   "speed": 0.6,
+   "stands_for": [],
+   "triangles": 2060
+  },
+  "Cat": {
+   "bones": 24,
+   "build": "clay",
+   "clips": {
+    "Idle": 4.5,
+    "Sit": 4.0,
+    "Walk": 0.8
+   },
+   "file": "creatures/cat.glb",
+   "height": 0.67,
+   "speed": 0.35,
+   "stands_for": [
+    "KL_Cat_Sit"
+   ],
+   "triangles": 3549
+  },
+  "Chick": {
+   "bones": 13,
+   "build": "clay",
+   "clips": {
+    "Idle": 3.0,
+    "Peck": 1.2,
+    "Walk": 0.4
+   },
+   "file": "creatures/chick.glb",
+   "height": 0.27,
+   "speed": 0.24,
+   "stands_for": [
+    "KL_Chick"
+   ],
+   "triangles": 3842
+  },
+  "Chicken": {
+   "bones": 13,
+   "build": "clay",
+   "clips": {
+    "Idle": 4.0,
+    "Peck": 1.6,
+    "Walk": 0.7
+   },
+   "file": "creatures/chicken.glb",
+   "height": 0.67,
+   "speed": 0.45,
+   "stands_for": [
+    "KL_Chicken",
+    "KL_Chicken_Peck"
+   ],
+   "triangles": 5334
+  },
+  "Cow": {
+   "bones": 24,
+   "build": "clay",
+   "clips": {
+    "Eat": 3.2,
+    "Idle": 6.0,
+    "Walk": 1.3
+   },
+   "file": "creatures/cow.glb",
+   "height": 1.54,
+   "speed": 0.5,
+   "stands_for": [
+    "KL_Cow",
+    "KL_Cow_Graze"
+   ],
+   "triangles": 5632
+  },
+  "Duck": {
+   "bones": 13,
+   "build": "clay",
+   "clips": {
+    "Idle": 5.0,
+    "Swim": 2.0,
+    "Walk": 0.6
+   },
+   "file": "creatures/duck.glb",
+   "height": 0.66,
+   "speed": 0.4,
+   "stands_for": [
+    "KL_Duck",
+    "KL_Duck_Swim"
+   ],
+   "triangles": 4198
+  },
+  "Pony": {
+   "bones": 24,
+   "build": "clay",
+   "clips": {
+    "Eat": 3.2,
+    "Idle": 6.0,
+    "Walk": 1.1
+   },
+   "file": "creatures/pony.glb",
+   "height": 1.91,
+   "speed": 0.66,
+   "stands_for": [
+    "KL_Pony",
+    "KL_Pony_Graze"
+   ],
+   "triangles": 5610
+  },
+  "Sheep": {
+   "bones": 22,
+   "build": "clay",
+   "clips": {
+    "Eat": 2.6,
+    "Idle": 5.0,
+    "Walk": 0.9
+   },
+   "file": "creatures/sheep.glb",
+   "height": 1.04,
+   "speed": 0.45,
+   "stands_for": [
+    "KL_Sheep",
+    "KL_Sheep_Graze"
+   ],
+   "triangles": 4958
+  }
+ },
+ "fps": 24,
+ "note": "written by assets/kingdom/blender/passes/k34_animals.py",
+ "version": 1
+}

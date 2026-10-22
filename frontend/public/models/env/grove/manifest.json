@@ -1,0 +1,244 @@
+{
+  "schema": "kindred.grove-export-manifest.v2",
+  "generatedAt": "2026-10-08T07:05:44.836Z",
+  "source": "../blender/grove_master_refined.blend",
+  "generator": "Blender 5.2.0 LTS",
+  "format": "glTF 2.0 binary",
+  "policy": "locally-authored-procedural-blender-no-paid-generation",
+  "validation": {
+    "status": "passed-structural-threejs-and-budget-checks",
+    "checks": [
+      "GLB magic header",
+      "GLB version 2",
+      "declared file length",
+      "JSON chunk parse",
+      "scene, mesh, and material presence",
+      "SHA-256 digest",
+      "Three.js GLTFLoader parse (geometry; embedded textures are not decoded under Node)",
+      "runtime mesh traversal",
+      "module and bundle byte budget",
+      "runtime triangle budget"
+    ],
+    "totals": {
+      "modules": 14,
+      "bytes": 18924140,
+      "runtimeTriangles": 594943
+    },
+    "limitations": [
+      "Lightmaps and texture tiers are not yet authored.",
+      "Sustained hardware frame-rate and final Runtime approval remain pending."
+    ]
+  },
+  "modules": [
+    {
+      "file": "grove_exterior.glb",
+      "bytes": 3475924,
+      "nodes": 469,
+      "meshes": 236,
+      "materials": 36,
+      "sha256": "7a53bc72f98d9f51af7dd2cce14051bb582731d81c638a37b078d9049129ff79",
+      "runtimeMeshes": 1202,
+      "runtimeTriangles": 185409,
+      "boundsMeters": [
+        600,
+        32.4,
+        600
+      ]
+    },
+    {
+      "file": "grove_architecture.glb",
+      "bytes": 3760852,
+      "nodes": 339,
+      "meshes": 177,
+      "materials": 38,
+      "sha256": "e531e9c5ae41eaa3984266e68a1bea916623ca7b24588644781e28a04b32e4a4",
+      "runtimeMeshes": 948,
+      "runtimeTriangles": 120512,
+      "boundsMeters": [
+        61.8428,
+        23.45,
+        46.8376
+      ]
+    },
+    {
+      "file": "grove_grocer.glb",
+      "bytes": 1556160,
+      "nodes": 29,
+      "meshes": 29,
+      "materials": 33,
+      "sha256": "65ecb1da837b8cbff103f2bd7bed057e26b6ce0d565aff6a21cb9642ecfef3a2",
+      "runtimeMeshes": 125,
+      "runtimeTriangles": 38412,
+      "boundsMeters": [
+        12.48,
+        4.96,
+        8.82
+      ]
+    },
+    {
+      "file": "thread_and_thimble.glb",
+      "bytes": 964080,
+      "nodes": 20,
+      "meshes": 20,
+      "materials": 30,
+      "sha256": "ad61231900a56ebfe75a4efc3adfe15f62757784d94c7dbfb6337d98a777d0fc",
+      "runtimeMeshes": 106,
+      "runtimeTriangles": 25940,
+      "boundsMeters": [
+        12.48,
+        4.87,
+        8.82
+      ]
+    },
+    {
+      "file": "home_nook.glb",
+      "bytes": 875136,
+      "nodes": 23,
+      "meshes": 23,
+      "materials": 27,
+      "sha256": "bf3221137ecde33e468f5f91b8aef78e9f3b515f3ae4f4fd4abe3e9e26c4468e",
+      "runtimeMeshes": 102,
+      "runtimeTriangles": 22328,
+      "boundsMeters": [
+        12.48,
+        4.85,
+        8.82
+      ]
+    },
+    {
+      "file": "cafe_canopy.glb",
+      "bytes": 905652,
+      "nodes": 35,
+      "meshes": 35,
+      "materials": 26,
+      "sha256": "35c1a3bcc35f6073441e072c1207b2cf5bd13b239a61421d96fc3e0fcd2b0f51",
+      "runtimeMeshes": 100,
+      "runtimeTriangles": 22818,
+      "boundsMeters": [
+        12.48,
+        4.85,
+        8.82
+      ]
+    },
+    {
+      "file": "sole_search.glb",
+      "bytes": 743708,
+      "nodes": 17,
+      "meshes": 17,
+      "materials": 21,
+      "sha256": "125b7b8e89823d68d6d4210b33673134563b5e227a75d4e0de7c1c0c871aa8a9",
+      "runtimeMeshes": 67,
+      "runtimeTriangles": 17622,
+      "boundsMeters": [
+        12.48,
+        4.895,
+        8.82
+      ]
+    },
+    {
+      "file": "pixel_pantry.glb",
+      "bytes": 893136,
+      "nodes": 21,
+      "meshes": 21,
+      "materials": 23,
+      "sha256": "687cfd99cb28c257f2d0d40c400161333da1ddecc406216db604fddb38c24081",
+      "runtimeMeshes": 85,
+      "runtimeTriangles": 20890,
+      "boundsMeters": [
+        12.48,
+        4.895,
+        8.82
+      ]
+    },
+    {
+      "file": "maker_meadow.glb",
+      "bytes": 1029808,
+      "nodes": 19,
+      "meshes": 19,
+      "materials": 28,
+      "sha256": "5e42a9ccd98787d30ec4cb93ec118d1897062b9bf2c73c4fb364e056b1b06fd6",
+      "runtimeMeshes": 100,
+      "runtimeTriangles": 28246,
+      "boundsMeters": [
+        12.48,
+        4.895,
+        8.82
+      ]
+    },
+    {
+      "file": "seasonal_pop_up.glb",
+      "bytes": 933860,
+      "nodes": 18,
+      "meshes": 18,
+      "materials": 29,
+      "sha256": "6b20589b7a6fbc51a86126eb1f5f5348fc11a2175c2dc80a093b26a844792512",
+      "runtimeMeshes": 91,
+      "runtimeTriangles": 22044,
+      "boundsMeters": [
+        12.48,
+        4.895,
+        8.82
+      ]
+    },
+    {
+      "file": "book_burrow.glb",
+      "bytes": 1176744,
+      "nodes": 23,
+      "meshes": 23,
+      "materials": 25,
+      "sha256": "b38fcb06789a368d7efa87541a9c4772e55f6c2c14a749cbe3761929f2f74de8",
+      "runtimeMeshes": 92,
+      "runtimeTriangles": 24354,
+      "boundsMeters": [
+        12.48,
+        4.895,
+        8.82
+      ]
+    },
+    {
+      "file": "alltimefitness.glb",
+      "bytes": 914964,
+      "nodes": 24,
+      "meshes": 24,
+      "materials": 28,
+      "sha256": "0c2766918d4d7801e1b2266aba06cb649d0718fdf0b2d288408533125a4242e0",
+      "runtimeMeshes": 87,
+      "runtimeTriangles": 24474,
+      "boundsMeters": [
+        12.48,
+        4.895,
+        8.82
+      ]
+    },
+    {
+      "file": "food_hall.glb",
+      "bytes": 740592,
+      "nodes": 56,
+      "meshes": 56,
+      "materials": 28,
+      "sha256": "4b60b996882c1a25158a7057d82345e08091e8749a7a3b1796c441c7c9c33764",
+      "runtimeMeshes": 134,
+      "runtimeTriangles": 17428,
+      "boundsMeters": [
+        12.48,
+        4.895,
+        8.82
+      ]
+    },
+    {
+      "file": "rooftop_garden.glb",
+      "bytes": 953524,
+      "nodes": 37,
+      "meshes": 37,
+      "materials": 25,
+      "sha256": "375561795faaeb677d89a748d98be26f7922e9e8818d53d3e1a832732e6ac382",
+      "runtimeMeshes": 103,
+      "runtimeTriangles": 24466,
+      "boundsMeters": [
+        12.48,
+        4.9,
+        8.82
+      ]
+    }
+  ]
+}

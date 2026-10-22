@@ -21,7 +21,7 @@
     "status": "pending",
     "approvedBy": "",
     "approvedAt": "",
-    "evidence": ["../exports/manifest.json", "runtime-contract.json", "../../../src/grove/interiors/GroveMallInterior.js", "../../../public/models/env/grove/manifest.json"],
+    "evidence": ["../exports/manifest.json", "runtime-contract.json", "../../../src/grove/interiors/GroveMallInterior.js", "../../../frontend/public/models/env/grove/manifest.json"],
     "strangestElement": "The authored upper-floor side wings required explicit north and south connector decks to make atrium circulation safe in the two-dimensional player controller.",
     "notes": "Local runtime integration, Three.js loading, all three level switches, 37 measured fixture blockers, active-floor shop culling, production build, and browser preview have passed. The culling pass reduced the observed preview from 403 to 238 draw calls. Mesh-level collision/UV/lightmap review, sustained frame-rate measurement, final-art refinement, and explicit human Runtime approval remain outstanding."
   }

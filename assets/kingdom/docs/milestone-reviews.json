@@ -1,0 +1,7 @@
+{
+  "schema": "game-room.milestone-reviews.v1",
+  "roomId": "kingdom-island",
+  "function": {"status": "concept-authorized", "approvedBy": "user", "approvedAt": "2026-10-06", "evidence": ["User approved the proposed island build and then explicitly requested a complete Kingdom redesign."], "notes": "Locally authored first scene; no paid generation. Detailed form is for review."},
+  "form": {"status": "pending", "approvedBy": "", "approvedAt": "", "evidence": ["../blender/kingdom_island.blend", "../renders/kingdom_overview.png", "scene-audit.json"], "notes": "Review rendered geometry and scale; runtime integration is not yet represented."},
+  "runtime": {"status": "not-started", "approvedBy": "", "approvedAt": "", "evidence": [], "notes": "New Kingdom will replace the old presentation; no Grove mutations in this phase."}
+}

@@ -1,0 +1,1211 @@
+{
+ "version": 2,
+ "cell": 1.0,
+ "lawnBlenderZ": 2.0,
+ "spawn": {
+  "x": 0.0,
+  "z": 53.3,
+  "heading": 3.1416
+ },
+ "dock": {
+  "from": {
+   "x": 0.0,
+   "z": 43.3
+  },
+  "end": {
+   "x": 0.0,
+   "z": 55.3
+  },
+  "width": 3.2,
+  "moor": {
+   "x": -4.9,
+   "z": 53.5
+  },
+  "lights": [
+   {
+    "x": 1.22,
+    "y": 2.32,
+    "z": 51.68
+   },
+   {
+    "x": -1.22,
+    "y": 2.32,
+    "z": 51.68
+   }
+  ]
+ },
+ "terrace": {
+  "x": -37.0,
+  "z": -27.8,
+  "radius": 6.6,
+  "top": 1.8,
+  "ramp": {
+   "x0": -37.5,
+   "x1": -34.9,
+   "zFoot": -16.2,
+   "zTop": -23.0
+  }
+ },
+ "site": {
+  "x": -3.0,
+  "z": 8.0,
+  "rot": 0.0,
+  "cells": [
+   6,
+   6
+  ]
+ },
+ "kit": [
+  "KK_Tent",
+  "KK_Cabin_Frame",
+  "KK_Cabin",
+  "KK_Bench",
+  "KK_Fence_Post",
+  "KK_Fence_Rail",
+  "KK_Campfire",
+  "KK_Campfire_Flame",
+  "KK_Log_Stool",
+  "KK_Sign_Sprout",
+  "KK_Seedling",
+  "KK_Wet_Patch",
+  "KK_Crop_Carrot_S2",
+  "KK_Crop_Carrot_S3",
+  "KK_Crop_Carrot",
+  "KK_Crop_Cabbage_S2",
+  "KK_Crop_Cabbage_S3",
+  "KK_Crop_Cabbage",
+  "KK_Crop_Pumpkin_S2",
+  "KK_Crop_Pumpkin_S3",
+  "KK_Crop_Pumpkin",
+  "KK_Crop_Tomato_S2",
+  "KK_Crop_Tomato_S3",
+  "KK_Crop_Tomato",
+  "KK_Crop_Corn_S2",
+  "KK_Crop_Corn_S3",
+  "KK_Crop_Corn",
+  "KK_Crop_Strawberry_S2",
+  "KK_Crop_Strawberry_S3",
+  "KK_Crop_Strawberry",
+  "KK_Daisy_S2",
+  "KK_Daisy_S3",
+  "KK_Daisy_S4",
+  "KK_Tulip_S2",
+  "KK_Tulip_S3",
+  "KK_Tulip_S4",
+  "KK_Sunflower_S2",
+  "KK_Sunflower_S3",
+  "KK_Sunflower_S4",
+  "KK_Rose_S2",
+  "KK_Rose_S3",
+  "KK_Rose_S4",
+  "KK_Lavender_S2",
+  "KK_Lavender_S3",
+  "KK_Lavender_S4",
+  "KK_Tree_Sapling",
+  "KK_Tree_Round",
+  "KK_Tree_Apple",
+  "KK_Tree_Citrus_Bare",
+  "KK_Tree_Citrus",
+  "KK_Bush",
+  "KK_Rock",
+  "KK_Grass_Tuft",
+  "KK_Flower_pink",
+  "KK_Flower_yellow",
+  "KK_Flower_white",
+  "KK_Flower_purple",
+  "KK_Tree_Wild_A",
+  "KK_Tree_Wild_A2",
+  "KK_Tree_Wild_B",
+  "KK_Tree_Wild_B2",
+  "KK_Tree_Wild_C",
+  "KK_Tree_Wild_D",
+  "KK_Tree_Wild_D2",
+  "KK_Tree_Blossom",
+  "KK_Thicket_A",
+  "KK_Thicket_B",
+  "KK_Fern",
+  "KK_Mushrooms",
+  "KK_Log",
+  "KK_Stump",
+  "KK_Land_Sign"
+ ],
+ "day1": [
+  {
+   "x": -3.5,
+   "z": 33.5,
+   "rot": 6.1586,
+   "scale": 0.841,
+   "name": "K_D1_Bush_00",
+   "mesh": "KK_Bush"
+  },
+  {
+   "x": -16.5,
+   "z": 11.5,
+   "rot": 0.9549,
+   "scale": 0.971,
+   "name": "K_D1_Bush_01",
+   "mesh": "KK_Bush"
+  },
+  {
+   "x": -6.5,
+   "z": 37.5,
+   "rot": 3.6436,
+   "scale": 0.96,
+   "name": "K_D1_Bush_02",
+   "mesh": "KK_Bush"
+  },
+  {
+   "x": 7.5,
+   "z": 39.5,
+   "rot": 2.9788,
+   "scale": 1.032,
+   "name": "K_D1_Bush_03",
+   "mesh": "KK_Bush"
+  },
+  {
+   "x": -13.5,
+   "z": 8.5,
+   "rot": 0.1418,
+   "scale": 0.962,
+   "name": "K_D1_Bush_04",
+   "mesh": "KK_Bush"
+  },
+  {
+   "x": -15.5,
+   "z": 7.5,
+   "rot": 0.5063,
+   "scale": 0.957,
+   "name": "K_D1_Bush_05",
+   "mesh": "KK_Bush"
+  },
+  {
+   "x": -19.5,
+   "z": 27.5,
+   "rot": 5.1477,
+   "scale": 1.102,
+   "name": "K_D1_Bush_06",
+   "mesh": "KK_Bush"
+  },
+  {
+   "x": -13.5,
+   "z": 4.5,
+   "rot": 6.0176,
+   "scale": 0.853,
+   "name": "K_D1_Bush_07",
+   "mesh": "KK_Bush"
+  },
+  {
+   "x": 10.5,
+   "z": 20.5,
+   "rot": 2.3201,
+   "scale": 0.998,
+   "name": "K_D1_Bush_08",
+   "mesh": "KK_Bush"
+  },
+  {
+   "x": 13.5,
+   "z": 26.5,
+   "rot": 3.2389,
+   "scale": 1.016,
+   "name": "K_D1_Bush_09",
+   "mesh": "KK_Bush"
+  },
+  {
+   "x": 11.5,
+   "z": 32.5,
+   "rot": 5.4947,
+   "scale": 1.079,
+   "name": "K_D1_Bush_10",
+   "mesh": "KK_Bush"
+  },
+  {
+   "x": -11.5,
+   "z": 11.5,
+   "rot": 0.6505,
+   "scale": 1.022,
+   "name": "K_D1_Bush_11",
+   "mesh": "KK_Bush"
+  },
+  {
+   "x": -0.5,
+   "z": 12.5,
+   "rot": 2.1366,
+   "scale": 0.818,
+   "name": "K_D1_Bush_12",
+   "mesh": "KK_Bush"
+  },
+  {
+   "x": 15.5,
+   "z": 17.5,
+   "rot": 3.8583,
+   "scale": 0.852,
+   "name": "K_D1_Bush_13",
+   "mesh": "KK_Bush"
+  },
+  {
+   "x": -5.5,
+   "z": 22.5,
+   "rot": 3.3182,
+   "scale": 1.142,
+   "name": "K_D1_Bush_14",
+   "mesh": "KK_Bush"
+  },
+  {
+   "x": 1.5,
+   "z": 12.5,
+   "rot": 0.0,
+   "scale": 1.0,
+   "name": "K_D1_Campfire",
+   "mesh": "KK_Campfire"
+  },
+  {
+   "x": 14.5,
+   "z": 20.5,
+   "rot": 2.0482,
+   "scale": 0.73,
+   "name": "K_D1_Flower_00",
+   "mesh": "KK_Flower_pink"
+  },
+  {
+   "x": 14.5,
+   "z": 21.5,
+   "rot": 3.4899,
+   "scale": 0.796,
+   "name": "K_D1_Flower_01",
+   "mesh": "KK_Flower_pink"
+  },
+  {
+   "x": 13.5,
+   "z": 20.5,
+   "rot": 0.6667,
+   "scale": 0.74,
+   "name": "K_D1_Flower_02",
+   "mesh": "KK_Flower_pink"
+  },
+  {
+   "x": 13.5,
+   "z": 19.5,
+   "rot": 1.5613,
+   "scale": 0.669,
+   "name": "K_D1_Flower_03",
+   "mesh": "KK_Flower_pink"
+  },
+  {
+   "x": -17.5,
+   "z": 22.5,
+   "rot": 4.3933,
+   "scale": 0.819,
+   "name": "K_D1_Flower_04",
+   "mesh": "KK_Flower_yellow"
+  },
+  {
+   "x": -17.5,
+   "z": 21.5,
+   "rot": 5.9199,
+   "scale": 0.665,
+   "name": "K_D1_Flower_05",
+   "mesh": "KK_Flower_yellow"
+  },
+  {
+   "x": -16.5,
+   "z": 22.5,
+   "rot": 3.5155,
+   "scale": 0.836,
+   "name": "K_D1_Flower_06",
+   "mesh": "KK_Flower_yellow"
+  },
+  {
+   "x": -18.5,
+   "z": 21.5,
+   "rot": 5.2779,
+   "scale": 0.634,
+   "name": "K_D1_Flower_07",
+   "mesh": "KK_Flower_yellow"
+  },
+  {
+   "x": 7.5,
+   "z": 10.5,
+   "rot": 4.2064,
+   "scale": 0.796,
+   "name": "K_D1_Flower_08",
+   "mesh": "KK_Flower_white"
+  },
+  {
+   "x": 6.5,
+   "z": 10.5,
+   "rot": 5.6362,
+   "scale": 0.639,
+   "name": "K_D1_Flower_09",
+   "mesh": "KK_Flower_white"
+  },
+  {
+   "x": 6.5,
+   "z": 9.5,
+   "rot": 4.4995,
+   "scale": 0.765,
+   "name": "K_D1_Flower_10",
+   "mesh": "KK_Flower_white"
+  },
+  {
+   "x": 8.5,
+   "z": 9.5,
+   "rot": 0.8984,
+   "scale": 0.821,
+   "name": "K_D1_Flower_11",
+   "mesh": "KK_Flower_white"
+  },
+  {
+   "x": 6.5,
+   "z": 23.5,
+   "rot": 1.0145,
+   "scale": 0.708,
+   "name": "K_D1_Flower_12",
+   "mesh": "KK_Flower_purple"
+  },
+  {
+   "x": 5.5,
+   "z": 23.5,
+   "rot": 3.2396,
+   "scale": 0.685,
+   "name": "K_D1_Flower_13",
+   "mesh": "KK_Flower_purple"
+  },
+  {
+   "x": 7.5,
+   "z": 22.5,
+   "rot": 1.2299,
+   "scale": 0.68,
+   "name": "K_D1_Flower_14",
+   "mesh": "KK_Flower_purple"
+  },
+  {
+   "x": 6.5,
+   "z": 22.5,
+   "rot": 4.5374,
+   "scale": 0.605,
+   "name": "K_D1_Flower_15",
+   "mesh": "KK_Flower_purple"
+  },
+  {
+   "x": -13.5,
+   "z": 26.5,
+   "rot": 0.7091,
+   "scale": 0.83,
+   "name": "K_D1_Flower_16",
+   "mesh": "KK_Flower_pink"
+  },
+  {
+   "x": -13.5,
+   "z": 25.5,
+   "rot": 1.436,
+   "scale": 0.819,
+   "name": "K_D1_Flower_17",
+   "mesh": "KK_Flower_pink"
+  },
+  {
+   "x": -12.5,
+   "z": 25.5,
+   "rot": 0.5282,
+   "scale": 0.668,
+   "name": "K_D1_Flower_18",
+   "mesh": "KK_Flower_pink"
+  },
+  {
+   "x": -13.5,
+   "z": 27.5,
+   "rot": 5.6919,
+   "scale": 0.645,
+   "name": "K_D1_Flower_19",
+   "mesh": "KK_Flower_pink"
+  },
+  {
+   "x": -6.5,
+   "z": 42.5,
+   "rot": 3.9501,
+   "scale": 0.733,
+   "name": "K_D1_Flower_20",
+   "mesh": "KK_Flower_yellow"
+  },
+  {
+   "x": -7.5,
+   "z": 42.5,
+   "rot": 1.2935,
+   "scale": 0.711,
+   "name": "K_D1_Flower_21",
+   "mesh": "KK_Flower_yellow"
+  },
+  {
+   "x": -5.5,
+   "z": 41.5,
+   "rot": 4.2233,
+   "scale": 0.668,
+   "name": "K_D1_Flower_22",
+   "mesh": "KK_Flower_yellow"
+  },
+  {
+   "x": -5.5,
+   "z": 42.5,
+   "rot": 5.0497,
+   "scale": 0.849,
+   "name": "K_D1_Flower_23",
+   "mesh": "KK_Flower_yellow"
+  },
+  {
+   "x": -16.5,
+   "z": 14.5,
+   "rot": 4.3212,
+   "scale": 0.846,
+   "name": "K_D1_Flower_24",
+   "mesh": "KK_Flower_white"
+  },
+  {
+   "x": -15.5,
+   "z": 14.5,
+   "rot": 2.1533,
+   "scale": 0.808,
+   "name": "K_D1_Flower_25",
+   "mesh": "KK_Flower_white"
+  },
+  {
+   "x": -17.5,
+   "z": 13.5,
+   "rot": 4.4405,
+   "scale": 0.759,
+   "name": "K_D1_Flower_26",
+   "mesh": "KK_Flower_white"
+  },
+  {
+   "x": -17.5,
+   "z": 14.5,
+   "rot": 2.5428,
+   "scale": 0.687,
+   "name": "K_D1_Flower_27",
+   "mesh": "KK_Flower_white"
+  },
+  {
+   "x": 13.029,
+   "z": 10.32,
+   "rot": 5.4698,
+   "scale": 1.269,
+   "name": "K_D1_Grass_00",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": 4.963,
+   "z": 8.163,
+   "rot": 1.654,
+   "scale": 1.429,
+   "name": "K_D1_Grass_01",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": 11.846,
+   "z": 23.912,
+   "rot": 1.5359,
+   "scale": 1.431,
+   "name": "K_D1_Grass_02",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": 7.761,
+   "z": 20.632,
+   "rot": 0.5639,
+   "scale": 1.12,
+   "name": "K_D1_Grass_03",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": -13.871,
+   "z": 29.57,
+   "rot": 4.7158,
+   "scale": 1.262,
+   "name": "K_D1_Grass_04",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": -4.464,
+   "z": 39.204,
+   "rot": 0.2751,
+   "scale": 1.359,
+   "name": "K_D1_Grass_05",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": -3.734,
+   "z": 41.622,
+   "rot": 0.8753,
+   "scale": 1.188,
+   "name": "K_D1_Grass_06",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": 3.818,
+   "z": 40.687,
+   "rot": 3.6698,
+   "scale": 1.391,
+   "name": "K_D1_Grass_07",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": -8.475,
+   "z": 38.474,
+   "rot": 1.4448,
+   "scale": 0.917,
+   "name": "K_D1_Grass_08",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": 11.731,
+   "z": 8.121,
+   "rot": 3.5093,
+   "scale": 1.245,
+   "name": "K_D1_Grass_09",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": -9.441,
+   "z": 37.883,
+   "rot": 4.2456,
+   "scale": 1.06,
+   "name": "K_D1_Grass_10",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": 16.211,
+   "z": 24.049,
+   "rot": 0.11,
+   "scale": 1.152,
+   "name": "K_D1_Grass_11",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": 2.613,
+   "z": -0.657,
+   "rot": 1.3239,
+   "scale": 1.22,
+   "name": "K_D1_Grass_12",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": 6.651,
+   "z": 8.055,
+   "rot": 5.9862,
+   "scale": 0.973,
+   "name": "K_D1_Grass_13",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": 3.787,
+   "z": 35.834,
+   "rot": 5.5723,
+   "scale": 1.287,
+   "name": "K_D1_Grass_14",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": 5.065,
+   "z": 10.568,
+   "rot": 1.986,
+   "scale": 1.362,
+   "name": "K_D1_Grass_15",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": 12.359,
+   "z": 29.665,
+   "rot": 5.6647,
+   "scale": 1.059,
+   "name": "K_D1_Grass_16",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": -9.966,
+   "z": 9.448,
+   "rot": 1.7289,
+   "scale": 0.927,
+   "name": "K_D1_Grass_17",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": 10.79,
+   "z": 34.777,
+   "rot": 3.964,
+   "scale": 1.402,
+   "name": "K_D1_Grass_18",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": 11.115,
+   "z": 27.205,
+   "rot": 4.5212,
+   "scale": 0.927,
+   "name": "K_D1_Grass_19",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": -3.412,
+   "z": 36.349,
+   "rot": 4.7292,
+   "scale": 1.254,
+   "name": "K_D1_Grass_20",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": 4.074,
+   "z": 24.644,
+   "rot": 2.9668,
+   "scale": 1.089,
+   "name": "K_D1_Grass_21",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": 13.771,
+   "z": 33.754,
+   "rot": 2.8272,
+   "scale": 0.977,
+   "name": "K_D1_Grass_22",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": -2.026,
+   "z": 35.777,
+   "rot": 2.6005,
+   "scale": 1.188,
+   "name": "K_D1_Grass_23",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": -17.537,
+   "z": 23.661,
+   "rot": 5.9156,
+   "scale": 1.297,
+   "name": "K_D1_Grass_24",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": -0.009,
+   "z": -0.928,
+   "rot": 4.0558,
+   "scale": 1.067,
+   "name": "K_D1_Grass_25",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": -16.335,
+   "z": 23.686,
+   "rot": 2.4384,
+   "scale": 1.023,
+   "name": "K_D1_Grass_26",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": -8.474,
+   "z": 8.309,
+   "rot": 4.2887,
+   "scale": 1.009,
+   "name": "K_D1_Grass_27",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": 5.223,
+   "z": 9.524,
+   "rot": 1.338,
+   "scale": 1.436,
+   "name": "K_D1_Grass_28",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": 7.911,
+   "z": 26.499,
+   "rot": 1.1656,
+   "scale": 1.415,
+   "name": "K_D1_Grass_29",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": 4.423,
+   "z": 23.232,
+   "rot": 6.0587,
+   "scale": 1.014,
+   "name": "K_D1_Grass_30",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": 2.018,
+   "z": 7.999,
+   "rot": 5.636,
+   "scale": 0.917,
+   "name": "K_D1_Grass_31",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": 11.092,
+   "z": 30.177,
+   "rot": 5.9266,
+   "scale": 0.913,
+   "name": "K_D1_Grass_32",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": 15.877,
+   "z": 27.026,
+   "rot": 2.4285,
+   "scale": 1.038,
+   "name": "K_D1_Grass_33",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": 5.311,
+   "z": 25.295,
+   "rot": 5.0427,
+   "scale": 1.306,
+   "name": "K_D1_Grass_34",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": 3.359,
+   "z": 2.127,
+   "rot": 1.5539,
+   "scale": 0.936,
+   "name": "K_D1_Grass_35",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": -5.387,
+   "z": 27.876,
+   "rot": 5.2833,
+   "scale": 1.062,
+   "name": "K_D1_Grass_36",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": -12.594,
+   "z": 26.731,
+   "rot": 4.6374,
+   "scale": 1.01,
+   "name": "K_D1_Grass_37",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": -11.567,
+   "z": 27.205,
+   "rot": 2.4886,
+   "scale": 1.446,
+   "name": "K_D1_Grass_38",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": 3.513,
+   "z": 38.351,
+   "rot": 6.2264,
+   "scale": 0.956,
+   "name": "K_D1_Grass_39",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": -14.312,
+   "z": 31.287,
+   "rot": 1.3675,
+   "scale": 1.103,
+   "name": "K_D1_Grass_40",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": 16.029,
+   "z": 20.194,
+   "rot": 2.6625,
+   "scale": 1.351,
+   "name": "K_D1_Grass_41",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": -11.29,
+   "z": 9.151,
+   "rot": 0.9166,
+   "scale": 1.056,
+   "name": "K_D1_Grass_42",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": 15.579,
+   "z": 28.953,
+   "rot": 3.0331,
+   "scale": 0.929,
+   "name": "K_D1_Grass_43",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": 8.583,
+   "z": 27.409,
+   "rot": 5.6814,
+   "scale": 1.241,
+   "name": "K_D1_Grass_44",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": 4.521,
+   "z": -0.378,
+   "rot": 3.0905,
+   "scale": 1.426,
+   "name": "K_D1_Grass_45",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": -20.221,
+   "z": 21.307,
+   "rot": 1.3089,
+   "scale": 1.045,
+   "name": "K_D1_Grass_46",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": 7.731,
+   "z": 2.117,
+   "rot": 4.2706,
+   "scale": 1.392,
+   "name": "K_D1_Grass_47",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": 12.988,
+   "z": 6.997,
+   "rot": 3.957,
+   "scale": 1.117,
+   "name": "K_D1_Grass_48",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": 12.411,
+   "z": 22.043,
+   "rot": 2.2635,
+   "scale": 1.321,
+   "name": "K_D1_Grass_49",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": -15.28,
+   "z": 30.626,
+   "rot": 1.9644,
+   "scale": 0.901,
+   "name": "K_D1_Grass_50",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": -19.923,
+   "z": 22.732,
+   "rot": 0.8295,
+   "scale": 1.025,
+   "name": "K_D1_Grass_51",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": 6.912,
+   "z": 12.483,
+   "rot": 1.4091,
+   "scale": 1.221,
+   "name": "K_D1_Grass_52",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": -9.275,
+   "z": 26.519,
+   "rot": 3.9203,
+   "scale": 1.161,
+   "name": "K_D1_Grass_53",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": 10.511,
+   "z": 10.595,
+   "rot": 5.4744,
+   "scale": 1.33,
+   "name": "K_D1_Grass_54",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": 15.093,
+   "z": 14.493,
+   "rot": 4.9196,
+   "scale": 1.293,
+   "name": "K_D1_Grass_55",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": -2.392,
+   "z": 36.681,
+   "rot": 4.6606,
+   "scale": 1.149,
+   "name": "K_D1_Grass_56",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": -7.906,
+   "z": 40.901,
+   "rot": 4.4716,
+   "scale": 1.046,
+   "name": "K_D1_Grass_57",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": 14.009,
+   "z": 10.692,
+   "rot": 0.9085,
+   "scale": 0.915,
+   "name": "K_D1_Grass_58",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": -7.33,
+   "z": 39.658,
+   "rot": 0.4132,
+   "scale": 1.225,
+   "name": "K_D1_Grass_59",
+   "mesh": "KK_Grass_Tuft"
+  },
+  {
+   "x": 3.5,
+   "z": 12.5,
+   "rot": 0.0,
+   "scale": 1.0,
+   "name": "K_D1_Log_Stool_0",
+   "mesh": "KK_Log_Stool"
+  },
+  {
+   "x": 1.5,
+   "z": 14.5,
+   "rot": 0.0,
+   "scale": 1.0,
+   "name": "K_D1_Log_Stool_1",
+   "mesh": "KK_Log_Stool"
+  },
+  {
+   "x": -6.5,
+   "z": 11.5,
+   "rot": 0.25,
+   "scale": 1.0,
+   "name": "K_D1_Plot_Sign",
+   "mesh": "KK_Sign_Sprout"
+  },
+  {
+   "x": 8.5,
+   "z": 35.5,
+   "rot": 1.6406,
+   "scale": 1.157,
+   "name": "K_D1_Rock_00",
+   "mesh": "KK_Rock"
+  },
+  {
+   "x": 6.5,
+   "z": 3.5,
+   "rot": 3.3464,
+   "scale": 1.445,
+   "name": "K_D1_Rock_01",
+   "mesh": "KK_Rock"
+  },
+  {
+   "x": 8.5,
+   "z": 37.5,
+   "rot": 5.1417,
+   "scale": 1.418,
+   "name": "K_D1_Rock_02",
+   "mesh": "KK_Rock"
+  },
+  {
+   "x": 10.5,
+   "z": 25.5,
+   "rot": 5.8875,
+   "scale": 1.592,
+   "name": "K_D1_Rock_03",
+   "mesh": "KK_Rock"
+  },
+  {
+   "x": 9.5,
+   "z": 23.5,
+   "rot": 2.522,
+   "scale": 1.563,
+   "name": "K_D1_Rock_04",
+   "mesh": "KK_Rock"
+  },
+  {
+   "x": -3.5,
+   "z": 30.5,
+   "rot": 0.7982,
+   "scale": 1.006,
+   "name": "K_D1_Rock_05",
+   "mesh": "KK_Rock"
+  },
+  {
+   "x": 8.5,
+   "z": 4.5,
+   "rot": 6.1594,
+   "scale": 1.36,
+   "name": "K_D1_Rock_06",
+   "mesh": "KK_Rock"
+  },
+  {
+   "x": -10.5,
+   "z": 7.5,
+   "rot": 0.823,
+   "scale": 0.91,
+   "name": "K_D1_Rock_07",
+   "mesh": "KK_Rock"
+  },
+  {
+   "x": -20.5,
+   "z": 24.5,
+   "rot": 2.7257,
+   "scale": 1.51,
+   "name": "K_D1_Rock_08",
+   "mesh": "KK_Rock"
+  },
+  {
+   "x": 10.5,
+   "z": 4.5,
+   "rot": 2.2229,
+   "scale": 1.221,
+   "name": "K_D1_Rock_09",
+   "mesh": "KK_Rock"
+  },
+  {
+   "x": -17.5,
+   "z": 31.5,
+   "rot": 2.6429,
+   "scale": 1.542,
+   "name": "K_D1_Rock_10",
+   "mesh": "KK_Rock"
+  },
+  {
+   "x": -3.0,
+   "z": 8.0,
+   "rot": 0.0,
+   "scale": 1.0,
+   "name": "K_D1_Tent",
+   "mesh": "KK_Tent"
+  },
+  {
+   "x": -5.5,
+   "z": 13.5,
+   "rot": 4.0899,
+   "scale": 0.629,
+   "name": "K_D1_Tree_00",
+   "mesh": "KK_Tree_Round"
+  },
+  {
+   "x": 10.5,
+   "z": 15.5,
+   "rot": 0.2356,
+   "scale": 0.773,
+   "name": "K_D1_Tree_01",
+   "mesh": "KK_Tree_Round"
+  },
+  {
+   "x": 3.5,
+   "z": 18.5,
+   "rot": 2.6673,
+   "scale": 0.931,
+   "name": "K_D1_Tree_02",
+   "mesh": "KK_Tree_Round"
+  },
+  {
+   "x": -14.5,
+   "z": 37.5,
+   "rot": 3.626,
+   "scale": 0.759,
+   "name": "K_D1_Tree_03",
+   "mesh": "KK_Tree_Round"
+  },
+  {
+   "x": 4.5,
+   "z": 30.5,
+   "rot": 0.9064,
+   "scale": 0.647,
+   "name": "K_D1_Tree_04",
+   "mesh": "KK_Tree_Round"
+  },
+  {
+   "x": -8.5,
+   "z": 1.5,
+   "rot": 1.1355,
+   "scale": 0.833,
+   "name": "K_D1_Tree_05",
+   "mesh": "KK_Tree_Round"
+  },
+  {
+   "x": -9.5,
+   "z": 31.5,
+   "rot": 3.4416,
+   "scale": 0.625,
+   "name": "K_D1_Tree_06",
+   "mesh": "KK_Tree_Round"
+  },
+  {
+   "x": -11.5,
+   "z": 17.5,
+   "rot": 4.9912,
+   "scale": 0.88,
+   "name": "K_D1_Tree_07",
+   "mesh": "KK_Tree_Round"
+  },
+  {
+   "x": -1.5,
+   "z": 3.5,
+   "rot": 3.2999,
+   "scale": 0.95,
+   "name": "K_D1_Tree_08",
+   "mesh": "KK_Tree_Round"
+  }
+ ],
+ "steps": [
+  {
+   "name": "K_Beach_Steps_E",
+   "width": 2.2,
+   "top": {
+    "x": 46.79,
+    "z": 8.25
+   },
+   "foot": {
+    "x": 49.87,
+    "z": 8.79
+   }
+  },
+  {
+   "name": "K_Beach_Steps_N",
+   "width": 2.2,
+   "top": {
+    "x": 19.14,
+    "z": -35.99
+   },
+   "foot": {
+    "x": 20.6,
+    "z": -38.75
+   }
+  },
+  {
+   "name": "K_Beach_Steps_S",
+   "width": 2.2,
+   "top": {
+    "x": 10.94,
+    "z": 40.83
+   },
+   "foot": {
+    "x": 11.75,
+    "z": 43.85
+   }
+  },
+  {
+   "name": "K_Beach_Steps_W",
+   "width": 2.2,
+   "top": {
+    "x": -31.25,
+    "z": 32.36
+   },
+   "foot": {
+    "x": -33.42,
+    "z": 34.61
+   }
+  }
+ ],
+ "showcase": "kingdom_showcase.json",
+ "expansion": "kingdom_expansion.glb",
+ "sections": "kingdom_sections.json"
+}

@@ -1,0 +1,1616 @@
+{
+ "frame": {
+  "local": "x to the right seen from the lane, y to the back wall (front -3.4, back +3.45), z up from the shop floor; rz turns about z; an item or stand drawn with its front to -Y faces the lane",
+  "to_game": "k = sign(shop z). game x = shop x - k * local x; game y = floor * 5 + 0.03 + local z; game z = shop z + k * local y; add half a turn about the up axis when k > 0"
+ },
+ "kit": "shop_display_kit.glb",
+ "note": "written by assets/items/shop_displays.py",
+ "shops": {
+  "alltimefitness": {
+   "accent": "sky",
+   "extras": [
+    {
+     "for": "wel-candle",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -1.16,
+     "y": -2.336,
+     "z": 0.78
+    },
+    {
+     "for": "wel-bathoil",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -0.75,
+     "y": -2.305,
+     "z": 0.78
+    },
+    {
+     "for": "wel-balmbottle",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -0.34,
+     "y": -2.32,
+     "z": 0.78
+    },
+    {
+     "for": "wel-yogamat",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -0.75,
+     "y": -1.8,
+     "z": 0.98
+    },
+    {
+     "for": "wel-cushion",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": 1.15,
+     "y": -2.41,
+     "z": 0.14
+    }
+   ],
+   "floor": 2,
+   "game": {
+    "k": 1,
+    "x": 20,
+    "z": 14
+   },
+   "solids": [
+    {
+     "stand": 0,
+     "x0": -1.55,
+     "x1": 0.05,
+     "y0": -2.375,
+     "y1": -1.425
+    },
+    {
+     "cx": 1.15,
+     "cy": -1.9,
+     "r": 0.6,
+     "stand": 1
+    }
+   ],
+   "spots": {
+    "wel-balmbottle": {
+     "rz": 0,
+     "stand": 0,
+     "x": -0.34,
+     "y": -2.12,
+     "z": 0.78
+    },
+    "wel-bathoil": {
+     "rz": 0,
+     "stand": 0,
+     "x": -0.75,
+     "y": -2.12,
+     "z": 0.78
+    },
+    "wel-candle": {
+     "rz": 0,
+     "stand": 0,
+     "x": -1.16,
+     "y": -2.12,
+     "z": 0.78
+    },
+    "wel-cushion": {
+     "rz": 0,
+     "stand": 1,
+     "x": 1.15,
+     "y": -1.9,
+     "z": 0.14
+    },
+    "wel-yogamat": {
+     "rz": 0,
+     "stand": 0,
+     "x": -0.75,
+     "y": -1.65,
+     "z": 0.98
+    }
+   },
+   "stands": [
+    {
+     "rz": 0,
+     "stand": "SD_Table_S",
+     "x": -0.75,
+     "y": -1.9,
+     "z": 0
+    },
+    {
+     "rz": 0,
+     "stand": "SD_Plinth",
+     "x": 1.15,
+     "y": -1.9,
+     "z": 0
+    }
+   ]
+  },
+  "book-burrow": {
+   "accent": "teal",
+   "extras": [
+    {
+     "for": "boo-storybook",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -0.428,
+     "y": -2.29,
+     "z": 0.78
+    },
+    {
+     "for": "boo-cookbook",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": 0.02,
+     "y": -2.29,
+     "z": 0.78
+    },
+    {
+     "for": "boo-fieldguide",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": 0.448,
+     "y": -2.29,
+     "z": 0.78
+    },
+    {
+     "for": "boo-journal",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -0.296,
+     "y": -1.8,
+     "z": 0.98
+    },
+    {
+     "for": "boo-sketchbook",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": 0.243,
+     "y": -1.8,
+     "z": 0.98
+    }
+   ],
+   "floor": 2,
+   "game": {
+    "k": 1,
+    "x": -20,
+    "z": 14
+   },
+   "solids": [
+    {
+     "stand": 0,
+     "x0": -0.8,
+     "x1": 0.8,
+     "y0": -2.375,
+     "y1": -1.425
+    }
+   ],
+   "spots": {
+    "boo-cookbook": {
+     "rz": 0,
+     "stand": 0,
+     "x": 0.02,
+     "y": -2.12,
+     "z": 0.78
+    },
+    "boo-fieldguide": {
+     "rz": 0,
+     "stand": 0,
+     "x": 0.448,
+     "y": -2.12,
+     "z": 0.785
+    },
+    "boo-journal": {
+     "rz": 0,
+     "stand": 0,
+     "x": -0.296,
+     "y": -1.65,
+     "z": 0.985
+    },
+    "boo-sketchbook": {
+     "rz": 0,
+     "stand": 0,
+     "x": 0.243,
+     "y": -1.65,
+     "z": 0.98
+    },
+    "boo-storybook": {
+     "rz": 0,
+     "stand": 0,
+     "x": -0.428,
+     "y": -2.12,
+     "z": 0.78
+    }
+   },
+   "stands": [
+    {
+     "rz": 0,
+     "stand": "SD_Table_S",
+     "x": 0.0,
+     "y": -1.9,
+     "z": 0
+    }
+   ]
+  },
+  "cafe-canopy": {
+   "accent": "red",
+   "extras": [
+    {
+     "for": "eat-mug",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -2.937,
+     "y": -2.852,
+     "z": 0.78
+    },
+    {
+     "for": "eat-tart",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -2.489,
+     "y": -2.905,
+     "z": 0.78
+    },
+    {
+     "for": "eat-teapot",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -2.002,
+     "y": -2.845,
+     "z": 0.78
+    },
+    {
+     "for": "eat-honeyjar",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -2.45,
+     "y": -2.3,
+     "z": 0.98
+    },
+    {
+     "for": "eat-picnicmat",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -5.28,
+     "y": -3.262,
+     "z": 0.0
+    }
+   ],
+   "floor": 0,
+   "game": {
+    "k": -1,
+    "x": -20,
+    "z": -14
+   },
+   "solids": [
+    {
+     "stand": 0,
+     "x0": -3.25,
+     "x1": -1.65,
+     "y0": -2.875,
+     "y1": -1.925
+    }
+   ],
+   "spots": {
+    "eat-honeyjar": {
+     "rz": 0,
+     "stand": 0,
+     "x": -2.45,
+     "y": -2.15,
+     "z": 0.98
+    },
+    "eat-mug": {
+     "rz": 0,
+     "stand": 0,
+     "x": -2.937,
+     "y": -2.62,
+     "z": 0.78
+    },
+    "eat-picnicmat": {
+     "rz": 0,
+     "stand": null,
+     "x": -4.45,
+     "y": -2.65,
+     "z": 0.0
+    },
+    "eat-tart": {
+     "rz": 0,
+     "stand": 0,
+     "x": -2.489,
+     "y": -2.62,
+     "z": 0.78
+    },
+    "eat-teapot": {
+     "rz": 0,
+     "stand": 0,
+     "x": -2.002,
+     "y": -2.62,
+     "z": 0.78
+    }
+   },
+   "stands": [
+    {
+     "rz": 0,
+     "stand": "SD_Table_S",
+     "x": -2.45,
+     "y": -2.4,
+     "z": 0
+    }
+   ]
+  },
+  "food-hall": {
+   "accent": "orange",
+   "extras": [
+    {
+     "for": "foo-soup",
+     "mesh": "SD_Tag",
+     "rz": -0.785,
+     "x": -0.789,
+     "y": -2.189,
+     "z": 0.74
+    },
+    {
+     "for": "foo-noodlebowl",
+     "mesh": "SD_Tag",
+     "rz": 0.785,
+     "x": -0.011,
+     "y": -2.189,
+     "z": 0.74
+    },
+    {
+     "for": "foo-teatray",
+     "mesh": "SD_Tag",
+     "rz": 2.356,
+     "x": -0.011,
+     "y": -1.411,
+     "z": 0.74
+    },
+    {
+     "for": "foo-ricebowl",
+     "mesh": "SD_Tag",
+     "rz": 3.927,
+     "x": -0.789,
+     "y": -1.411,
+     "z": 0.74
+    },
+    {
+     "for": "foo-fruitcup",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -0.4,
+     "y": -2.0,
+     "z": 1.0
+    }
+   ],
+   "floor": 2,
+   "game": {
+    "k": -1,
+    "x": -20,
+    "z": -14
+   },
+   "solids": [
+    {
+     "cx": -0.4,
+     "cy": -1.8,
+     "r": 0.6,
+     "stand": 0
+    }
+   ],
+   "spots": {
+    "foo-fruitcup": {
+     "rz": 0,
+     "stand": 0,
+     "x": -0.4,
+     "y": -1.8,
+     "z": 1.0
+    },
+    "foo-noodlebowl": {
+     "rz": 0,
+     "stand": 0,
+     "x": -0.117,
+     "y": -2.083,
+     "z": 0.74
+    },
+    "foo-ricebowl": {
+     "rz": 0,
+     "stand": 0,
+     "x": -0.683,
+     "y": -1.517,
+     "z": 0.74
+    },
+    "foo-soup": {
+     "rz": 0,
+     "stand": 0,
+     "x": -0.683,
+     "y": -2.083,
+     "z": 0.74
+    },
+    "foo-teatray": {
+     "rz": 0,
+     "stand": 0,
+     "x": -0.117,
+     "y": -1.517,
+     "z": 0.74
+    }
+   },
+   "stands": [
+    {
+     "rz": 0,
+     "stand": "SD_Round",
+     "x": -0.4,
+     "y": -1.8,
+     "z": 0
+    }
+   ]
+  },
+  "grove-grocer": {
+   "accent": "green",
+   "extras": [
+    {
+     "for": "gro-breadloaf",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -1.57,
+     "y": -2.095,
+     "z": 0.78
+    },
+    {
+     "for": "gro-fruitbowl",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -1.07,
+     "y": -2.19,
+     "z": 0.78
+    },
+    {
+     "for": "gro-eggbasket",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -0.555,
+     "y": -2.19,
+     "z": 0.78
+    },
+    {
+     "for": "gro-honeyjar",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -0.09,
+     "y": -2.14,
+     "z": 0.78
+    },
+    {
+     "for": "gro-teatin",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -1.414,
+     "y": -1.6,
+     "z": 0.98
+    },
+    {
+     "for": "gro-plantpot",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -0.874,
+     "y": -1.6,
+     "z": 0.98
+    },
+    {
+     "for": "gro-seedpack",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -0.31,
+     "y": -1.6,
+     "z": 0.98
+    }
+   ],
+   "floor": 0,
+   "game": {
+    "k": 1,
+    "x": -20,
+    "z": 14
+   },
+   "solids": [
+    {
+     "stand": 0,
+     "x0": -1.95,
+     "x1": 0.25,
+     "y0": -2.175,
+     "y1": -1.225
+    }
+   ],
+   "spots": {
+    "gro-breadloaf": {
+     "rz": 0,
+     "stand": 0,
+     "x": -1.57,
+     "y": -1.92,
+     "z": 0.78
+    },
+    "gro-eggbasket": {
+     "rz": 0,
+     "stand": 0,
+     "x": -0.555,
+     "y": -1.92,
+     "z": 0.78
+    },
+    "gro-fruitbowl": {
+     "rz": 0,
+     "stand": 0,
+     "x": -1.07,
+     "y": -1.92,
+     "z": 0.78
+    },
+    "gro-honeyjar": {
+     "rz": 0,
+     "stand": 0,
+     "x": -0.09,
+     "y": -1.92,
+     "z": 0.78
+    },
+    "gro-plantpot": {
+     "rz": 0,
+     "stand": 0,
+     "x": -0.874,
+     "y": -1.45,
+     "z": 0.98
+    },
+    "gro-seedpack": {
+     "rz": 0,
+     "stand": 0,
+     "x": -0.31,
+     "y": -1.45,
+     "z": 0.98
+    },
+    "gro-teatin": {
+     "rz": 0,
+     "stand": 0,
+     "x": -1.414,
+     "y": -1.45,
+     "z": 0.98
+    }
+   },
+   "stands": [
+    {
+     "rz": 0,
+     "stand": "SD_Table_M",
+     "x": -0.85,
+     "y": -1.7,
+     "z": 0
+    }
+   ]
+  },
+  "home-nook": {
+   "accent": "terracotta",
+   "extras": [
+    {
+     "for": "fur-lamp",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -1.65,
+     "y": -2.58,
+     "z": 0.14
+    },
+    {
+     "for": "fur-shelf",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -0.63,
+     "y": -2.58,
+     "z": 0.14
+    },
+    {
+     "for": "fur-birdhouse",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": 0.4,
+     "y": -2.58,
+     "z": 0.14
+    },
+    {
+     "for": "fur-planter",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -1.15,
+     "y": -2.58,
+     "z": 0.14
+    },
+    {
+     "for": "fur-stool",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": 0.07,
+     "y": -2.58,
+     "z": 0.14
+    },
+    {
+     "for": "fur-rug",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": 2.767,
+     "y": -3.303,
+     "z": 0.0
+    }
+   ],
+   "floor": 0,
+   "game": {
+    "k": -1,
+    "x": 20,
+    "z": -14
+   },
+   "solids": [
+    {
+     "stand": 0,
+     "x0": -2.15,
+     "x1": 0.85,
+     "y0": -2.65,
+     "y1": -1.25
+    }
+   ],
+   "spots": {
+    "fur-birdhouse": {
+     "rz": 0,
+     "stand": 0,
+     "x": 0.4,
+     "y": -1.65,
+     "z": 0.14
+    },
+    "fur-lamp": {
+     "rz": 0,
+     "stand": 0,
+     "x": -1.65,
+     "y": -1.67,
+     "z": 0.14
+    },
+    "fur-planter": {
+     "rz": 0,
+     "stand": 0,
+     "x": -1.15,
+     "y": -2.33,
+     "z": 0.14
+    },
+    "fur-rug": {
+     "rz": 0,
+     "stand": null,
+     "x": 3.6,
+     "y": -2.45,
+     "z": 0.0
+    },
+    "fur-shelf": {
+     "rz": 0,
+     "stand": 0,
+     "x": -0.63,
+     "y": -1.65,
+     "z": 0.14
+    },
+    "fur-stool": {
+     "rz": 0,
+     "stand": 0,
+     "x": 0.07,
+     "y": -2.29,
+     "z": 0.14
+    }
+   },
+   "stands": [
+    {
+     "rz": 0,
+     "stand": "SD_Stage",
+     "x": -0.65,
+     "y": -1.95,
+     "z": 0
+    }
+   ]
+  },
+  "maker-meadow": {
+   "accent": "gold",
+   "extras": [
+    {
+     "for": "mak-paint",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -1.544,
+     "y": -2.171,
+     "z": 0.78
+    },
+    {
+     "for": "mak-yarn",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -0.933,
+     "y": -2.194,
+     "z": 0.78
+    },
+    {
+     "for": "mak-toolbox",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -0.29,
+     "y": -2.159,
+     "z": 0.78
+    },
+    {
+     "for": "mak-birdhouse",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -1.305,
+     "y": -1.65,
+     "z": 0.98
+    },
+    {
+     "for": "mak-sewing",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -0.534,
+     "y": -1.65,
+     "z": 0.98
+    },
+    {
+     "for": "mak-fence",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": 1.35,
+     "y": -2.26,
+     "z": 0.14
+    },
+    {
+     "for": "mak-wood",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": 1.35,
+     "y": -2.26,
+     "z": 0.14
+    }
+   ],
+   "floor": 1,
+   "game": {
+    "k": -1,
+    "x": -20,
+    "z": -14
+   },
+   "solids": [
+    {
+     "stand": 0,
+     "x0": -2.0,
+     "x1": 0.2,
+     "y0": -2.225,
+     "y1": -1.275
+    },
+    {
+     "cx": 1.35,
+     "cy": -1.75,
+     "r": 0.6,
+     "stand": 1
+    }
+   ],
+   "spots": {
+    "mak-birdhouse": {
+     "rz": 0,
+     "stand": 0,
+     "x": -1.305,
+     "y": -1.5,
+     "z": 0.98
+    },
+    "mak-fence": {
+     "rz": 0,
+     "stand": 1,
+     "x": 1.35,
+     "y": -1.49,
+     "z": 0.14
+    },
+    "mak-paint": {
+     "rz": 0,
+     "stand": 0,
+     "x": -1.544,
+     "y": -1.97,
+     "z": 0.78
+    },
+    "mak-sewing": {
+     "rz": 0,
+     "stand": 0,
+     "x": -0.534,
+     "y": -1.5,
+     "z": 0.98
+    },
+    "mak-toolbox": {
+     "rz": 0,
+     "stand": 0,
+     "x": -0.29,
+     "y": -1.97,
+     "z": 0.78
+    },
+    "mak-wood": {
+     "rz": 0,
+     "stand": 1,
+     "x": 1.35,
+     "y": -1.95,
+     "z": 0.14
+    },
+    "mak-yarn": {
+     "rz": 0,
+     "stand": 0,
+     "x": -0.933,
+     "y": -1.97,
+     "z": 0.78
+    }
+   },
+   "stands": [
+    {
+     "rz": 0,
+     "stand": "SD_Table_M",
+     "x": -0.9,
+     "y": -1.75,
+     "z": 0
+    },
+    {
+     "rz": 0,
+     "stand": "SD_Plinth",
+     "x": 1.35,
+     "y": -1.75,
+     "z": 0
+    }
+   ]
+  },
+  "pixel-pantry": {
+   "accent": "purple",
+   "extras": [
+    {
+     "for": "gam-handheld",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -1.324,
+     "y": -2.14,
+     "z": 0.78
+    },
+    {
+     "for": "gam-controller",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -0.8,
+     "y": -2.155,
+     "z": 0.78
+    },
+    {
+     "for": "gam-collectible",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -0.376,
+     "y": -2.155,
+     "z": 0.78
+    },
+    {
+     "for": "gam-adventure",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -0.9,
+     "y": -1.65,
+     "z": 0.98
+    },
+    {
+     "for": "gam-headphones",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": 0.75,
+     "y": -1.97,
+     "z": 0.05
+    }
+   ],
+   "floor": 1,
+   "game": {
+    "k": 1,
+    "x": 20,
+    "z": 14
+   },
+   "solids": [
+    {
+     "stand": 0,
+     "x0": -1.7,
+     "x1": -0.1,
+     "y0": -2.225,
+     "y1": -1.275
+    },
+    {
+     "stand": 1,
+     "x0": 0.25,
+     "x1": 0.85,
+     "y0": -2.05,
+     "y1": -1.45
+    }
+   ],
+   "spots": {
+    "gam-adventure": {
+     "rz": 0,
+     "stand": 0,
+     "x": -0.9,
+     "y": -1.5,
+     "z": 0.98
+    },
+    "gam-collectible": {
+     "rz": 0,
+     "stand": 0,
+     "x": -0.376,
+     "y": -1.97,
+     "z": 0.78
+    },
+    "gam-controller": {
+     "rz": 0,
+     "stand": 0,
+     "x": -0.8,
+     "y": -1.97,
+     "z": 0.78
+    },
+    "gam-handheld": {
+     "rz": 0,
+     "stand": 0,
+     "x": -1.324,
+     "y": -1.97,
+     "z": 0.78
+    },
+    "gam-headphones": {
+     "rz": 0,
+     "stand": 1,
+     "x": 0.55,
+     "y": -1.75,
+     "z": 0.7
+    }
+   },
+   "stands": [
+    {
+     "rz": 0,
+     "stand": "SD_Table_S",
+     "x": -0.9,
+     "y": -1.75,
+     "z": 0
+    },
+    {
+     "rz": 0,
+     "stand": "SD_Head",
+     "x": 0.55,
+     "y": -1.75,
+     "z": 0
+    }
+   ]
+  },
+  "rooftop-garden": {
+   "accent": "leaf_dark",
+   "extras": [
+    {
+     "for": "gar-wateringcan",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -4.159,
+     "y": -2.815,
+     "z": 0.5
+    },
+    {
+     "for": "gar-strawberryseed",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -3.53,
+     "y": -2.815,
+     "z": 0.5
+    },
+    {
+     "for": "gar-fern",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -3.075,
+     "y": -2.815,
+     "z": 0.5
+    },
+    {
+     "for": "gar-flowerpot",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -2.65,
+     "y": -2.815,
+     "z": 0.5
+    },
+    {
+     "for": "gar-cabbageseed",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -4.361,
+     "y": -2.555,
+     "z": 0.8
+    },
+    {
+     "for": "gar-carrotseed",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -4.016,
+     "y": -2.555,
+     "z": 0.8
+    },
+    {
+     "for": "gar-cornseed",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -3.672,
+     "y": -2.555,
+     "z": 0.8
+    },
+    {
+     "for": "gar-daisyseed",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -3.328,
+     "y": -2.555,
+     "z": 0.8
+    },
+    {
+     "for": "gar-lavenderseed",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -2.984,
+     "y": -2.555,
+     "z": 0.8
+    },
+    {
+     "for": "gar-pumpkinseed",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -2.639,
+     "y": -2.555,
+     "z": 0.8
+    },
+    {
+     "for": "gar-seeds",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -4.369,
+     "y": -2.295,
+     "z": 1.1
+    },
+    {
+     "for": "gar-sunflowerseed",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -4.033,
+     "y": -2.295,
+     "z": 1.1
+    },
+    {
+     "for": "gar-tomatoseed",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -3.697,
+     "y": -2.295,
+     "z": 1.1
+    },
+    {
+     "for": "gar-tulipbulb",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -3.355,
+     "y": -2.295,
+     "z": 1.1
+    },
+    {
+     "for": "gar-acorn",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -3.005,
+     "y": -2.295,
+     "z": 1.1
+    },
+    {
+     "for": "gar-rosebush",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -2.646,
+     "y": -2.295,
+     "z": 1.1
+    },
+    {
+     "for": "gar-applesapling",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -5.1,
+     "y": -2.864,
+     "z": 0.0
+    },
+    {
+     "for": "gar-orangesapling",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -1.95,
+     "y": -2.864,
+     "z": 0.0
+    },
+    {
+     "for": "gar-bench",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": 3.25,
+     "y": -2.78,
+     "z": 0.14
+    },
+    {
+     "for": "gar-planter",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": 4.97,
+     "y": -2.8,
+     "z": 0.0
+    }
+   ],
+   "floor": 2,
+   "game": {
+    "k": -1,
+    "x": 20,
+    "z": -14
+   },
+   "solids": [
+    {
+     "stand": 0,
+     "x0": -4.65,
+     "x1": -2.35,
+     "y0": -2.85,
+     "y1": -2.05
+    },
+    {
+     "item": "gar-applesapling",
+     "x0": -5.418,
+     "x1": -4.779,
+     "y0": -2.764,
+     "y1": -2.157
+    },
+    {
+     "item": "gar-orangesapling",
+     "x0": -2.268,
+     "x1": -1.629,
+     "y0": -2.764,
+     "y1": -2.157
+    },
+    {
+     "stand": 1,
+     "x0": 2.05,
+     "x1": 4.45,
+     "y0": -2.85,
+     "y1": -2.05
+    },
+    {
+     "item": "gar-planter",
+     "x0": 4.472,
+     "x1": 5.467,
+     "y0": -2.7,
+     "y1": -2.2
+    }
+   ],
+   "spots": {
+    "gar-acorn": {
+     "rz": 0,
+     "stand": 0,
+     "x": -3.005,
+     "y": -2.19,
+     "z": 1.1
+    },
+    "gar-applesapling": {
+     "rz": 0,
+     "stand": null,
+     "x": -5.1,
+     "y": -2.45,
+     "z": 0.0
+    },
+    "gar-bench": {
+     "rz": 0,
+     "stand": 1,
+     "x": 3.25,
+     "y": -2.45,
+     "z": 0.14
+    },
+    "gar-cabbageseed": {
+     "rz": 0,
+     "stand": 0,
+     "x": -4.361,
+     "y": -2.45,
+     "z": 0.8
+    },
+    "gar-carrotseed": {
+     "rz": 0,
+     "stand": 0,
+     "x": -4.016,
+     "y": -2.45,
+     "z": 0.8
+    },
+    "gar-cornseed": {
+     "rz": 0,
+     "stand": 0,
+     "x": -3.672,
+     "y": -2.45,
+     "z": 0.8
+    },
+    "gar-daisyseed": {
+     "rz": 0,
+     "stand": 0,
+     "x": -3.328,
+     "y": -2.45,
+     "z": 0.8
+    },
+    "gar-fern": {
+     "rz": 0,
+     "stand": 0,
+     "x": -3.075,
+     "y": -2.71,
+     "z": 0.5
+    },
+    "gar-flowerpot": {
+     "rz": 0,
+     "stand": 0,
+     "x": -2.65,
+     "y": -2.71,
+     "z": 0.5
+    },
+    "gar-lavenderseed": {
+     "rz": 0,
+     "stand": 0,
+     "x": -2.984,
+     "y": -2.45,
+     "z": 0.8
+    },
+    "gar-orangesapling": {
+     "rz": 0,
+     "stand": null,
+     "x": -1.95,
+     "y": -2.45,
+     "z": 0.0
+    },
+    "gar-planter": {
+     "rz": 0,
+     "stand": null,
+     "x": 4.97,
+     "y": -2.45,
+     "z": 0.0
+    },
+    "gar-pumpkinseed": {
+     "rz": 0,
+     "stand": 0,
+     "x": -2.639,
+     "y": -2.45,
+     "z": 0.8
+    },
+    "gar-rosebush": {
+     "rz": 0,
+     "stand": 0,
+     "x": -2.646,
+     "y": -2.19,
+     "z": 1.1
+    },
+    "gar-seeds": {
+     "rz": 0,
+     "stand": 0,
+     "x": -4.369,
+     "y": -2.19,
+     "z": 1.1
+    },
+    "gar-strawberryseed": {
+     "rz": 0,
+     "stand": 0,
+     "x": -3.53,
+     "y": -2.71,
+     "z": 0.5
+    },
+    "gar-sunflowerseed": {
+     "rz": 0,
+     "stand": 0,
+     "x": -4.033,
+     "y": -2.19,
+     "z": 1.1
+    },
+    "gar-tomatoseed": {
+     "rz": 0,
+     "stand": 0,
+     "x": -3.697,
+     "y": -2.19,
+     "z": 1.1
+    },
+    "gar-tulipbulb": {
+     "rz": 0,
+     "stand": 0,
+     "x": -3.355,
+     "y": -2.19,
+     "z": 1.1
+    },
+    "gar-wateringcan": {
+     "rz": 0,
+     "stand": 0,
+     "x": -4.159,
+     "y": -2.71,
+     "z": 0.5
+    }
+   },
+   "stands": [
+    {
+     "rz": 0,
+     "stand": "SD_Rack",
+     "x": -3.5,
+     "y": -2.45,
+     "z": 0
+    },
+    {
+     "rz": 0,
+     "stand": "SD_Plinth_Wide",
+     "x": 3.25,
+     "y": -2.45,
+     "z": 0
+    }
+   ]
+  },
+  "seasonal-pop-up": {
+   "accent": "rose",
+   "extras": [
+    {
+     "mesh": "SD_Hook",
+     "rz": 0,
+     "x": -0.268,
+     "y": -1.55,
+     "z": 0.98
+    },
+    {
+     "mesh": "SD_Board",
+     "rz": 0,
+     "x": 0.298,
+     "y": -1.49,
+     "z": 0.98
+    },
+    {
+     "for": "sea-gift",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -0.311,
+     "y": -2.278,
+     "z": 0.78
+    },
+    {
+     "for": "sea-tree",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": 0.299,
+     "y": -2.287,
+     "z": 0.78
+    },
+    {
+     "for": "sea-lantern",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -0.268,
+     "y": -1.7,
+     "z": 0.98
+    },
+    {
+     "for": "sea-ribbon",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": 0.298,
+     "y": -1.7,
+     "z": 0.98
+    }
+   ],
+   "floor": 1,
+   "game": {
+    "k": -1,
+    "x": 20,
+    "z": -14
+   },
+   "solids": [
+    {
+     "stand": 0,
+     "x0": -0.8,
+     "x1": 0.8,
+     "y0": -2.275,
+     "y1": -1.325
+    }
+   ],
+   "spots": {
+    "sea-gift": {
+     "rz": 0,
+     "stand": 0,
+     "x": -0.311,
+     "y": -2.02,
+     "z": 0.78
+    },
+    "sea-lantern": {
+     "rz": 0,
+     "stand": 0,
+     "x": -0.268,
+     "y": -1.55,
+     "z": 2.0
+    },
+    "sea-ribbon": {
+     "rz": 0,
+     "stand": 0,
+     "x": 0.298,
+     "y": -1.525,
+     "z": 1.343
+    },
+    "sea-tree": {
+     "rz": 0,
+     "stand": 0,
+     "x": 0.299,
+     "y": -2.02,
+     "z": 0.78
+    }
+   },
+   "stands": [
+    {
+     "rz": 0,
+     "stand": "SD_Table_S",
+     "x": 0.0,
+     "y": -1.8,
+     "z": 0
+    }
+   ]
+  },
+  "sole-search": {
+   "accent": "blue",
+   "extras": [
+    {
+     "for": "sho-cloudstep",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -0.595,
+     "y": -2.273,
+     "z": 0.78
+    },
+    {
+     "for": "sho-sockroll",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": 0.01,
+     "y": -2.14,
+     "z": 0.78
+    },
+    {
+     "for": "sho-sunsandal",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": 0.605,
+     "y": -2.273,
+     "z": 0.78
+    },
+    {
+     "for": "sho-ankleboot",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": -0.431,
+     "y": -1.65,
+     "z": 0.98
+    },
+    {
+     "for": "sho-rainboot",
+     "mesh": "SD_Tag",
+     "rz": 0,
+     "x": 0.431,
+     "y": -1.65,
+     "z": 0.98
+    }
+   ],
+   "floor": 1,
+   "game": {
+    "k": 1,
+    "x": -20,
+    "z": 14
+   },
+   "solids": [
+    {
+     "stand": 0,
+     "x0": -1.1,
+     "x1": 1.1,
+     "y0": -2.225,
+     "y1": -1.275
+    }
+   ],
+   "spots": {
+    "sho-ankleboot": {
+     "rz": 0,
+     "stand": 0,
+     "x": -0.431,
+     "y": -1.5,
+     "z": 0.98
+    },
+    "sho-cloudstep": {
+     "rz": 0,
+     "stand": 0,
+     "x": -0.595,
+     "y": -1.97,
+     "z": 0.78
+    },
+    "sho-rainboot": {
+     "rz": 0,
+     "stand": 0,
+     "x": 0.431,
+     "y": -1.5,
+     "z": 0.98
+    },
+    "sho-sockroll": {
+     "rz": 0,
+     "stand": 0,
+     "x": 0.01,
+     "y": -1.97,
+     "z": 0.779
+    },
+    "sho-sunsandal": {
+     "rz": 0,
+     "stand": 0,
+     "x": 0.605,
+     "y": -1.97,
+     "z": 0.78
+    }
+   },
+   "stands": [
+    {
+     "rz": 0,
+     "stand": "SD_Table_M",
+     "x": 0.0,
+     "y": -1.75,
+     "z": 0
+    }
+   ]
+  }
+ },
+ "stands": {
+  "SD_Head": {
+   "kind": "head",
+   "size": [
+    0.6,
+    0.6,
+    1.32
+   ]
+  },
+  "SD_Plinth": {
+   "kind": "plinth",
+   "size": [
+    1.2,
+    1.2,
+    0.14
+   ]
+  },
+  "SD_Plinth_Wide": {
+   "kind": "plinth",
+   "size": [
+    2.4,
+    0.8,
+    0.14
+   ]
+  },
+  "SD_Rack": {
+   "kind": "rack",
+   "size": [
+    2.3,
+    0.8,
+    1.1
+   ]
+  },
+  "SD_Round": {
+   "kind": "round",
+   "size": [
+    1.2,
+    1.2,
+    1.0
+   ]
+  },
+  "SD_Stage": {
+   "kind": "plinth",
+   "size": [
+    3.0,
+    1.4,
+    0.14
+   ]
+  },
+  "SD_Table_M": {
+   "kind": "table",
+   "size": [
+    2.2,
+    0.95,
+    0.98
+   ]
+  },
+  "SD_Table_S": {
+   "kind": "table",
+   "size": [
+    1.6,
+    0.95,
+    0.98
+   ]
+  }
+ },
+ "version": 1
+}

@@ -1,0 +1,24 @@
+{
+  "schema": "kindred.grove-seasonal-pop-up-assets.v1",
+  "shopId": "seasonal-pop-up",
+  "floor": "level-2",
+  "theme": "bloom-festival",
+  "status": "form-refined-prototype",
+  "refinementEvidence": {
+    "blenderSource": "../blender/grove_master_refined.blend",
+    "builder": "../blender/refine_seasonal_pop_up_interior.py",
+    "reviewRender": "../renders/seasonal_pop_up_refined_blender.png",
+    "circulation": "two 1.6 m routes around the restrained central hero tree",
+    "departments": ["modular slat wall", "tote bags", "flower crowns", "postcards", "gift pedestals", "lanterns", "wrapping", "checkout"]
+  },
+  "items": [
+    { "id": "bloom-tote", "category": "accessory", "function": "hanging seasonal merchandise", "reuseClass": "seasonal-merchandise" },
+    { "id": "flower-crown", "category": "accessory", "function": "festival wearable", "reuseClass": "seasonal-merchandise" },
+    { "id": "bloom-postcard", "category": "paper-goods", "function": "supported souvenir display", "reuseClass": "seasonal-merchandise" },
+    { "id": "gift-box", "category": "gift", "function": "pedestal merchandise", "reuseClass": "seasonal-gift" },
+    { "id": "bloom-lantern", "category": "decor", "function": "festival lighting merchandise", "reuseClass": "seasonal-decor" },
+    { "id": "hero-tree", "category": "landmark", "function": "seasonal shop destination", "reuseClass": "hero-installation" }
+  ],
+  "generationPolicy": "form-refined items are procedural Blender meshes; no paid external generation submitted",
+  "notes": "The sealed shop shell, modular slat system and sparse pedestal layout are designed for future event reskins. Every merchandise item has visible support. Runtime export remains separately gated."
+}

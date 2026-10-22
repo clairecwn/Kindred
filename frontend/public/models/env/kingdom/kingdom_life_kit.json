@@ -1,0 +1,599 @@
+{
+ "creatures": {
+  "KL_Bird": {
+   "fly": "KL_Bird_Fly",
+   "perch": "KL_Bird"
+  },
+  "KL_Butterfly": {
+   "stand": "KL_Butterfly"
+  },
+  "KL_Cat_Sit": {
+   "sit": "KL_Cat_Sit"
+  },
+  "KL_Chick": {
+   "stand": "KL_Chick"
+  },
+  "KL_Chicken": {
+   "peck": "KL_Chicken_Peck",
+   "stand": "KL_Chicken"
+  },
+  "KL_Cow": {
+   "graze": "KL_Cow_Graze",
+   "stand": "KL_Cow"
+  },
+  "KL_Duck": {
+   "stand": "KL_Duck",
+   "swim": "KL_Duck_Swim"
+  },
+  "KL_Pony": {
+   "graze": "KL_Pony_Graze",
+   "stand": "KL_Pony"
+  },
+  "KL_Sheep": {
+   "graze": "KL_Sheep_Graze",
+   "stand": "KL_Sheep"
+  }
+ },
+ "groups": {
+  "air": [
+   "KL_Butterfly",
+   "KL_Butterfly_Body",
+   "KL_Butterfly_Wing",
+   "KL_Bird",
+   "KL_Bird_Fly"
+  ],
+  "boat": [
+   "KL_Boat"
+  ],
+  "effect": [
+   "KL_Smoke_Puff",
+   "KL_Ripple"
+  ],
+  "pond": [
+   "KL_Duck",
+   "KL_Duck_Swim"
+  ],
+  "yard": [
+   "KL_Pony",
+   "KL_Pony_Graze",
+   "KL_Cow",
+   "KL_Cow_Graze",
+   "KL_Sheep",
+   "KL_Sheep_Graze",
+   "KL_Chicken",
+   "KL_Chicken_Peck",
+   "KL_Chick",
+   "KL_Cat_Sit"
+  ]
+ },
+ "note": "written by assets/kingdom/blender/passes/k24_export_life.py",
+ "parts": {
+  "KL_Bird": {
+   "group": "air",
+   "home": "roofs",
+   "kind": "flier",
+   "min": [
+    -0.17,
+    -0.2,
+    -0.0
+   ],
+   "paint": {
+    "A": "blue"
+   },
+   "pose": "perch",
+   "recolour": [
+    "KV_A_blue",
+    "KV_A_blue_dk",
+    "KV_A_blue_lt"
+   ],
+   "size": [
+    0.34,
+    0.5,
+    0.31
+   ],
+   "span": 0.3,
+   "triangles": 4208
+  },
+  "KL_Bird_Fly": {
+   "group": "air",
+   "home": "roofs",
+   "kind": "flier",
+   "min": [
+    -0.41,
+    -0.19,
+    0.02
+   ],
+   "paint": {
+    "A": "blue"
+   },
+   "pose": "fly",
+   "recolour": [
+    "KV_A_blue",
+    "KV_A_blue_dk",
+    "KV_A_blue_lt"
+   ],
+   "size": [
+    0.81,
+    0.44,
+    0.3
+   ],
+   "span": 0.68,
+   "triangles": 4208
+  },
+  "KL_Boat": {
+   "floats": true,
+   "group": "boat",
+   "home": "dock",
+   "kind": "boat",
+   "min": [
+    -0.8,
+    -1.9,
+    -0.34
+   ],
+   "paint": {
+    "A": "red",
+    "B": "red"
+   },
+   "recolour": [
+    "KV_A_red",
+    "KV_A_red_dk",
+    "KV_B_red"
+   ],
+   "seats": [
+    0.0,
+    0.75,
+    0.3,
+    0.0,
+    -0.35,
+    0.3
+   ],
+   "size": [
+    1.6,
+    3.69,
+    3.14
+   ],
+   "span": 3.8,
+   "triangles": 1358
+  },
+  "KL_Butterfly": {
+   "flap": "swap the wings for two Butterfly_Wing turned about Y",
+   "group": "air",
+   "home": "flowers",
+   "kind": "flier",
+   "min": [
+    -0.22,
+    -0.21,
+    -0.03
+   ],
+   "paint": {
+    "A": "pink",
+    "B": "yellow"
+   },
+   "recolour": [
+    "KV_A_pink",
+    "KV_A_pink_dk",
+    "KV_B_yellow"
+   ],
+   "size": [
+    0.44,
+    0.37,
+    0.18
+   ],
+   "span": 0.5,
+   "triangles": 548
+  },
+  "KL_Butterfly_Body": {
+   "group": "air",
+   "kind": "part",
+   "min": [
+    -0.05,
+    -0.15,
+    -0.03
+   ],
+   "of": "Butterfly",
+   "size": [
+    0.11,
+    0.23,
+    0.11
+   ],
+   "triangles": 292
+  },
+  "KL_Butterfly_Wing": {
+   "axis": "Y",
+   "group": "air",
+   "hinge": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "kind": "part",
+   "min": [
+    0.01,
+    -0.21,
+    -0.02
+   ],
+   "mirror": "X",
+   "of": "Butterfly",
+   "paint": {
+    "A": "pink",
+    "B": "yellow"
+   },
+   "recolour": [
+    "KV_A_pink",
+    "KV_A_pink_dk",
+    "KV_B_yellow"
+   ],
+   "size": [
+    0.25,
+    0.37,
+    0.04
+   ],
+   "triangles": 128
+  },
+  "KL_Cat_Sit": {
+   "group": "yard",
+   "home": "porch",
+   "kind": "animal",
+   "min": [
+    -0.19,
+    -0.22,
+    -0.0
+   ],
+   "paint": {
+    "A": "orange"
+   },
+   "pose": "sit",
+   "recolour": [
+    "KV_A_orange",
+    "KV_A_orange_dk",
+    "KV_A_orange_lt"
+   ],
+   "size": [
+    0.4,
+    0.49,
+    0.63
+   ],
+   "span": 0.6,
+   "triangles": 3549
+  },
+  "KL_Chick": {
+   "group": "yard",
+   "home": "yard",
+   "kind": "animal",
+   "min": [
+    -0.1,
+    -0.16,
+    -0.0
+   ],
+   "paint": {
+    "A": "yellow"
+   },
+   "pose": "stand",
+   "recolour": [
+    "KV_A_yellow",
+    "KV_A_yellow_dk",
+    "KV_A_yellow_lt"
+   ],
+   "size": [
+    0.19,
+    0.28,
+    0.27
+   ],
+   "span": 0.27,
+   "triangles": 3842
+  },
+  "KL_Chicken": {
+   "group": "yard",
+   "home": "yard",
+   "kind": "animal",
+   "min": [
+    -0.22,
+    -0.33,
+    0.0
+   ],
+   "paint": {
+    "A": "white"
+   },
+   "pose": "stand",
+   "recolour": [
+    "KV_A_white",
+    "KV_A_white_dk",
+    "KV_A_white_lt"
+   ],
+   "size": [
+    0.43,
+    0.65,
+    0.67
+   ],
+   "span": 0.5,
+   "triangles": 5334
+  },
+  "KL_Chicken_Peck": {
+   "group": "yard",
+   "home": "yard",
+   "kind": "animal",
+   "min": [
+    -0.22,
+    -0.43,
+    0.0
+   ],
+   "paint": {
+    "A": "white"
+   },
+   "pose": "peck",
+   "recolour": [
+    "KV_A_white",
+    "KV_A_white_dk",
+    "KV_A_white_lt"
+   ],
+   "size": [
+    0.43,
+    0.58,
+    0.72
+   ],
+   "span": 0.5,
+   "triangles": 5334
+  },
+  "KL_Cow": {
+   "group": "yard",
+   "home": "paddock",
+   "kind": "animal",
+   "min": [
+    -0.44,
+    -1.26,
+    -0.0
+   ],
+   "paint": {
+    "A": "white",
+    "B": "trunk"
+   },
+   "pose": "stand",
+   "recolour": [
+    "KV_A_white",
+    "KV_A_white_dk",
+    "KV_A_white_lt",
+    "KV_B_trunk"
+   ],
+   "size": [
+    0.87,
+    2.14,
+    1.54
+   ],
+   "span": 1.8,
+   "triangles": 5632
+  },
+  "KL_Cow_Graze": {
+   "group": "yard",
+   "home": "paddock",
+   "kind": "animal",
+   "min": [
+    -0.43,
+    -0.94,
+    -0.0
+   ],
+   "paint": {
+    "A": "white",
+    "B": "trunk"
+   },
+   "pose": "graze",
+   "recolour": [
+    "KV_A_white",
+    "KV_A_white_dk",
+    "KV_A_white_lt",
+    "KV_B_trunk"
+   ],
+   "size": [
+    0.87,
+    1.82,
+    1.31
+   ],
+   "span": 1.8,
+   "triangles": 5632
+  },
+  "KL_Duck": {
+   "floats": false,
+   "group": "pond",
+   "home": "pond",
+   "kind": "animal",
+   "min": [
+    -0.19,
+    -0.4,
+    0.0
+   ],
+   "paint": {
+    "A": "white"
+   },
+   "pose": "stand",
+   "recolour": [
+    "KV_A_white",
+    "KV_A_white_dk",
+    "KV_A_white_lt"
+   ],
+   "size": [
+    0.38,
+    0.72,
+    0.66
+   ],
+   "span": 0.5,
+   "triangles": 4198
+  },
+  "KL_Duck_Swim": {
+   "floats": true,
+   "group": "pond",
+   "home": "pond",
+   "kind": "animal",
+   "min": [
+    -0.19,
+    -0.41,
+    -0.22
+   ],
+   "paint": {
+    "A": "white"
+   },
+   "pose": "swim",
+   "recolour": [
+    "KV_A_white",
+    "KV_A_white_dk",
+    "KV_A_white_lt"
+   ],
+   "size": [
+    0.38,
+    0.74,
+    0.7
+   ],
+   "span": 0.5,
+   "triangles": 4198
+  },
+  "KL_Pony": {
+   "group": "yard",
+   "home": "paddock",
+   "kind": "animal",
+   "min": [
+    -0.35,
+    -1.15,
+    -0.0
+   ],
+   "paint": {
+    "A": "trunk"
+   },
+   "pose": "stand",
+   "recolour": [
+    "KV_A_trunk_light",
+    "KV_A_trunk_light_dk",
+    "KV_A_trunk_light_lt"
+   ],
+   "size": [
+    0.7,
+    2.07,
+    1.91
+   ],
+   "span": 1.6,
+   "triangles": 5610
+  },
+  "KL_Pony_Graze": {
+   "group": "yard",
+   "home": "paddock",
+   "kind": "animal",
+   "min": [
+    -0.35,
+    -0.99,
+    -0.01
+   ],
+   "paint": {
+    "A": "trunk"
+   },
+   "pose": "graze",
+   "recolour": [
+    "KV_A_trunk_light",
+    "KV_A_trunk_light_dk",
+    "KV_A_trunk_light_lt"
+   ],
+   "size": [
+    0.7,
+    1.92,
+    1.38
+   ],
+   "span": 1.6,
+   "triangles": 5610
+  },
+  "KL_Ripple": {
+   "floats": true,
+   "group": "effect",
+   "home": "water",
+   "kind": "effect",
+   "min": [
+    -0.55,
+    -0.55,
+    0.0
+   ],
+   "size": [
+    1.09,
+    1.09,
+    0.0
+   ],
+   "span": 1.1,
+   "triangles": 112,
+   "use": "lies on water: grows to three times its size and is drawn no more"
+  },
+  "KL_Sheep": {
+   "group": "yard",
+   "home": "lawn",
+   "kind": "animal",
+   "min": [
+    -0.37,
+    -0.7,
+    0.0
+   ],
+   "paint": {
+    "A": "white",
+    "B": "slate"
+   },
+   "pose": "stand",
+   "recolour": [
+    "KV_A_white",
+    "KV_A_white_lt",
+    "KV_B_slate"
+   ],
+   "size": [
+    0.74,
+    1.2,
+    1.04
+   ],
+   "span": 0.9,
+   "triangles": 4958
+  },
+  "KL_Sheep_Graze": {
+   "group": "yard",
+   "home": "lawn",
+   "kind": "animal",
+   "min": [
+    -0.37,
+    -0.61,
+    -0.0
+   ],
+   "paint": {
+    "A": "white",
+    "B": "slate"
+   },
+   "pose": "graze",
+   "recolour": [
+    "KV_A_white",
+    "KV_A_white_lt",
+    "KV_B_slate"
+   ],
+   "size": [
+    0.74,
+    1.12,
+    1.05
+   ],
+   "span": 0.9,
+   "triangles": 4958
+  },
+  "KL_Smoke_Puff": {
+   "group": "effect",
+   "home": "chimney",
+   "kind": "effect",
+   "min": [
+    -0.26,
+    -0.19,
+    -0.2
+   ],
+   "size": [
+    0.54,
+    0.39,
+    0.53
+   ],
+   "span": 0.5,
+   "triangles": 480,
+   "use": "rises 2 m while growing to twice its size, then is drawn no more"
+  }
+ },
+ "rules": {
+  "frame": "the ground (the water line for a part that floats) is at 0, the part's middle is at the origin, its front looks to -Blender Y",
+  "paint": "KV_A_<colour> is the coat, wing or hull; KV_B_<colour> the patches, spots or stripe; _dk and _lt are their steps",
+  "poses": "a creature that does more than stand has one mesh for each pose; the game swaps them and moves the whole mesh",
+  "water": "the sea's surface is 2.15 m below the lawn; a pond's is 0.07 m above it",
+  "wings": "KL_Butterfly_Wing is the right wing with its hinge on the origin along Y; draw it twice on KL_Butterfly_Body, the second mirrored in X, and turn the two about Y to flap"
+ },
+ "version": 1
+}

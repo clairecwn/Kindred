@@ -1,0 +1,24 @@
+{
+  "schema": "kindred.grove-pixel-pantry-assets.v1",
+  "shopId": "pixel-pantry",
+  "floor": "level-2",
+  "status": "form-refined-prototype",
+  "refinementEvidence": {
+    "blenderSource": "../blender/grove_master_refined.blend",
+    "builder": "../blender/refine_pixel_pantry_interior.py",
+    "reviewRender": "../renders/pixel_pantry_refined_blender.png",
+    "walkInRoute": "3.2 m central arrival lane on Level 2",
+    "departments": ["game library", "handheld consoles", "playable demo", "controllers", "headphones", "cables", "service counter"]
+  },
+  "items": [
+    { "id": "game-case", "category": "software", "function": "supported wall merchandise", "reuseClass": "game-media" },
+    { "id": "game-cartridge", "category": "software", "function": "collectible game media", "reuseClass": "game-media" },
+    { "id": "handheld-console", "category": "hardware", "function": "central product display", "reuseClass": "game-hardware" },
+    { "id": "demo-console", "category": "hardware", "function": "playable demo station", "reuseClass": "game-hardware" },
+    { "id": "controller", "category": "accessory", "function": "interactive demo input", "reuseClass": "game-accessory" },
+    { "id": "gaming-headphones", "category": "accessory", "function": "supported accessory display", "reuseClass": "game-accessory" },
+    { "id": "cable-coil", "category": "accessory", "function": "small accessory merchandise", "reuseClass": "game-accessory" }
+  ],
+  "generationPolicy": "form-refined items are procedural Blender meshes; no paid external generation submitted",
+  "notes": "All cases, cartridges, handhelds, controllers, headphones and cables are placed from measured support heights. The service counter includes a dedicated staff work position. Runtime export remains separately gated."
+}

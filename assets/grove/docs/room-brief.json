@@ -12,6 +12,6 @@
   "primaryArrival": { "width": 8.0, "height": 4.5, "destination": "central atrium", "type": "open-hallway" },
   "circulation": { "type": "loop-with-spokes", "mainLoopWidth": 4.0, "verticalConnections": ["north-stair", "south-escalator", "east-lift"] },
   "performanceBudget": { "targetFramerate": 60, "visibleHeroProps": 80, "drawDistanceMeters": 70, "runtimeTier": "stylized-low-poly" },
-  "scopeBoundary": { "characterAssets": "read-only", "avatarSourceFolders": ["assets_blender", "public/models/kindred_*.glb", "src/avatar"], "environmentSource": "assets/grove" },
+  "scopeBoundary": { "characterAssets": "read-only", "avatarSourceFolders": ["assets_blender", "frontend/public/models/kindred_*.glb", "src/avatar"], "environmentSource": "assets/grove" },
   "gates": { "function": "approved", "form": "approved", "runtime": "pending" }
 }

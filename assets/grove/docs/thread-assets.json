@@ -1,8 +1,15 @@
 {
   "schema": "kindred.grove-thread-assets.v1",
   "shopId": "thread-and-thimble",
-  "status": "prototype-with-style-reference",
+  "status": "form-refined-prototype",
   "referenceImage": "../renders/thread-and-thimble-reference.png",
+  "refinementEvidence": {
+    "blenderSource": "../blender/grove_master_refined.blend",
+    "builder": "../blender/refine_thread_thimble_interior.py",
+    "reviewRender": "../renders/thread_thimble_refined_blender.png",
+    "walkInRoute": "3.2 m central arrival lane from the mall threshold",
+    "departments": ["womenswear", "menswear", "footwear", "accessories", "fitting room", "checkout"]
+  },
   "items": [
     { "id": "folded-shirt-stack", "category": "clothing", "function": "folded apparel display", "dimensions": [0.65, 0.45, 0.42], "reuseClass": "folded-apparel" },
     { "id": "dress-mannequin", "category": "clothing", "function": "hero garment display", "dimensions": [0.65, 0.55, 1.85], "reuseClass": "mannequin-display" },
@@ -11,5 +18,6 @@
     { "id": "sun-hat", "category": "accessories", "function": "hat display", "dimensions": [0.58, 0.58, 0.28], "reuseClass": "accessory-display" },
     { "id": "scarf-rack", "category": "accessories", "function": "scarf display", "dimensions": [0.8, 0.25, 1.2], "reuseClass": "accessory-display" }
   ],
-  "generationPolicy": "prototype items are procedural Blender meshes guided by the saved visual reference; no paid external generation submitted"
+  "generationPolicy": "form-refined items are procedural Blender meshes guided by the saved visual reference; no paid external generation submitted",
+  "notes": "Garments, sneakers, handbags, hats, folded tops, mannequins, racks, fitting room, mirror, and checkout are individually modeled and supported by visible fixtures. Runtime export remains separately gated."
 }

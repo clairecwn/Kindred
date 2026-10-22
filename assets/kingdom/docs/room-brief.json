@@ -1,0 +1,16 @@
+{
+  "schema": "game-room.room-brief.v1",
+  "roomId": "kingdom-island",
+  "family": "custom",
+  "purpose": "A completely redesigned personal island home for decorating, gardening and farming.",
+  "runtimeSurface": "Future replacement for Kingdom; first deliverable is the Blender source and form review.",
+  "boundsMeters": [44, 42, 10],
+  "hero": {"id": "cottage", "role": "Home and main orientation landmark", "reservedBoundsMeters": [10, 10, 7]},
+  "symmetry": {"mode": "none", "order": 1, "appliesTo": [], "exceptions": ["Cottage facade has locally balanced window bays; island and activity areas are deliberately asymmetric."]},
+  "circulation": {"description": "Dock to home spine with garden, farm, orchard and stable branches; front lawn reserved for owned furniture. Farm aisles widened to 1.6m after measuring the character.", "minimumClearanceMeters": 1.5},
+  "productionCamera": {"viewport": [1440, 1080], "location": [38, -53, 40], "target": [0, 0, 2], "verticalFovDegrees": 31.9},
+  "performanceBudget": {"maxSceneTriangles": 450000, "maxVLowBytes": 15000000, "maxHighTextureBytes": 16000000},
+  "creditBudget": {"maximumCredits": 0, "approvalRequired": true},
+  "environment": {"type": "procedural", "identity": "kingdom-daylight-ocean", "source": "Locally authored water, islets and daylight", "assignmentKey": "KINGDOM_BACKDROP"},
+  "artifacts": {"floorPlan": "../renders/kingdom_plan.png", "reflectedCeilingPlan": "not-applicable-outdoor-island", "planMetadata": "room-layout.json", "wallElevations": [], "visualTarget": "design-direction.md", "openingContactSheet": "../renders/kingdom_home.png"}
+}

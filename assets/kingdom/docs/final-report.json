@@ -1,0 +1,39 @@
+{
+  "schema": "game-room.room-final-report.v1",
+  "roomId": "kingdom-island",
+  "status": "expanded-home-ready-for-review-not-integrated",
+  "latestRevision": {"audit": "home-expansion-audit.json", "interiorAreaM2": 103.21, "overview": "../renders/kingdom_expanded_home_overview.png", "roofOffPlan": "../renders/kingdom_expanded_home_plan.png", "note": "Other listed renders and first-scene checks are historical; latest audit supersedes house dimensions."},
+  "source": "../blender/kingdom_island.blend",
+  "gates": {"function": false, "form": false, "runtime": false},
+  "gateNotes": "The user authorized the island concept and complete redesign. This package is the first concrete scene for visual review; a complete production gate or runtime approval is not claimed.",
+  "verified": {
+    "characterHeightMeters": 2.0,
+    "characterWidthMeters": 1.249,
+    "referenceGroundContactErrorMeters": 0.0,
+    "houseApertureMeters": [3.12, 2.8],
+    "houseCentralPassage15RaySamplesClear": true,
+    "doorHeadroomMeters": 0.8,
+    "mainPathWidthMeters": 2.6,
+    "farmAisleMinimumMeters": 1.6,
+    "environmentTriangles": 337002,
+    "triangleBudget": 450000,
+    "packedOriginalSurfaceTextures": 3,
+    "externalPaidGeneration": false
+  },
+  "reviewRenders": {
+    "overview": "../renders/kingdom_overview.png",
+    "arrival": "../renders/kingdom_arrival.png",
+    "homeAndCharacter": "../renders/kingdom_home.png",
+    "farm": "../renders/kingdom_farm.png",
+    "layout": "../renders/kingdom_plan.png",
+    "geometryPlan": "../renders/kingdom_plan_clay.png",
+    "groveReadOnlyContext": "../renders/grove_context_readonly.png"
+  },
+  "runtimeChecks": {"integrated": false, "inventoryConnected": false, "navigationVerified": false, "performanceMeasuredInGame": false},
+  "postmortem": {
+    "observations": ["Current Grove uses patterned lawns, warm paving and bright lagoon water.", "Kai's imported file also contains an unrelated helper sphere; it is hidden only in the Kingdom reference.", "Original crop aisles were too tight relative to the measured character width."],
+    "corrections": ["Boolean-unified overlapping paths to remove dark seams.", "Aligned the evaluated character feet to the path.", "Sealed wall junctions and completed cottage gables and ceiling.", "Raised pond water to the bank.", "Separated distant trees from hill volumes.", "Widened crop aisles to 1.6m.", "Packed original lawn, paving and water textures into the scene."],
+    "remainingRisks": ["Runtime needs static batching or instancing; triangle count alone does not establish browser performance.", "Placement regions are candidates; fixed geometry and travel routes must be subtracted during placement validation.", "Grove purchase records and app inventory currently use separate stores; migration must preserve ownership without duplicating purchases.", "Farming and animal behaviour are not implemented. The stable has no owned animal.", "The home is a base interior shell, not a furnished final interior."]
+  },
+  "proposedLessons": []
+}

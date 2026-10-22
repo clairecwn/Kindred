@@ -1,0 +1,24 @@
+{
+  "schema": "kindred.grove-maker-meadow-assets.v1",
+  "shopId": "maker-meadow",
+  "floor": "level-2",
+  "status": "form-refined-prototype",
+  "refinementEvidence": {
+    "blenderSource": "../blender/grove_master_refined.blend",
+    "builder": "../blender/refine_maker_meadow_interior.py",
+    "reviewRender": "../renders/maker_meadow_refined_blender.png",
+    "walkInRoute": "3.2 m central arrival and workshop route on Level 2",
+    "departments": ["yarn", "fabric", "paint", "craft kits", "sewing station", "maker workbench", "checkout"]
+  },
+  "items": [
+    { "id": "yarn-ball", "category": "textile", "function": "supported craft supply", "reuseClass": "craft-material" },
+    { "id": "fabric-bolt", "category": "textile", "function": "supported fabric display", "reuseClass": "craft-material" },
+    { "id": "paint-can", "category": "paint", "function": "art supply display", "reuseClass": "craft-material" },
+    { "id": "craft-kit", "category": "kit", "function": "boxed project merchandise", "reuseClass": "craft-kit" },
+    { "id": "sewing-machine", "category": "equipment", "function": "interactive workshop station", "reuseClass": "maker-equipment" },
+    { "id": "toolbox", "category": "tools", "function": "supported workshop equipment", "reuseClass": "maker-equipment" },
+    { "id": "workshop-stool", "category": "furniture", "function": "activity seating", "reuseClass": "seating" }
+  ],
+  "generationPolicy": "form-refined items are procedural Blender meshes; no paid external generation submitted",
+  "notes": "Maker Meadow uses a sealed shell with an open atrium-facing entrance. Supplies are placed from measured support heights, and the sewing and art stations remain outside the central route. Runtime export remains separately gated."
+}

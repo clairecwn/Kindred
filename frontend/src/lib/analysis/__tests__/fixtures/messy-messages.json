@@ -1,0 +1,29 @@
+{
+  "note": "Evaluation set for slang, Singlish, short forms, kids' spelling and memes. Each case states what a friend from that context would understand. Expand with real (consented, anonymised) messages labelled by people from each group.",
+  "cases": [
+    { "id": "sg-bored", "group": "sg", "text": "lecture so long sian", "expect": { "term": "sian", "sense": "bored", "valence": "neg" } },
+    { "id": "sg-heavy", "group": "sg", "text": "sian life lah everything also cannot", "expect": { "term": "sian", "sense": "resigned", "masked": true } },
+    { "id": "sg-trouble", "group": "sg", "text": "exam tmr die liao never study", "expect": { "term": "die liao", "sense": "in-trouble", "crisis": false } },
+    { "id": "sg-amazed", "group": "sg", "text": "walao this cake so good sia", "expect": { "term": "walao", "sense": "amazed" } },
+    { "id": "sg-resigned", "group": "sg", "text": "ok lor no choice", "expect": { "term": "ok lor", "sense": "resigned", "masked": true } },
+    { "id": "sg-easy", "group": "sg", "text": "ok lor see you then haha", "expect": { "term": "ok lor", "sense": "easy-going", "masked": false } },
+    { "id": "sg-music", "group": "sg", "text": "just found a new song by her, playing it on repeat", "expect": { "term": "song", "sense": "music" } },
+    { "id": "sg-sarcasm", "group": "sg", "text": "he so free ah, keep texting the group chat", "expect": { "term": "so free", "sense": "sarcastic" } },
+    { "id": "kid-meme", "group": "kid", "text": "6 7!! lol", "expect": { "term": "6 7", "sense": "meme", "play": true } },
+    { "id": "kid-number", "group": "kid", "text": "i got 67 marks for maths", "expect": { "term": "67", "sense": "number", "play": false } },
+    { "id": "kid-scuba", "group": "kid", "text": "scubaaa bro", "expect": { "term": "scuba", "sense": "meme", "play": true } },
+    { "id": "kid-overthink", "group": "kid", "text": "cant stop thinking about it, so scuba rn", "expect": { "term": "scuba", "sense": "submerged" } },
+    { "id": "kid-crine", "group": "kid", "text": "im crine that video", "expect": { "term": "crine", "sense": "laughing", "valence": "pos" } },
+    { "id": "us-laughing", "group": "us", "text": "im crying lol that was so funny", "expect": { "term": "im crying", "sense": "laughing" } },
+    { "id": "us-sad", "group": "us", "text": "im crying, i miss her so much", "expect": { "term": "im crying", "sense": "sad", "valence": "neg" } },
+    { "id": "us-doomed", "group": "us", "text": "im so cooked for the test tmr", "expect": { "term": "cooked", "sense": "doomed", "valence": "neg" } },
+    { "id": "us-dinner", "group": "us", "text": "mum cooked chicken rice for dinner", "expect": { "term": "cooked", "sense": "literal" } },
+    { "id": "us-aura", "group": "us", "text": "-1000 aura when i tripped in class", "expect": { "term": "aura", "sense": "lost-aura" } },
+    { "id": "kid-spelling", "group": "kid", "text": "i feel so lonley and tierd", "expect": { "spelling": ["lonley", "tierd"], "valence": "neg" } },
+    { "id": "kid-digits", "group": "kid", "text": "b4 skool i felt gr8", "expect": { "spelling": ["gr8"], "unknown": [] } },
+    { "id": "kid-unknown", "group": "kid", "text": "zxqv was so funny", "expect": { "unknown": ["zxqv"] } },
+    { "id": "safety-kms", "group": "kid", "text": "i wanna kms this hw is too much", "expect": { "crisis": true } },
+    { "id": "safety-unalive", "group": "kid", "text": "sometimes i want to unalive myself", "expect": { "crisis": true } },
+    { "id": "safety-distance", "group": "us", "text": "ran 5 kms today, legs dead", "expect": { "crisis": false } }
+  ]
+}

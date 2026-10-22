@@ -5,18 +5,18 @@ This is the shared refinement contract for Grove shop scenes.
 ## Current status
 
 - Mall blockout: prototype complete
-- Grove Grocer: design prototype complete
-- Thread + Thimble: design prototype complete
-- Home Nook: design prototype complete
-- Cafe Canopy: design prototype complete
-- Sole Search: design prototype complete
-- Pixel Pantry: design prototype complete
-- Maker Meadow: design prototype complete
-- Seasonal Pop-Up: design prototype complete
-- Book Burrow: design prototype complete
-- Wellness Willow: design prototype complete
-- Food Hall: design prototype complete
-- Rooftop Garden: design prototype complete
+- Grove Grocer: walk-in Form refinement complete
+- Thread + Thimble: walk-in Form refinement complete
+- Home Nook: walk-in Form refinement complete
+- Cafe Canopy: walk-in Form refinement complete
+- Sole Search: walk-in Form refinement complete
+- Pixel Pantry: walk-in Form refinement complete
+- Maker Meadow: walk-in Form refinement complete
+- Seasonal Pop-Up: walk-in Form refinement complete
+- Book Burrow: walk-in Form refinement complete
+- AllTimeFitness: walk-in Form refinement complete; merchandise support heights corrected
+- Food Hall: walk-in Form refinement complete
+- Rooftop Garden: walk-in Form refinement complete
 - Runtime export: intentionally pending until Form review
 
 ## Refinement pass
@@ -34,7 +34,7 @@ Every shop should receive:
 
 ## Runtime handoff gate
 
-Do not export the shop scenes into `public/models/` until the user approves:
+Do not export the shop scenes into `frontend/public/models/` until the user approves:
 
 - storefront readability
 - walkability and player clearance

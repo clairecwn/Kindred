@@ -1,0 +1,23 @@
+{
+  "schema": "kindred.grove-book-burrow-assets.v1",
+  "shopId": "book-burrow",
+  "floor": "level-3",
+  "status": "form-refined-prototype",
+  "refinementEvidence": {
+    "blenderSource": "../blender/grove_master_refined.blend",
+    "builder": "../blender/refine_book_burrow_interior.py",
+    "reviewRender": "../renders/book_burrow_refined_blender.png",
+    "walkInRoute": "3.2 m central arrival and browsing aisle on Level 3",
+    "departments": ["library wall", "new books", "staff picks", "reading nooks", "open-book tables", "returns", "checkout"]
+  },
+  "items": [
+    { "id": "book-volume", "category": "book", "function": "supported shelf merchandise", "reuseClass": "book-media" },
+    { "id": "book-stack", "category": "book", "function": "recommendation-table merchandise", "reuseClass": "book-media" },
+    { "id": "open-book", "category": "book", "function": "reading-nook prop", "reuseClass": "book-media" },
+    { "id": "reading-chair", "category": "furniture", "function": "inward-facing reading seat", "reuseClass": "seating" },
+    { "id": "reading-table", "category": "furniture", "function": "supported open-book surface", "reuseClass": "display-table" },
+    { "id": "return-basket", "category": "service", "function": "book return point", "reuseClass": "retail-service" }
+  ],
+  "generationPolicy": "form-refined items are procedural Blender meshes; no paid external generation submitted",
+  "notes": "Every book and stack is positioned from a measured shelf or tabletop support height. Reading chairs face inward toward their tables while remaining outside the arrival aisle. Runtime export remains separately gated."
+}

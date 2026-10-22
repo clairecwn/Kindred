@@ -13,7 +13,7 @@ cp .env.example .env
 npm run dev
 ```
 
-Supabase URL and anon key are optional for local use. Without them, saves use browser storage on one device. A `VITE_` model key is visible in the browser bundle: use it only for local testing. The authenticated Edge Function in `supabase/functions/analyse/` is the server-side starting point for a public deployment; the current companion transport in `src/lib/groq.js` has not been moved behind it.
+Supabase URL and anon key are optional for local use. Without them, saves use browser storage on one device. A `VITE_` model key is visible in the browser bundle: use it only for local testing. The authenticated Edge Function in `backend/supabase/functions/analyse/` is the server-side starting point for a public deployment; the current companion transport in `frontend/src/lib/groq.js` has not been moved behind it.
 
 ```bash
 npm run test:analysis  # journal, emotion, memory, and conversation policy
@@ -21,18 +21,47 @@ npm test               # all application tests
 npm run check          # tests, avatar checks, and production build
 ```
 
+## Repository layout
+
+```text
+Kindred/
+├── frontend/          Web app (React + Vite + three.js)
+│   ├── index.html
+│   ├── src/           App code, organised by feature (grove, kingdom, home, ventures, avatar, lib)
+│   └── public/        Static files served as-is: exported models (models/), images, icons
+├── backend/
+│   └── supabase/      Database migrations, row-level security, Edge Functions, config
+├── assets/            Source art (Blender files and the scripts that build and export them)
+│   ├── characters/    The five playable characters and the dressing room
+│   ├── grove/         Grove mall and park
+│   ├── kingdom/       Kingdom island
+│   └── items/         Buyable item models shared by Grove and Kingdom
+├── tools/
+│   ├── blender/       Older Blender build scripts
+│   ├── blender-mcp-addon/
+│   └── scripts/       Node utilities (journal model comparison)
+├── docs/
+│   ├── product/       Vision and gameplay blueprint
+│   ├── story/         Kindred Storyline (story, cast, scripts)
+│   └── companion/     Journal companion design notes and research
+├── package.json       One package for the whole repo; run npm scripts from here
+└── vite.config.js     Points Vite at frontend/ and builds to dist/
+```
+
+Blender exports write straight into `frontend/public/models/`. The Grove, Kingdom and item `.blend` files link to each other with absolute paths under `assets/`, so do not move those folders. Supabase commands take `--workdir backend` (see the `db:*` npm scripts).
+
 ## Where things live
 
 | Area | Code | Purpose |
 | --- | --- | --- |
-| Journal and Journey | `src/components/WellnessView.jsx` | Saves entries, opens chat, and displays day and week emotion summaries. |
-| Companion | `src/lib/journal-ai.js` | Builds each turn, calls the assessor and writer, revises rejected drafts. |
-| Analysis | `src/lib/analysis/` | Text and appraisal features, topic state, memory, voice, reply checks, and longitudinal signals. |
-| Model transport | `src/lib/groq.js` | Timeouts, bounded retries, fallback models and optional Gemini route. |
-| Home and Kingdom | `src/home/`, `src/kingdom/`, `src/avatar/` | Private world and shared avatar system. |
-| Grove | `src/grove/` | Shared 3D world, interaction, economy, and story. |
-| Ventures | `src/ventures/` | Activity matching and map supply. |
-| Persistence | `src/hooks/useDatabaseState.js`, `supabase/` | Local fallback, account storage, migrations, and RLS. |
+| Journal and Journey | `frontend/src/components/WellnessView.jsx` | Saves entries, opens chat, and displays day and week emotion summaries. |
+| Companion | `frontend/src/lib/journal-ai.js` | Builds each turn, calls the assessor and writer, revises rejected drafts. |
+| Analysis | `frontend/src/lib/analysis/` | Text and appraisal features, topic state, memory, voice, reply checks, and longitudinal signals. |
+| Model transport | `frontend/src/lib/groq.js` | Timeouts, bounded retries, fallback models and optional Gemini route. |
+| Home and Kingdom | `frontend/src/home/`, `frontend/src/kingdom/`, `frontend/src/avatar/` | Private world and shared avatar system. |
+| Grove | `frontend/src/grove/` | Shared 3D world, interaction, economy, and story. |
+| Ventures | `frontend/src/ventures/` | Activity matching and map supply. |
+| Persistence | `frontend/src/hooks/useDatabaseState.js`, `backend/supabase/` | Local fallback, account storage, migrations, and RLS. |
 
 ## Companion architecture
 

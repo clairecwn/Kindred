@@ -17,7 +17,7 @@
     "interactiveItems": "individual-glb-or-instanced-prefab",
     "collision": "separate-low-detail-mesh"
   },
-  "runtimeDestination": "public/models/env/grove/",
+  "runtimeDestination": "frontend/public/models/env/grove/",
   "exportManifest": "exports/manifest.json",
   "blockedUntil": ["walkability-review", "collision-review", "performance-budget-review", "runtime-approval"],
   "characterPipeline": "read-only"

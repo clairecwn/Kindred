@@ -1,7 +1,14 @@
 {
   "schema": "kindred.grove-home-nook-assets.v1",
   "shopId": "home-nook",
-  "status": "prototype",
+  "status": "form-refined-prototype",
+  "refinementEvidence": {
+    "blenderSource": "../blender/grove_master_refined.blend",
+    "builder": "../blender/refine_home_nook_interior.py",
+    "reviewRender": "../renders/home_nook_refined_blender.png",
+    "walkInRoute": "3.2 m central arrival lane from the mall threshold",
+    "departments": ["living vignette", "kitchenware", "textiles", "storage", "decor", "checkout"]
+  },
   "items": [
     { "id": "table-lamp", "category": "lighting", "function": "home lighting display", "reuseClass": "home-decor" },
     { "id": "kettle", "category": "kitchen", "function": "small appliance display", "reuseClass": "kitchenware" },
@@ -12,5 +19,6 @@
     { "id": "storage-box", "category": "storage", "function": "household organization display", "reuseClass": "storage" },
     { "id": "folding-chair", "category": "furniture", "function": "small furniture display", "reuseClass": "furniture" }
   ],
-  "generationPolicy": "prototype items are procedural Blender meshes; no paid external generation submitted"
+  "generationPolicy": "form-refined items are procedural Blender meshes; no paid external generation submitted",
+  "notes": "Home Nook now uses supported open shelving, a furnished living vignette, individually modeled tableware, textiles, storage and decor, plus a side checkout. Shelf and tabletop contact heights were corrected after user review. Runtime export remains separately gated."
 }

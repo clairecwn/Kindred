@@ -1,7 +1,7 @@
 """
 build_characters.py — authors the whole Kindred cast in Blender (as a
 Python module: `python3 tools/blender/build_characters.py`, bpy imported
-directly, no Blender UI) and exports rigged .glb into public/models/.
+directly, no Blender UI) and exports rigged .glb into frontend/public/models/.
 
 What one character is made of:
   Body     one voxel-fused watertight mesh (torso + arms + mitts + legs +
@@ -12,7 +12,7 @@ What one character is made of:
   Ears / Tail / Nose / Eyes / Pupils / Shines  crisp separate meshes,
            rigid-weighted to Head / Tail_01 / Tail_02.
 Garments are built by build_wardrobe_glb() against the SAME armature and
-exported to public/models/kindred_wardrobe.glb, so the runtime can rebind
+exported to frontend/public/models/kindred_wardrobe.glb, so the runtime can rebind
 any garment onto any character's skeleton by bone name.
 
 Run:  python3 tools/blender/build_characters.py [--species fox,bear] [--render]
@@ -36,7 +36,7 @@ from rig import BONES, BONE_LIST, SOCKETS, AVATAR_HEIGHT, to_blender, world_rest
 from species_defs import SPECIES, SPECIES_LIST  # noqa: E402
 
 REPO = os.path.abspath(os.path.join(HERE, "..", ".."))
-OUT_DIR = os.path.join(REPO, "public", "models")
+OUT_DIR = os.path.join(REPO, "frontend", "public", "models")
 RENDER_DIR = os.path.join(HERE, "renders")
 
 REST = {n: world_rest(n) for n in BONE_LIST}

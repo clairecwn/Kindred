@@ -1,7 +1,7 @@
 {
   "schema": "kindred.grove-grocer-assets.v1",
   "shopId": "grove-grocer",
-  "status": "prototype",
+  "status": "form-refined-prototype",
   "items": [
     { "id": "carrot", "category": "produce", "function": "fresh vegetable display", "dimensions": [0.12, 0.12, 0.5], "attachmentFace": "-Z", "semanticFront": "+Y", "reuseClass": "small-produce", "targetPolycount": 600 },
     { "id": "tomato", "category": "produce", "function": "fresh vegetable display", "dimensions": [0.22, 0.22, 0.2], "attachmentFace": "-Z", "semanticFront": "+Y", "reuseClass": "small-produce", "targetPolycount": 500 },
@@ -13,5 +13,10 @@
     { "id": "shopping-basket", "category": "fixture", "function": "carry basket interaction prop", "dimensions": [0.45, 0.3, 0.25], "attachmentFace": "-Z", "semanticFront": "+Y", "reuseClass": "carry-prop", "targetPolycount": 1200 },
     { "id": "shopping-trolley", "category": "fixture", "function": "push trolley interaction prop", "dimensions": [0.8, 0.45, 0.95], "attachmentFace": "-Z", "semanticFront": "+Y", "reuseClass": "carry-prop", "targetPolycount": 2400 }
   ],
-  "generationPolicy": "prototype items are procedural Blender meshes; no paid external generation submitted"
+  "generationPolicy": "prototype items are procedural Blender meshes; no paid external generation submitted",
+  "refinementEvidence": [
+    "../blender/refine_grocer_interior.py",
+    "../renders/grove_grocer_refined_blender.png"
+  ],
+  "refinementNotes": "Open fixtures replace solid aisle placeholders; the 3.2m arrival lane, checkout queue, produce market, chilled, pantry, bakery, and household departments use individually named supported items."
 }

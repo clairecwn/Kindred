@@ -1,0 +1,36 @@
+{
+  "schema": "kindred.grove-character-scale-audit.v1",
+  "roomId": "grove-mall",
+  "auditedAt": "2026-10-06",
+  "policy": "integrated-character-assets-used-read-only",
+  "characterSource": "frontend/public/models/kindred_*.glb",
+  "castBoundsMeters": [
+    { "id": "kai", "width": 1.178, "height": 2.000, "depth": 1.166 },
+    { "id": "alex", "width": 1.171, "height": 2.037, "depth": 1.142 },
+    { "id": "bella", "width": 1.170, "height": 2.121, "depth": 1.620 },
+    { "id": "tate", "width": 1.433, "height": 1.994, "depth": 1.240 },
+    { "id": "lara", "width": 1.205, "height": 2.012, "depth": 1.165 }
+  ],
+  "designEnvelopeMeters": {
+    "maximumVisibleHeight": 2.123,
+    "maximumVisibleWidth": 1.433,
+    "protectedMovementDiameter": 1.04
+  },
+  "checks": [
+    { "feature": "mall entrance", "measurement": "8.0 m wide x 4.5 m high", "status": "passed" },
+    { "feature": "floor-to-floor clearance", "measurement": "5.0 m", "status": "passed" },
+    { "feature": "runtime atrium rails", "measurement": "1.11 m top height", "status": "passed" },
+    { "feature": "Cafe Canopy staff aisle", "measurement": "1.60 m clear design width", "status": "passed" },
+    { "feature": "Cafe Canopy service counter", "measurement": "1.15 m top height", "status": "passed" },
+    { "feature": "indoor camera target", "measurement": "1.10 m look target", "status": "passed" },
+    { "feature": "movement collision body", "measurement": "0.52 m radius", "status": "passed-protected-core" }
+  ],
+  "changes": [
+    "Widened the movement collision body from 0.40 m to 0.52 m radius.",
+    "Raised runtime connector rails from 0.91 m to 1.11 m top height.",
+    "Widened Cafe Canopy's staff aisle from 1.25 m to 1.60 m.",
+    "Lowered Cafe Canopy's service counter and supported display from 1.48 m to 1.15 m top height.",
+    "Kept the integrated character GLBs unmodified."
+  ],
+  "status": "passed"
+}

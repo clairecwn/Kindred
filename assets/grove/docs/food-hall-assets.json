@@ -1,0 +1,26 @@
+{
+  "schema": "kindred.grove-food-hall-assets.v1",
+  "shopId": "food-hall",
+  "floor": "level-3",
+  "status": "form-refined-prototype",
+  "refinementEvidence": {
+    "blenderSource": "../blender/grove_master_refined.blend",
+    "builder": "../blender/refine_food_hall_interior.py",
+    "reviewRender": "../renders/food_hall_refined_blender.png",
+    "staffAisleRender": "../renders/food_hall_staff_aisle_blender.png",
+    "walkInRoute": "open right-side customer arrival route with lateral queue",
+    "staffClearance": "1.35 m continuous aisle with three NPC work positions",
+    "departments": ["noodle portal", "garden trellis stall", "bakery awning stall", "pickup drinks", "queue", "communal dining", "standing rail"]
+  },
+  "items": [
+    { "id": "noodle-bowl", "category": "prepared-food", "function": "stall meal display", "reuseClass": "food-item" },
+    { "id": "dumpling", "category": "prepared-food", "function": "stall side dish", "reuseClass": "food-item" },
+    { "id": "salad-bowl", "category": "prepared-food", "function": "garden stall display", "reuseClass": "food-item" },
+    { "id": "wrap", "category": "prepared-food", "function": "garden stall display", "reuseClass": "food-item" },
+    { "id": "pastry", "category": "bakery", "function": "bakery stall display", "reuseClass": "food-item" },
+    { "id": "cake", "category": "bakery", "function": "hero dessert", "reuseClass": "food-item" },
+    { "id": "drink", "category": "beverage", "function": "supported pickup item", "reuseClass": "food-item" }
+  ],
+  "generationPolicy": "form-refined items are procedural Blender meshes; no paid external generation submitted",
+  "notes": "The market-hall layout uses three distinct vendor silhouettes, a long communal harvest table, benches, and a standing rail. Every displayed meal now contacts its tray or counter, the continuous staff aisle remains clear, and the right-side arrival route avoids the dining fixtures. Runtime export remains separately gated."
+}

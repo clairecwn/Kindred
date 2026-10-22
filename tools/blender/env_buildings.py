@@ -1,6 +1,6 @@
 """Kindred landmark architecture — the silhouette-carrying buildings.
 
-    python3 tools/blender/env_buildings.py   -> public/models/env/buildings.glb
+    python3 tools/blender/env_buildings.py   -> frontend/public/models/env/buildings.glb
 
 Every building is authored around the same grammar so the world reads as
 one place: a stone plinth, warm plaster walls, a deep-overhang pitched or
@@ -274,5 +274,5 @@ for n, f in [("shop_grocer", shop_grocer), ("shop_furnish", shop_furnish), ("sho
 
 assign_shared_material()
 export_glb(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..",
-                        "public", "models", "env", "buildings.glb"))
+                        "frontend", "public", "models", "env", "buildings.glb"))
 print("buildings:", NAMES)

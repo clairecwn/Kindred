@@ -1,0 +1,22 @@
+{
+  "revision": "home-expansion-v1",
+  "units": "metres",
+  "interior_clear_dimensions": [
+    10.27,
+    10.05
+  ],
+  "interior_clear_area_m2": 103.21,
+  "ceiling_height_approx_m": 3.37,
+  "wall_aperture_width_m": 3.12,
+  "wall_aperture_height_m": 2.8,
+  "entrance_wall_ray_samples_clear": true,
+  "floor_height_m": 2.24,
+  "character_scale_changed": false,
+  "fixed_partitions": false,
+  "runtime_integrated": false,
+  "future_features_not_implemented": [
+    "User-built partitions",
+    "Additional floors",
+    "Structural expansion upgrades"
+  ]
+}

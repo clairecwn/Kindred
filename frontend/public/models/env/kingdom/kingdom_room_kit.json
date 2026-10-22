@@ -1,0 +1,1575 @@
+{
+ "examples": [
+  {
+   "finish": {
+    "floor": "stone",
+    "trim": "#FFFAEC",
+    "wall": "boards",
+    "wall_tint": "#F0C890"
+   },
+   "parts": [
+    [
+     "Window_Round",
+     "back",
+     0.9,
+     1.75
+    ],
+    [
+     "Sconce",
+     "left",
+     0.4,
+     1.9
+    ],
+    [
+     "Beam_4",
+     "floor",
+     0.0,
+     0.4
+    ],
+    [
+     "Doormat",
+     "floor",
+     0.0,
+     -1.55
+    ]
+   ],
+   "room": "Shed"
+  },
+  {
+   "finish": {
+    "floor": "planks",
+    "trim": "#FFFAEC",
+    "wall": null,
+    "wall_tint": "#FFF1D0"
+   },
+   "parts": [
+    [
+     "Fireplace",
+     "back",
+     0.0,
+     0.0
+    ],
+    [
+     "Wainscot",
+     "back",
+     -2.5,
+     0.0
+    ],
+    [
+     "Wainscot",
+     "back",
+     -1.5,
+     0.0
+    ],
+    [
+     "Wainscot",
+     "back",
+     1.5,
+     0.0
+    ],
+    [
+     "Wainscot",
+     "back",
+     2.5,
+     0.0
+    ],
+    [
+     "Window_Square",
+     "left",
+     0.4,
+     1.75
+    ],
+    [
+     "Window_Square",
+     "right",
+     0.4,
+     1.75
+    ],
+    [
+     "Beam_6",
+     "floor",
+     0.0,
+     0.2
+    ],
+    [
+     "Doormat",
+     "floor",
+     0.0,
+     -2.55
+    ]
+   ],
+   "room": "Cabin"
+  },
+  {
+   "finish": {
+    "floor": "checker",
+    "floor_tint": "#8FD8D0",
+    "trim": "#FFFAEC",
+    "wall": "stripes",
+    "wall_tint": "#FFE48A"
+   },
+   "parts": [
+    [
+     "Fireplace",
+     "back",
+     -0.8,
+     0.0
+    ],
+    [
+     "Stair_Up",
+     "back",
+     2.5,
+     0.0
+    ],
+    [
+     "Window_Arch",
+     "back",
+     -2.93,
+     1.85
+    ],
+    [
+     "Window_Arch",
+     "left",
+     0.6,
+     1.85
+    ],
+    [
+     "Window_Arch",
+     "right",
+     0.6,
+     1.85
+    ],
+    [
+     "Door",
+     "left",
+     -2.2,
+     0.0
+    ],
+    [
+     "Beam_8",
+     "floor",
+     0.0,
+     -1.4
+    ],
+    [
+     "Beam_8",
+     "floor",
+     0.0,
+     1.6
+    ],
+    [
+     "Doormat",
+     "floor",
+     0.0,
+     -3.55
+    ]
+   ],
+   "room": "Cottage"
+  },
+  {
+   "finish": {
+    "floor": "carpet",
+    "floor_tint": "#F49AB8",
+    "trim": "#C98443",
+    "wall": "dots",
+    "wall_tint": "#B8E8FF"
+   },
+   "parts": [
+    [
+     "Window_Round",
+     "back",
+     -1.5,
+     1.8
+    ],
+    [
+     "Window_Round",
+     "back",
+     0.3,
+     1.8
+    ],
+    [
+     "Stair_Down",
+     "floor",
+     1.9,
+     2.4
+    ],
+    [
+     "Window_Square",
+     "left",
+     0.2,
+     1.75
+    ],
+    [
+     "Sconce",
+     "right",
+     0.2,
+     1.9
+    ],
+    [
+     "Beam_6",
+     "floor",
+     0.0,
+     -0.4
+    ]
+   ],
+   "room": "Upper"
+  },
+  {
+   "finish": {
+    "floor": "planks",
+    "trim": "#FFFAEC",
+    "wall": "stripes",
+    "wall_tint": "#CFEAD6"
+   },
+   "parts": [
+    [
+     "Fireplace",
+     "back",
+     0.0,
+     0.0
+    ],
+    [
+     "Stair_Up",
+     "back",
+     3.4,
+     0.0
+    ],
+    [
+     "Window_Arch",
+     "back",
+     -3.3,
+     1.85
+    ],
+    [
+     "Window_Arch",
+     "left",
+     -0.3,
+     1.85
+    ],
+    [
+     "Window_Arch",
+     "right",
+     -0.5,
+     1.85
+    ],
+    [
+     "Door",
+     "left",
+     -2.5,
+     0.0
+    ],
+    [
+     "Sconce",
+     "left",
+     3.3,
+     1.9
+    ],
+    [
+     "Beam_10",
+     "floor",
+     0.0,
+     -1.6
+    ],
+    [
+     "Beam_10",
+     "floor",
+     0.0,
+     1.2
+    ],
+    [
+     "Doormat",
+     "floor",
+     0.0,
+     -3.55
+    ]
+   ],
+   "room": "Manor"
+  }
+ ],
+ "finishes": {
+  "floor": {
+   "carpet": {
+    "material": "KI_fin_floor_carpet",
+    "sample": "KR_Finish_floor_carpet",
+    "tint": "#F49AB8"
+   },
+   "checker": {
+    "material": "KI_fin_floor_checker",
+    "sample": "KR_Finish_floor_checker",
+    "tint": "#8FD8D0"
+   },
+   "planks": {
+    "material": "KI_fin_floor_planks",
+    "sample": "KR_Finish_floor_planks",
+    "tint": null
+   },
+   "stone": {
+    "material": "KI_fin_floor_stone",
+    "sample": "KR_Finish_floor_stone",
+    "tint": null
+   }
+  },
+  "wall": {
+   "boards": {
+    "material": "KI_fin_wall_boards",
+    "sample": "KR_Finish_wall_boards",
+    "tint": "#F0C890"
+   },
+   "dots": {
+    "material": "KI_fin_wall_dots",
+    "sample": "KR_Finish_wall_dots",
+    "tint": "#B8E8FF"
+   },
+   "stripes": {
+    "material": "KI_fin_wall_stripes",
+    "sample": "KR_Finish_wall_stripes",
+    "tint": "#FFE48A"
+   }
+  }
+ },
+ "furniture": {
+  "Cabin": {
+   "floor": [
+    [
+     "fur-bigrug",
+     0.0,
+     1.0,
+     0
+    ],
+    [
+     "fur-sofa",
+     0.0,
+     0.0,
+     2
+    ],
+    [
+     "fur-coffeetable",
+     0.0,
+     1.5,
+     0
+    ],
+    [
+     "fur-armchair",
+     -2.0,
+     1.5,
+     1
+    ],
+    [
+     "fur-sidetable",
+     -2.25,
+     2.5,
+     0
+    ],
+    [
+     "fur-bookcase",
+     2.5,
+     2.75,
+     0
+    ],
+    [
+     "fur-plant",
+     -2.75,
+     -1.25,
+     0
+    ],
+    [
+     "fur-media",
+     2.75,
+     -1.25,
+     -1
+    ],
+    [
+     "fur-diningtable",
+     -1.5,
+     -1.5,
+     0
+    ],
+    [
+     "fur-chair",
+     -2.0,
+     -0.75,
+     0
+    ],
+    [
+     "fur-chair",
+     -1.0,
+     -0.75,
+     0
+    ],
+    [
+     "fur-chair",
+     -2.0,
+     -2.25,
+     2
+    ],
+    [
+     "fur-chair",
+     -1.0,
+     -2.25,
+     2
+    ]
+   ],
+   "on": [
+    [
+     "fur-tablelamp",
+     -2.25,
+     2.5,
+     0.56
+    ],
+    [
+     "eat-teapot",
+     -1.5,
+     -1.5,
+     0.8
+    ],
+    [
+     "boo-storybook",
+     0.3,
+     1.5,
+     0.46
+    ]
+   ],
+   "wall": [
+    [
+     "fur-picture",
+     "left",
+     -1.75,
+     2.05
+    ]
+   ]
+  },
+  "Cottage": {
+   "floor": [
+    [
+     "fur-bigrug",
+     -0.75,
+     1.75,
+     0
+    ],
+    [
+     "fur-sofa",
+     -0.75,
+     0.75,
+     2
+    ],
+    [
+     "fur-coffeetable",
+     -0.75,
+     2.0,
+     0
+    ],
+    [
+     "fur-armchair",
+     -3.0,
+     2.0,
+     1
+    ],
+    [
+     "fur-sidetable",
+     -3.25,
+     3.0,
+     0
+    ],
+    [
+     "fur-piano",
+     -3.5,
+     -0.5,
+     1
+    ],
+    [
+     "fur-fridge",
+     3.75,
+     2.25,
+     -1
+    ],
+    [
+     "fur-counter",
+     3.75,
+     1.25,
+     -1
+    ],
+    [
+     "fur-sink",
+     3.75,
+     0.25,
+     -1
+    ],
+    [
+     "fur-counter",
+     3.75,
+     -0.75,
+     -1
+    ],
+    [
+     "fur-stove",
+     3.75,
+     -1.75,
+     -1
+    ],
+    [
+     "fur-diningtable",
+     1.5,
+     -0.5,
+     1
+    ],
+    [
+     "fur-chair",
+     0.75,
+     -1.0,
+     1
+    ],
+    [
+     "fur-chair",
+     0.75,
+     0.0,
+     1
+    ],
+    [
+     "fur-chair",
+     2.25,
+     -1.0,
+     -1
+    ],
+    [
+     "fur-chair",
+     2.25,
+     0.0,
+     -1
+    ],
+    [
+     "fur-plant",
+     3.75,
+     -3.25,
+     0
+    ]
+   ],
+   "on": [
+    [
+     "fur-tablelamp",
+     -3.25,
+     3.0,
+     0.56
+    ],
+    [
+     "gro-fruitbowl",
+     1.5,
+     -0.5,
+     0.8
+    ],
+    [
+     "gro-breadloaf",
+     3.72,
+     -0.75,
+     0.92
+    ]
+   ],
+   "wall": [
+    [
+     "fur-cupboard",
+     "right",
+     -1.75,
+     1.95
+    ],
+    [
+     "fur-picture",
+     "left",
+     -0.75,
+     2.2
+    ]
+   ]
+  },
+  "Manor": {
+   "floor": [
+    [
+     "fur-bigrug",
+     0.0,
+     1.75,
+     0
+    ],
+    [
+     "fur-sofa",
+     0.0,
+     0.75,
+     2
+    ],
+    [
+     "fur-coffeetable",
+     0.0,
+     2.0,
+     0
+    ],
+    [
+     "fur-armchair",
+     -2.0,
+     2.0,
+     1
+    ],
+    [
+     "fur-armchair",
+     2.0,
+     1.75,
+     -1
+    ],
+    [
+     "fur-sofa",
+     -2.75,
+     -0.25,
+     1
+    ],
+    [
+     "fur-sidetable",
+     -2.25,
+     3.25,
+     0
+    ],
+    [
+     "fur-bookcase",
+     -1.75,
+     3.75,
+     0
+    ],
+    [
+     "fur-piano",
+     -4.25,
+     2.0,
+     1
+    ],
+    [
+     "fur-plant",
+     -4.75,
+     3.75,
+     0
+    ],
+    [
+     "fur-plant",
+     -4.75,
+     0.9,
+     0
+    ],
+    [
+     "fur-diningtable",
+     2.5,
+     -1.5,
+     0
+    ],
+    [
+     "fur-chair",
+     2.0,
+     -0.75,
+     0
+    ],
+    [
+     "fur-chair",
+     3.0,
+     -0.75,
+     0
+    ],
+    [
+     "fur-chair",
+     2.0,
+     -2.25,
+     2
+    ],
+    [
+     "fur-chair",
+     3.0,
+     -2.25,
+     2
+    ],
+    [
+     "fur-chair",
+     1.25,
+     -1.5,
+     1
+    ],
+    [
+     "fur-chair",
+     3.75,
+     -1.5,
+     -1
+    ],
+    [
+     "fur-fridge",
+     4.75,
+     2.25,
+     -1
+    ],
+    [
+     "fur-counter",
+     4.75,
+     1.25,
+     -1
+    ],
+    [
+     "fur-sink",
+     4.75,
+     0.25,
+     -1
+    ],
+    [
+     "fur-counter",
+     4.75,
+     -0.75,
+     -1
+    ],
+    [
+     "fur-stove",
+     4.75,
+     -1.75,
+     -1
+    ],
+    [
+     "fur-plant",
+     4.75,
+     -3.25,
+     0
+    ]
+   ],
+   "on": [
+    [
+     "fur-tablelamp",
+     -2.25,
+     3.25,
+     0.56
+    ],
+    [
+     "boo-storybook",
+     0.3,
+     2.0,
+     0.46
+    ],
+    [
+     "gro-fruitbowl",
+     2.5,
+     -1.5,
+     0.8
+    ],
+    [
+     "gro-breadloaf",
+     4.72,
+     -0.75,
+     0.92
+    ]
+   ],
+   "wall": [
+    [
+     "fur-cupboard",
+     "right",
+     1.6,
+     1.95
+    ],
+    [
+     "fur-picture",
+     "back",
+     -1.75,
+     2.5
+    ]
+   ]
+  },
+  "Shed": {
+   "floor": [
+    [
+     "fur-bed",
+     -1.5,
+     1.0,
+     0
+    ],
+    [
+     "fur-bedside",
+     -0.75,
+     1.75,
+     0
+    ],
+    [
+     "fur-trunk",
+     -1.5,
+     -0.25,
+     0
+    ],
+    [
+     "fur-armchair",
+     1.5,
+     -0.25,
+     -1
+    ],
+    [
+     "fur-plant",
+     1.75,
+     1.75,
+     0
+    ],
+    [
+     "fur-rug",
+     0.1,
+     -0.2,
+     0
+    ]
+   ],
+   "on": [
+    [
+     "fur-tablelamp",
+     -0.75,
+     1.75,
+     0.6
+    ]
+   ],
+   "wall": [
+    [
+     "fur-clock",
+     "back",
+     -0.9,
+     2.05
+    ]
+   ]
+  },
+  "Upper": {
+   "floor": [
+    [
+     "fur-doublebed",
+     -1.5,
+     2.0,
+     0
+    ],
+    [
+     "fur-bedside",
+     -2.75,
+     2.75,
+     0
+    ],
+    [
+     "fur-bedside",
+     -0.25,
+     2.75,
+     0
+    ],
+    [
+     "fur-trunk",
+     -1.5,
+     0.75,
+     0
+    ],
+    [
+     "fur-rug",
+     -0.5,
+     -0.75,
+     0
+    ],
+    [
+     "fur-desk",
+     -2.75,
+     -1.75,
+     1
+    ],
+    [
+     "fur-deskchair",
+     -2.25,
+     -1.75,
+     -1
+    ],
+    [
+     "fur-wardrobe",
+     2.75,
+     -0.75,
+     -1
+    ],
+    [
+     "fur-dresser",
+     2.75,
+     1.0,
+     -1
+    ],
+    [
+     "fur-bathtub",
+     1.0,
+     -2.25,
+     0
+    ],
+    [
+     "fur-washstand",
+     2.75,
+     -2.25,
+     -1
+    ]
+   ],
+   "on": [
+    [
+     "fur-tablelamp",
+     -0.25,
+     2.75,
+     0.6
+    ],
+    [
+     "wel-candle",
+     2.7,
+     0.6,
+     0.87
+    ]
+   ],
+   "wall": [
+    [
+     "fur-clock",
+     "back",
+     1.9,
+     2.25
+    ],
+    [
+     "fur-wallshelf",
+     "left",
+     -1.75,
+     1.6
+    ]
+   ]
+  }
+ },
+ "height": 3.0,
+ "houses": {
+  "Cabin": [
+   "Cabin"
+  ],
+  "Cottage": [
+   "Cottage"
+  ],
+  "House": [
+   "Cottage",
+   "Upper"
+  ],
+  "Manor": [
+   "Manor",
+   "Manor",
+   "Upper"
+  ],
+  "Shed": [
+   "Shed"
+  ]
+ },
+ "note": "written by assets/kingdom/blender/passes/k23_export_room.py",
+ "parts": {
+  "beams": {
+   "10": {
+    "light": [
+     0.0,
+     0.0,
+     2.16
+    ],
+    "mesh": "KR_Beam_10",
+    "min": [
+     -5.33,
+     -0.19,
+     1.89
+    ],
+    "size": [
+     10.66,
+     0.38,
+     1.14
+    ],
+    "triangles": 316
+   },
+   "4": {
+    "light": [
+     0.0,
+     0.0,
+     2.16
+    ],
+    "mesh": "KR_Beam_4",
+    "min": [
+     -2.33,
+     -0.19,
+     1.89
+    ],
+    "size": [
+     4.66,
+     0.38,
+     1.14
+    ],
+    "triangles": 316
+   },
+   "6": {
+    "light": [
+     0.0,
+     0.0,
+     2.16
+    ],
+    "mesh": "KR_Beam_6",
+    "min": [
+     -3.33,
+     -0.19,
+     1.89
+    ],
+    "size": [
+     6.66,
+     0.38,
+     1.14
+    ],
+    "triangles": 316
+   },
+   "8": {
+    "light": [
+     0.0,
+     0.0,
+     2.16
+    ],
+    "mesh": "KR_Beam_8",
+    "min": [
+     -4.33,
+     -0.19,
+     1.89
+    ],
+    "size": [
+     8.66,
+     0.38,
+     1.14
+    ],
+    "triangles": 316
+   }
+  },
+  "floor": {
+   "Doormat": {
+    "mesh": "KR_Doormat",
+    "min": [
+     -0.7,
+     -0.35,
+     0.0
+    ],
+    "recolour": [
+     "KV_A_green",
+     "KV_A_green_dk"
+    ],
+    "size": [
+     1.4,
+     0.7,
+     0.05
+    ],
+    "triangles": 260
+   },
+   "Stair_Down": {
+    "cells": [
+     4,
+     2
+    ],
+    "mesh": "KR_Stair_Down",
+    "min": [
+     -1.02,
+     -0.52,
+     0.0
+    ],
+    "recolour": [
+     "KV_A_wood",
+     "KV_A_wood_dk",
+     "KV_A_wood_lt"
+    ],
+    "size": [
+     2.04,
+     1.04,
+     1.1
+    ],
+    "triangles": 740
+   }
+  },
+  "wall": {
+   "Door": {
+    "mesh": "KR_Door",
+    "min": [
+     -0.75,
+     -0.27,
+     0.0
+    ],
+    "recolour": [
+     "KV_A_blue",
+     "KV_A_blue_dk",
+     "KV_A_blue_lt"
+    ],
+    "size": [
+     1.5,
+     0.28,
+     2.5
+    ],
+    "triangles": 656
+   },
+   "Fireplace": {
+    "cells": [
+     4,
+     2
+    ],
+    "light": [
+     0.0,
+     -0.62,
+     0.45
+    ],
+    "mesh": "KR_Fireplace",
+    "min": [
+     -1.05,
+     -0.8,
+     0.0
+    ],
+    "size": [
+     2.1,
+     0.82,
+     3.0
+    ],
+    "surface": [
+     -1.0,
+     -0.56,
+     1.0,
+     -0.04,
+     1.5
+    ],
+    "triangles": 1472
+   },
+   "Sconce": {
+    "light": [
+     0.0,
+     -0.36,
+     -0.15
+    ],
+    "mesh": "KR_Sconce",
+    "min": [
+     -0.11,
+     -0.47,
+     -0.32
+    ],
+    "size": [
+     0.22,
+     0.48,
+     0.61
+    ],
+    "triangles": 812
+   },
+   "Stair_Up": {
+    "cells": [
+     6,
+     2
+    ],
+    "mesh": "KR_Stair_Up",
+    "min": [
+     -1.52,
+     -1.07,
+     0.0
+    ],
+    "recolour": [
+     "KV_A_wood",
+     "KV_A_wood_dk",
+     "KV_A_wood_lt"
+    ],
+    "size": [
+     3.04,
+     1.08,
+     2.96
+    ],
+    "top": [
+     0.9,
+     -0.5,
+     1.5
+    ],
+    "triangles": 1558
+   },
+   "Wainscot": {
+    "mesh": "KR_Wainscot",
+    "min": [
+     -0.5,
+     -0.07,
+     0.0
+    ],
+    "size": [
+     1.0,
+     0.07,
+     1.06
+    ],
+    "triangles": 348
+   }
+  },
+  "windows": {
+   "Arch": {
+    "mesh": "KR_Window_Arch",
+    "min": [
+     -1.06,
+     -0.3,
+     -0.95
+    ],
+    "recolour": [
+     "KV_B_red",
+     "KV_B_red_dk",
+     "KV_B_red_lt"
+    ],
+    "size": [
+     2.11,
+     0.31,
+     2.05
+    ],
+    "triangles": 852
+   },
+   "Round": {
+    "mesh": "KR_Window_Round",
+    "min": [
+     -0.74,
+     -0.14,
+     -0.74
+    ],
+    "size": [
+     1.48,
+     0.15,
+     1.48
+    ],
+    "triangles": 372
+   },
+   "Square": {
+    "mesh": "KR_Window_Square",
+    "min": [
+     -1.08,
+     -0.3,
+     -0.77
+    ],
+    "recolour": [
+     "KV_B_red",
+     "KV_B_red_dk",
+     "KV_B_red_lt"
+    ],
+    "size": [
+     2.15,
+     0.31,
+     1.71
+    ],
+    "triangles": 828
+   }
+  }
+ },
+ "recolour": {
+  "floor": "KI_roomFloor",
+  "trim": [
+   "KI_roomTrim",
+   "KI_roomTrim_dk",
+   "KI_roomTrim_lt"
+  ],
+  "wall": "KI_roomWall"
+ },
+ "rooms": {
+  "Cabin": {
+   "beam": "KR_Beam_6",
+   "cells": [
+    12,
+    12
+   ],
+   "doormat": [
+    0,
+    -2.55,
+    0
+   ],
+   "height": 3.0,
+   "inside": [
+    6,
+    6
+   ],
+   "mesh": "KR_Room_Cabin",
+   "min": [
+    -3.35,
+    -3.3,
+    -0.3
+   ],
+   "size": [
+    6.7,
+    6.65,
+    3.4
+   ],
+   "triangles": 780,
+   "walls": {
+    "back": {
+     "from": [
+      -3.0,
+      3.0
+     ],
+     "to": [
+      3.0,
+      3.0
+     ],
+     "turn": 0
+    },
+    "left": {
+     "from": [
+      -3.0,
+      -2.8
+     ],
+     "to": [
+      -3.0,
+      3.0
+     ],
+     "turn": 90
+    },
+    "right": {
+     "from": [
+      3.0,
+      -2.8
+     ],
+     "to": [
+      3.0,
+      3.0
+     ],
+     "turn": -90
+    }
+   }
+  },
+  "Cottage": {
+   "beam": "KR_Beam_8",
+   "cells": [
+    16,
+    16
+   ],
+   "doormat": [
+    0,
+    -3.55,
+    0
+   ],
+   "height": 3.0,
+   "inside": [
+    8,
+    8
+   ],
+   "mesh": "KR_Room_Cottage",
+   "min": [
+    -4.35,
+    -4.3,
+    -0.3
+   ],
+   "size": [
+    8.7,
+    8.65,
+    3.4
+   ],
+   "triangles": 780,
+   "walls": {
+    "back": {
+     "from": [
+      -4.0,
+      4.0
+     ],
+     "to": [
+      4.0,
+      4.0
+     ],
+     "turn": 0
+    },
+    "left": {
+     "from": [
+      -4.0,
+      -3.8
+     ],
+     "to": [
+      -4.0,
+      4.0
+     ],
+     "turn": 90
+    },
+    "right": {
+     "from": [
+      4.0,
+      -3.8
+     ],
+     "to": [
+      4.0,
+      4.0
+     ],
+     "turn": -90
+    }
+   }
+  },
+  "Manor": {
+   "beam": "KR_Beam_10",
+   "cells": [
+    20,
+    16
+   ],
+   "doormat": [
+    0,
+    -3.55,
+    0
+   ],
+   "height": 3.0,
+   "inside": [
+    10,
+    8
+   ],
+   "mesh": "KR_Room_Manor",
+   "min": [
+    -5.35,
+    -4.3,
+    -0.3
+   ],
+   "size": [
+    10.7,
+    8.65,
+    3.4
+   ],
+   "triangles": 780,
+   "walls": {
+    "back": {
+     "from": [
+      -5.0,
+      4.0
+     ],
+     "to": [
+      5.0,
+      4.0
+     ],
+     "turn": 0
+    },
+    "left": {
+     "from": [
+      -5.0,
+      -3.8
+     ],
+     "to": [
+      -5.0,
+      4.0
+     ],
+     "turn": 90
+    },
+    "right": {
+     "from": [
+      5.0,
+      -3.8
+     ],
+     "to": [
+      5.0,
+      4.0
+     ],
+     "turn": -90
+    }
+   }
+  },
+  "Shed": {
+   "beam": "KR_Beam_4",
+   "cells": [
+    8,
+    8
+   ],
+   "doormat": [
+    0,
+    -1.55,
+    0
+   ],
+   "height": 3.0,
+   "inside": [
+    4,
+    4
+   ],
+   "mesh": "KR_Room_Shed",
+   "min": [
+    -2.35,
+    -2.3,
+    -0.3
+   ],
+   "size": [
+    4.7,
+    4.65,
+    3.4
+   ],
+   "triangles": 780,
+   "walls": {
+    "back": {
+     "from": [
+      -2.0,
+      2.0
+     ],
+     "to": [
+      2.0,
+      2.0
+     ],
+     "turn": 0
+    },
+    "left": {
+     "from": [
+      -2.0,
+      -1.8
+     ],
+     "to": [
+      -2.0,
+      2.0
+     ],
+     "turn": 90
+    },
+    "right": {
+     "from": [
+      2.0,
+      -1.8
+     ],
+     "to": [
+      2.0,
+      2.0
+     ],
+     "turn": -90
+    }
+   }
+  },
+  "Upper": {
+   "beam": "KR_Beam_6",
+   "cells": [
+    12,
+    12
+   ],
+   "doormat": [
+    0,
+    -2.55,
+    0
+   ],
+   "height": 3.0,
+   "inside": [
+    6,
+    6
+   ],
+   "mesh": "KR_Room_Upper",
+   "min": [
+    -3.35,
+    -3.3,
+    -0.3
+   ],
+   "size": [
+    6.7,
+    6.65,
+    3.4
+   ],
+   "triangles": 780,
+   "walls": {
+    "back": {
+     "from": [
+      -3.0,
+      3.0
+     ],
+     "to": [
+      3.0,
+      3.0
+     ],
+     "turn": 0
+    },
+    "left": {
+     "from": [
+      -3.0,
+      -2.8
+     ],
+     "to": [
+      -3.0,
+      3.0
+     ],
+     "turn": 90
+    },
+    "right": {
+     "from": [
+      3.0,
+      -2.8
+     ],
+     "to": [
+      3.0,
+      3.0
+     ],
+     "turn": -90
+    }
+   }
+  }
+ },
+ "rules": {
+  "finishes": "swap the material KI_roomFloor for a floor finish and KI_roomWall for a wall finish (or keep KI_roomWall and set its colour, for plain paint). A finish with a tint is a pale picture multiplied by the material's colour: set that colour to repaint it. All floor finishes share one UV scale (2 m) and all wall finishes another (1 m)",
+  "trim": "KI_roomTrim with its _dk and _lt steps is the skirting, the frames and the wall caps; recolour the three together",
+  "wall parts": "drawn with the wall at y = 0 behind them and the room towards -Y; on a wall, turn them by that wall's turn (degrees about the up axis, counter-clockwise seen from above)"
+ },
+ "snap": 0.5,
+ "version": 1,
+ "view": "a room is seen from its open front (-Y) towards the back wall, like a Grove shop; it has no ceiling",
+ "wall": 0.3
+}

@@ -2,7 +2,7 @@
 
     python3 tools/blender/env_kit.py
 
-Exports public/models/env/kit.glb. Every piece is one joined mesh with
+Exports frontend/public/models/env/kit.glb. Every piece is one joined mesh with
 flat vertex colours, origin centred on its footprint with its base at
 z=0, authored Z-up and exported Y-up. The runtime (src/grove/scene/
 assets.js) pulls each named geometry out and draws it as an InstancedMesh,
@@ -264,5 +264,5 @@ for name, fn in [
 
 assign_shared_material()
 export_glb(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..",
-                        "public", "models", "env", "kit.glb"))
+                        "frontend", "public", "models", "env", "kit.glb"))
 print("pieces:", len(PIECES), PIECES)

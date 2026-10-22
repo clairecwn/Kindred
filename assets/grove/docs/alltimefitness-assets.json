@@ -1,0 +1,25 @@
+{
+  "schema": "kindred.grove-alltimefitness-assets.v1",
+  "shopId": "alltimefitness",
+  "displayName": "AllTimeFitness",
+  "floor": "level-3",
+  "status": "form-refined-prototype",
+  "refinementEvidence": {
+    "blenderSource": "../blender/grove_master_refined.blend",
+    "builder": "../blender/refine_wellness_willow_interior.py",
+    "reviewRender": "../renders/alltimefitness_refined_blender.png",
+    "walkInRoute": "3.2 m central arrival route between activity zones",
+    "departments": ["hydration", "towels", "candles", "care products", "yoga", "meditation", "reception"]
+  },
+  "items": [
+    { "id": "wellness-bottle", "category": "hydration", "function": "supported shelf merchandise", "reuseClass": "wellness-product" },
+    { "id": "folded-towel", "category": "textile", "function": "supported wellness textile", "reuseClass": "soft-goods" },
+    { "id": "aroma-candle", "category": "home-wellness", "function": "supported scented product", "reuseClass": "wellness-product" },
+    { "id": "care-jar", "category": "body-care", "function": "supported care product", "reuseClass": "wellness-product" },
+    { "id": "yoga-mat", "category": "exercise", "function": "demonstration activity surface", "reuseClass": "wellness-equipment" },
+    { "id": "meditation-cushion", "category": "meditation", "function": "inward-facing activity seat", "reuseClass": "seating" },
+    { "id": "willow-planter", "category": "decor", "function": "meditation focus", "reuseClass": "indoor-plant" }
+  ],
+  "generationPolicy": "form-refined items are procedural Blender meshes; no paid external generation submitted",
+  "notes": "Yoga and meditation zones remain outside the central route. Shelf goods and hydration props use exact contact heights, and reception includes a dedicated staff position. Runtime export remains separately gated."
+}
