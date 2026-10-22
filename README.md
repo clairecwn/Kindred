@@ -54,7 +54,7 @@ Requires Node.js 20 or later.
 ```bash
 npm install
 cp .env.example .env     # add VITE_GROQ_API_KEY, then restart Vite after any .env change
-npm run dev     
+npm run dev              # http://127.0.0.1:5173
 ```
 
 Supabase is optional for local use; without it, saves stay in the browser on one device. A `VITE_` key is visible in the browser bundle, so use one only for local testing.
@@ -148,90 +148,90 @@ The language model is used as an assessor and writer; it is not fine-tuned. The 
 
 ### Topic priority
 
-Each turn, `dialogue-policy.js` scores every topic $i$ from features in $[0, 1]$: salience $S_i$, emotional intensity $I_i$, unresolvedness $U_i$, engagement $E_i$, new information $N_i$, exploration depth $D_i$, recency $R_i$ and closure readiness $C_i$.
+Each turn, `dialogue-policy.js` scores every topic $`i`$ from features in $`[0, 1]`$: salience $`S_i`$, emotional intensity $`I_i`$, unresolvedness $`U_i`$, engagement $`E_i`$, new information $`N_i`$, exploration depth $`D_i`$, recency $`R_i`$ and closure readiness $`C_i`$.
 
-$$
+```math
 \begin{aligned}
 P_i ={} & 1.50\,S_i + 1.25\,I_i + 1.15\,U_i + 0.80\,E_i + 0.55\,N_i + 0.35\,(1 - D_i) + 1.10\,R_i \\
 & + 0.45\,F_i + 0.30\,L_i + \alpha_t\,A_i \\
-& - 1.20\,C_i - 1.80\,\mathbb{1}_{\text{incidental}} - \nu_i - 5\,\mathbb{1}_{\text{declined}}
+& - 1.20\,C_i - 1.80\,\mathbf{1}_{\text{incidental}} - \nu_i - 5\,\mathbf{1}_{\text{declined}}
 \end{aligned}
-$$
+```
 
-- $F_i \in \{0, 1\}$ marks the previous focus.
-- $L_i \in \{0, 1\}$ marks an explicit link to another topic.
-- $A_i \in [0, 1]$ is how closely the topic matches the journal line the user opened with. Its weight is $\alpha_t = 0.6$ before the companion's first reply and $0.3$ after.
-- $\nu_i = 1.7$ when a task topic has used up its question budget and the user has not asked for planning help; otherwise $0$.
+- $`F_i \in \{0, 1\}`$ marks the previous focus.
+- $`L_i \in \{0, 1\}`$ marks an explicit link to another topic.
+- $`A_i \in [0, 1]`$ is how closely the topic matches the journal line the user opened with. Its weight is $`\alpha_t = 0.6`$ before the companion's first reply and $`0.3`$ after.
+- $`\nu_i = 1.7`$ when a task topic has used up its question budget and the user has not asked for planning help; otherwise $`0`$.
 
-Priorities become relative weights through a softmax with temperature $\tau = 0.8$:
+Priorities become relative weights through a softmax with temperature $`\tau = 0.8`$:
 
-$$
+```math
 w_i = \frac{\exp\!\big((P_i - P_{\max}) / \tau\big)}{\sum_j \exp\!\big((P_j - P_{\max}) / \tau\big)}
-$$
+```
 
 These weights rank the current agenda. They are **not** the probability that a topic is the user's real priority. Recent explicit direction from the user wins, and a switching margin stops the focus from jumping around.
 
 Threads that matter but have not been explored carry a coverage debt:
 
-$$
+```math
 B_i = (S_i + I_i)\,U_i\,(1 - D_i)\,(1 - 0.5\,C_i)
-$$
+```
 
 After two low-information turns on one thread, the policy can shift to the thread with the highest debt, with a closing thought and a bridge grounded in the user's words. One brief "yeah" alone does not trigger a shift.
 
 ### When to ask a question
 
-A follow-up question needs an exact quote to ground it, a specific unknown, and a purpose. `conversation-guidance.js` scores each candidate question $q$:
+A follow-up question needs an exact quote to ground it, a specific unknown, and a purpose. `conversation-guidance.js` scores each candidate question $`q`$:
 
-$$
+```math
 Q_q = 0.90\,G_q + 0.80\,R_q - 0.65\,E_q - 1.10\,P_q - 1.40\,T_q - 1.40\,K_q - 1.10\,M_q - V_q
-$$
+```
 
 | Symbol | Meaning |
 | --- | --- |
-| $G_q$, $R_q$, $E_q \in \{0, 0.5, 1\}$ | Information gain, relevance, effort for the user |
-| $P_q \in [0, 1]$ | Repeats something already asked or answered |
-| $T_q \in \{0, 1\}$ | Task coaching the user did not ask for |
-| $K_q \in \{0, 1\}$ | Low-value purpose: coping tips, mood lifting, tasks or filler |
-| $M_q \in \{0, 1\}$ | No information gap named |
-| $V_q = \min(v_{\max},\ 0.12\,k)$ | Variety penalty; $k$ is how often the same angle appeared in the last three questions, $v_{\max} = 0.12$ if $R_q = 1$, else $0.30$ |
+| $`G_q`$, $`R_q`$, $`E_q \in \{0, 0.5, 1\}`$ | Information gain, relevance, effort for the user |
+| $`P_q \in [0, 1]`$ | Repeats something already asked or answered |
+| $`T_q \in \{0, 1\}`$ | Task coaching the user did not ask for |
+| $`K_q \in \{0, 1\}`$ | Low-value purpose: coping tips, mood lifting, tasks or filler |
+| $`M_q \in \{0, 1\}`$ | No information gap named |
+| $`V_q = \min(v_{\max},\ 0.12\,k)`$ | Variety penalty; $`k`$ is how often the same angle appeared in the last three questions, $`v_{\max} = 0.12`$ if $`R_q = 1`$, else $`0.30`$ |
 
-The companion asks only if $Q_q \ge 0.85$ and the chosen dialogue action allows a question. Otherwise it offers a concrete thought and leaves room to reply.
+The companion asks only if $`Q_q \ge 0.85`$ and the chosen dialogue action allows a question. Otherwise it offers a concrete thought and leaves room to reply.
 
 ### Affect
 
-Affect is held as a vector $\mathbf{v} = (v, a, d)$ of valence, arousal and dominance (Russell's circumplex, extended). Repeated cues saturate, so repetition cannot inflate a score without limit:
+Affect is held as a vector $`\mathbf{v} = (v, a, d)`$ of valence, arousal and dominance (Russell's circumplex, extended). Repeated cues saturate, so repetition cannot inflate a score without limit:
 
-$$
-\operatorname{sat}(x) = \begin{cases} 1 - e^{-x} & x > 0 \\ 0 & \text{otherwise} \end{cases}
-$$
+```math
+\mathrm{sat}(x) = \begin{cases} 1 - e^{-x} & x > 0 \\ 0 & \text{otherwise} \end{cases}
+```
 
-`conversation-affect.js` updates from the user's own turns only. With $\hat{\mathbf{v}}_t$ the reading of turn $t$ and $c_t \in [0, 1]$ its confidence:
+`conversation-affect.js` updates from the user's own turns only. With $`\hat{\mathbf{v}}_t`$ the reading of turn $`t`$ and $`c_t \in [0, 1]`$ its confidence:
 
-$$
+```math
 g_t = \min\!\big(0.78,\ 0.22 + 0.64\,c_t\big), \qquad
 \mathbf{v}_t = (1 - g_t)\,\mathbf{v}_{t-1} + g_t\,\hat{\mathbf{v}}_t
-$$
+```
 
-The first supported reading sets $\mathbf{v}_1 = \hat{\mathbf{v}}_1$. A bare acknowledgement, or a turn with no affect evidence, leaves the state unchanged.
+The first supported reading sets $`\mathbf{v}_1 = \hat{\mathbf{v}}_1`$. A bare acknowledgement, or a turn with no affect evidence, leaves the state unchanged.
 
-My Journey (`journey-affect.js`) averages entries within each day, then averages the days in the week, so every day gets one vote however many entries it has. For a week with entry days $\mathcal{D}$, where day $d$ has $n_d$ entries:
+My Journey (`journey-affect.js`) averages entries within each day, then averages the days in the week, so every day gets one vote however many entries it has. For a week with entry days $`\mathcal{D}`$, where day $`d`$ has $`n_d`$ entries:
 
-$$
+```math
 \bar{\mathbf{v}}_d = \frac{1}{n_d} \sum_{k=1}^{n_d} \mathbf{v}_{d,k}, \qquad
 \bar{\mathbf{v}}_{\text{week}} = \frac{1}{|\mathcal{D}|} \sum_{d \in \mathcal{D}} \bar{\mathbf{v}}_d
-$$
+```
 
 Opposing readings can show as *Mixed* instead of averaging out to *Neutral*.
 
 ### Memory
 
-`conversation-memory.js` ranks past text the user wrote by topic similarity $\sigma^{\text{topic}}_m$, shared causes $\sigma^{\text{cause}}_m$, affect similarity $\sigma^{\text{affect}}_m$ and recency $r_m$, where $\Delta t_m$ is the entry's age in days (a 45-day half-life):
+`conversation-memory.js` ranks past text the user wrote by topic similarity $`\sigma^{\text{topic}}_m`$, shared causes $`\sigma^{\text{cause}}_m`$, affect similarity $`\sigma^{\text{affect}}_m`$ and recency $`r_m`$, where $`\Delta t_m`$ is the entry's age in days (a 45-day half-life):
 
-$$
+```math
 \text{rel}_m = 0.50\,\sigma^{\text{topic}}_m + 0.22\,\sigma^{\text{cause}}_m + 0.13\,\sigma^{\text{affect}}_m + 0.15\,r_m,
 \qquad r_m = 2^{-\Delta t_m / 45}
-$$
+```
 
 A topic or cause match is required, so a similar mood alone never pulls up an unrelated entry. `personal-memory.js` keeps source quotes for things the user states about themselves, people they name, their own terms and their communication preferences. What the user says now always outranks history.
 
